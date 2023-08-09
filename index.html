@@ -1,0 +1,25 @@
+<!doctype html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body style="padding:0;margin:0;overflow:hidden;">
+
+    <canvas id="canvas" 
+            oncontextmenu="event.preventDefault()"
+            style="width:100vw;height:100vh">
+    </canvas>
+    <script type='text/javascript'>
+        var Module =
+        {
+            canvas: (function() { return document.getElementById('canvas'); })()
+        };
+    </script>
+    
+    <!-- Use the javascript glue created by emscripten -->
+    <script src="@EXAMPLE_NAME@.js"></script>
+</body>
+</html>
