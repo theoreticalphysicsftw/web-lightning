@@ -25,16 +25,20 @@ cmake_minimum_required(VERSION 3.5)
 
 project(web-lightning)
 enable_language(CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(
         GLOB
         WL_SOURCES 
         "src/common/*.cpp"
         "src/main_surface/*.cpp"
+        "src/gpu_api/*.cpp"
+        "src/algebra/*.cpp"
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    set(USE_FLAGS "-s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"png\"]'")
+    set(USE_FLAGS "-s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"png\"]' -s OFFSCREEN_FRAMEBUFFER=1")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
 endif()
 

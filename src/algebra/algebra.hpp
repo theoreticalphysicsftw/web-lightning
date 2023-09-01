@@ -23,56 +23,17 @@
 
 #pragma once
 
-#include <cstdint>
+#include "vector.hpp"
+#include "matrix.hpp"
 
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <string>
 
 namespace WL
 {
-    using U8 = uint8_t;
-    using U16 = uint16_t;
-    using U32 = uint32_t;
-    using U64 = uint64_t;
+    using Vec2 = TVector<F32, 2>;
+    using Vec3 = TVector<F32, 3>;
+    using Vec4 = TVector<F32, 4>;
 
-    using I8 = int8_t;
-    using I16 = int16_t;
-    using I32 = int32_t;
-    using I64 = int64_t;
-
-    using F32 = float;
-    using F64 = double;
-
-    using C = char;
-    using Byte = uint8_t;
-    using B = bool;
-    using V = void;
-
-    template <typename T>
-    using TArray = std::vector<T>;
-
-    template <typename T, U64 size>
-    using TStaticArray = std::array<T, size>;
-
-    template <typename K, typename V>
-    using TMap = std::unordered_map<K, V>;
-
-    template <typename K, typename V>
-    using TSet = std::unordered_set<K, V>;
-
-    template<typename F, typename S>
-    using TPair = std::pair<F, S>;
-
-    using SStr = std::string;
-
-    enum class EShaderType
-    {
-        Compute = 0,
-        Vertex,
-        Fragment
-    };
+    using Color2 = Vec2;
+    using Color3 = Vec3;
+    using Color4 = Vec4;
 }

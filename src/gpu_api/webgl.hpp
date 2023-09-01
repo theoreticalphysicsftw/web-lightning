@@ -23,56 +23,18 @@
 
 #pragma once
 
-#include <cstdint>
+#include <common/types.hpp>
+#include <algebra/algebra.hpp>
 
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <unordered_set>
+#define GL_GLEXT_PROTOTYPES 1
+#include <SDL2/SDL.h>
+#include <SDL_opengles2.h>
 
-#include <string>
-
-namespace WL
+namespace WL::GpuApi
 {
-    using U8 = uint8_t;
-    using U16 = uint16_t;
-    using U32 = uint32_t;
-    using U64 = uint64_t;
-
-    using I8 = int8_t;
-    using I16 = int16_t;
-    using I32 = int32_t;
-    using I64 = int64_t;
-
-    using F32 = float;
-    using F64 = double;
-
-    using C = char;
-    using Byte = uint8_t;
-    using B = bool;
-    using V = void;
-
-    template <typename T>
-    using TArray = std::vector<T>;
-
-    template <typename T, U64 size>
-    using TStaticArray = std::array<T, size>;
-
-    template <typename K, typename V>
-    using TMap = std::unordered_map<K, V>;
-
-    template <typename K, typename V>
-    using TSet = std::unordered_set<K, V>;
-
-    template<typename F, typename S>
-    using TPair = std::pair<F, S>;
-
-    using SStr = std::string;
-
-    enum class EShaderType
-    {
-        Compute = 0,
-        Vertex,
-        Fragment
-    };
+    B InitGL(SDL_Window* w);
+    U32 GetWindowFlagsGL();
+    V SetClearColorGL(const Color4& color);
+    V ClearPresentSurfaceGL();
+    V PresentGL();
 }

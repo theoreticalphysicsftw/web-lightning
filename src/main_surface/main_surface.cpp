@@ -23,13 +23,15 @@
 
 #include "main_surface.hpp"
 
+#include <gpu_api/gpu_api.hpp>
+
+
+#include <iostream>
 
 namespace WL::MainSurface
 {
     SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
     B isWindowClosed = false;
-
 
 #ifdef __EMSCRIPTEN__
     EM_JS(U32, GetCanvasWidth, (), { return canvas.width; });
@@ -42,11 +44,12 @@ namespace WL::MainSurface
 
     B Init(const C* appName)
     {
-
         if (SDL_Init(SDL_INIT_VIDEO) != 0)
         {
+            SDL_Quit();
             return false;
         }
+
 
         window = SDL_CreateWindow(
                                     appName,
@@ -55,7 +58,8 @@ namespace WL::MainSurface
                                     GetCanvasWidth(),
                                     GetCanvasHeight(),
                                     SDL_WINDOW_SHOWN |
-                                    SDL_WINDOW_RESIZABLE
+                                    SDL_WINDOW_RESIZABLE |
+                                    GpuApi::GetWindowFlags()
                                  );
 
         if (window == nullptr)
@@ -64,20 +68,12 @@ namespace WL::MainSurface
             return false;
         }
 
-        renderer = SDL_CreateRenderer(
-                                        window,
-                                        -1,
-                                        SDL_RENDERER_ACCELERATED |
-                                        SDL_RENDERER_PRESENTVSYNC
-                                     );
-        
-        if(!SDL_RenderSetLogicalSize(renderer, GetCanvasHeight(), GetCanvasWidth()))
-        
-        if (!renderer)
+        if (!GpuApi::Init(window))
         {
             SDL_Quit();
             return false;
         }
+
 
         return true;
     }
@@ -85,7 +81,6 @@ namespace WL::MainSurface
 
     V Destroy()
     {
-        SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
     }
@@ -119,9 +114,7 @@ namespace WL::MainSurface
 
     V Render()
     {
-        SDL_SetRenderDrawColor(renderer, 64, 8, 128, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
+        GpuApi::ClearPresentSurface();
     }
 
 

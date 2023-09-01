@@ -35,7 +35,6 @@
 namespace WL::MainSurface
 {
     extern SDL_Window* window;
-    extern SDL_Renderer* renderer;
 
     B Init(const C* appName = "web-lightning");
     V Destroy();

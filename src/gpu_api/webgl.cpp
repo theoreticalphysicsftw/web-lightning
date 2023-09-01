@@ -21,58 +21,42 @@
 // SOFTWARE.
 
 
-#pragma once
+#include "webgl.hpp"
 
-#include <cstdint>
 
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <string>
-
-namespace WL
+namespace WL::GpuApi
 {
-    using U8 = uint8_t;
-    using U16 = uint16_t;
-    using U32 = uint32_t;
-    using U64 = uint64_t;
+    SDL_GLContext context = nullptr;
+    SDL_Window* window = nullptr;
 
-    using I8 = int8_t;
-    using I16 = int16_t;
-    using I32 = int32_t;
-    using I64 = int64_t;
-
-    using F32 = float;
-    using F64 = double;
-
-    using C = char;
-    using Byte = uint8_t;
-    using B = bool;
-    using V = void;
-
-    template <typename T>
-    using TArray = std::vector<T>;
-
-    template <typename T, U64 size>
-    using TStaticArray = std::array<T, size>;
-
-    template <typename K, typename V>
-    using TMap = std::unordered_map<K, V>;
-
-    template <typename K, typename V>
-    using TSet = std::unordered_set<K, V>;
-
-    template<typename F, typename S>
-    using TPair = std::pair<F, S>;
-
-    using SStr = std::string;
-
-    enum class EShaderType
+    U32 GetWindowFlagsGL()
     {
-        Compute = 0,
-        Vertex,
-        Fragment
-    };
+        return SDL_WINDOW_OPENGL;
+    }
+
+    B InitGL(SDL_Window* w)
+    {
+        window = w;
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+        context = SDL_GL_CreateContext(w);
+        return context != nullptr;
+    }
+
+    V SetClearColorGL(const Color4& color)
+    {
+        glClearColor(color[0], color[1], color[2], color[3]);
+    }
+
+    V ClearPresentSurfaceGL()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    V PresentGL()
+    {
+        SDL_GL_SwapWindow(window);
+    }
 }
