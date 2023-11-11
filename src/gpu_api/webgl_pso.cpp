@@ -45,5 +45,6 @@ namespace WL
     {
         vertex.Compile(vertexSrc, EShaderType::Vertex);
         fragment.Compile(fragmentSrc, EShaderType::Fragment);
+        return true;
     }
 }

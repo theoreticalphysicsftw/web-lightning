@@ -45,12 +45,27 @@ endif()
 set(WL_SOURCE_DIR "src")
 add_library(${PROJECT_NAME} ${WL_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${WL_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC "extern")
 
 file(GLOB EXAMPLES "examples/*.cpp")
 foreach(EXAMPLE "${EXAMPLES}")
     cmake_path(GET EXAMPLE STEM EXAMPLE_NAME)
     configure_file("index.html" ${CMAKE_BINARY_DIR})
     add_executable(${EXAMPLE_NAME} "${EXAMPLE}")
+
     target_link_libraries(${EXAMPLE_NAME} ${PROJECT_NAME})
     target_include_directories(${EXAMPLE_NAME} PUBLIC ${WL_SOURCE_DIR})
+
+    if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten"))
+    target_link_libraries(${EXAMPLE_NAME} SDL2-static)
+    endif()
+
 endforeach()
+
+
+if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten"))
+add_subdirectory("extern/SDL2")
+add_subdirectory("extern/Glad")
+target_link_libraries(${PROJECT_NAME} SDL2-static)
+target_link_libraries(${PROJECT_NAME} glad-es3)
+endif()

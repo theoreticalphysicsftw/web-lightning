@@ -26,8 +26,8 @@
 
 #ifdef INCLUDE_GLSL_IN_CPP
     #define BEGIN_SHADER(SHADER_NAME) Str SHADER_NAME = R"(
-    #define END_SHADER(SHADER_NAME) Str SHADER_NAME = )";
+    #define END_SHADER() )";
 #else
     #define BEGIN_SHADER(SHADER_NAME)
-    #define END_SHADER(SHADER_NAME)
+    #define END_SHADER()
 #endif

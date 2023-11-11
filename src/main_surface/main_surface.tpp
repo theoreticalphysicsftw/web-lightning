@@ -111,9 +111,7 @@ namespace WL
 
             if (event.type == SDL_KEYDOWN)
             {
-                switch (event.key.keysym.sym)
-                {
-                }
+                //switch (event.key.keysym.sym)
             }
         }
     }

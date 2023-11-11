@@ -25,7 +25,6 @@
 
 #include <iostream>
 
-
 int main()
 {
     using namespace WL;
@@ -40,4 +39,6 @@ int main()
     GpuApi::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
     MainSurface::PresentLoop();
     MainSurface::Destroy();
+
+    return 0;
 }

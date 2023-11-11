@@ -24,7 +24,7 @@
 #pragma once
 
 #include <common/types.hpp>
-
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
 #if __EMSCRIPTEN__
