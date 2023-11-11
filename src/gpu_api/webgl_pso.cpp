@@ -21,18 +21,29 @@
 // SOFTWARE.
 
 
-#pragma once
+#include <SDL2/SDL_opengles2.h>
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-
-#include <SDL2/SDL.h>
+#include "webgl_pso.hpp"
 
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+    WebGLPso::WebGLPso()
     {
-    };
+    }
+
+    WebGLPso::~WebGLPso()
+    {
+    }
+
+    WebGLPso::WebGLPso(const Str& vertexSrc, const Str& fragmentSrc)
+    {
+        Compile(vertexSrc, fragmentSrc);
+    }
+
+    B WebGLPso::Compile(const Str& vertexSrc, const Str& fragmentSrc)
+    {
+        vertex.Compile(vertexSrc, EShaderType::Vertex);
+        fragment.Compile(fragmentSrc, EShaderType::Fragment);
+    }
 }

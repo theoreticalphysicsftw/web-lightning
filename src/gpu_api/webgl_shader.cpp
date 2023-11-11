@@ -21,18 +21,48 @@
 // SOFTWARE.
 
 
-#pragma once
+#include <SDL2/SDL_opengles2.h>
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-
-#include <SDL2/SDL.h>
+#include "webgl_shader.hpp"
 
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+    WebGLShader::WebGLShader() : id(0)
     {
-    };
+
+    }
+
+    WebGLShader::WebGLShader(const Str& source, EShaderType type)
+    {
+    }
+
+    WebGLShader::~WebGLShader()
+    {
+    }
+
+    B WebGLShader::Compile(Str source, EShaderType type)
+    {
+        static const GLenum typeTable[] =
+        {
+            GL_VERTEX_SHADER,
+            GL_FRAGMENT_SHADER
+        };
+
+        id = glCreateShader(typeTable[(U32)type]);
+        
+        if (id == 0)
+        {
+            return false;
+        }
+
+        auto data = source.c_str();
+        GLsizei size = source.size();
+        glShaderSource(id, 1, &data, &size);
+        glCompileShader(id);
+        GLint result;
+        glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+
+        return result == GL_TRUE;
+    }
 }

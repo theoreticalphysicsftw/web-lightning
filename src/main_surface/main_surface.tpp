@@ -26,11 +26,11 @@
 #include <gpu_api/gpu_api.hpp>
 
 
-#include <iostream>
-
-namespace WL::MainSurface
+namespace WL
 {
-    SDL_Window* window = nullptr;
+    template <class TGpuApi>
+    SDL_Window* MainSurface<TGpuApi>::window = nullptr;
+
     B isWindowClosed = false;
 
 #ifdef __EMSCRIPTEN__
@@ -42,11 +42,12 @@ namespace WL::MainSurface
 #endif
 
 
-    B Init(const C* appName)
+    template <class TGpuApi>
+    B MainSurface<TGpuApi>::Init(const C* appName)
     {
         if (SDL_Init(SDL_INIT_VIDEO) != 0)
         {
-            SDL_Quit();
+            isWindowClosed = true;
             return false;
         }
 
@@ -59,18 +60,18 @@ namespace WL::MainSurface
                                     GetCanvasHeight(),
                                     SDL_WINDOW_SHOWN |
                                     SDL_WINDOW_RESIZABLE |
-                                    GpuApi::GetWindowFlags()
+                                    TGpuApi::GetWindowFlags()
                                  );
 
         if (window == nullptr)
         {
-            SDL_Quit();
+            isWindowClosed = true;
             return false;
         }
 
-        if (!GpuApi::Init(window))
+        if (!TGpuApi::Init(window))
         {
-            SDL_Quit();
+            isWindowClosed = true;
             return false;
         }
 
@@ -79,14 +80,20 @@ namespace WL::MainSurface
     }
 
 
-    V Destroy()
+    template <class TGpuApi>
+    V MainSurface<TGpuApi>::Destroy()
     {
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+        if (window != nullptr)
+        {
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+        }
+        isWindowClosed = true;
     }
 
 
-    V ProcessInput()
+    template <class TGpuApi>
+    V MainSurface<TGpuApi>::ProcessInput()
     {
         SDL_Event event;
 
@@ -112,25 +119,29 @@ namespace WL::MainSurface
     }
 
 
-    V Render()
+    template <class TGpuApi>
+    V MainSurface<TGpuApi>::Render()
     {
-        GpuApi::ClearPresentSurface();
+        TGpuApi::ClearPresentSurface();
     }
 
 
-    V PresentLoopIteration()
+    template <class TGpuApi>
+    V MainSurface<TGpuApi>::PresentLoopIteration()
     {
         Render();
+        TGpuApi::Present();
         ProcessInput();
     }
 
 
-    V PresentLoop()
+    template <class TGpuApi>
+    V MainSurface<TGpuApi>::PresentLoop()
     {
     #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(PresentLoopIteration, 0, true);
     #else
-        while (isWindowClosed)
+        while (!isWindowClosed)
         {
             PresentLoopIteration();
         }

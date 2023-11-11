@@ -32,11 +32,24 @@
 #endif
 
 
-namespace WL::MainSurface
+namespace WL
 {
-    extern SDL_Window* window;
+    template <class TNativeApi>
+    struct MainSurface
+    {
+        static SDL_Window* window;
 
-    B Init(const C* appName = "web-lightning");
-    V Destroy();
-    V PresentLoop();
+        static B Init(const C* appName = "web-lightning");
+        static V Destroy();
+        static V PresentLoop();
+
+        private:
+
+        static V PresentLoopIteration();
+        static V Render();
+        static V ProcessInput();
+    };
 }
+
+
+#include "main_surface.tpp"

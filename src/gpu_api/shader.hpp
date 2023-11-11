@@ -23,16 +23,20 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-
-#include <SDL2/SDL.h>
-
-
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+
+    enum class EShaderType
     {
+        Vertex = 0,
+        Fragment,
+        Invalid
+    };
+
+    template <class TNativeShader>
+    struct Shader
+    {
+        EShaderType type;
+        Shader() : type(EShaderType::Invalid) {}
     };
 }

@@ -23,16 +23,11 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
 
-#include <SDL2/SDL.h>
-
-
-namespace WL
-{
-    template <class TNativeApi>
-    struct GpuApi
-    {
-    };
-}
+#ifdef INCLUDE_GLSL_IN_CPP
+    #define BEGIN_SHADER(SHADER_NAME) Str SHADER_NAME = R"(
+    #define END_SHADER(SHADER_NAME) Str SHADER_NAME = )";
+#else
+    #define BEGIN_SHADER(SHADER_NAME)
+    #define END_SHADER(SHADER_NAME)
+#endif

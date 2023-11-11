@@ -25,3 +25,4 @@
 
 #include "main_surface/main_surface.hpp"
 #include "gpu_api/gpu_api.hpp"
+#include "gpu_api/webgl.hpp"

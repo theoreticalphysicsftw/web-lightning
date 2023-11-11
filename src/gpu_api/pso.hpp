@@ -23,16 +23,11 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-
-#include <SDL2/SDL.h>
-
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+    template <typename TNativePso>
+    struct Pso
     {
     };
 }

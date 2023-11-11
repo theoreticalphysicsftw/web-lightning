@@ -21,20 +21,28 @@
 // SOFTWARE.
 
 
+#include <common/types.hpp>
+#include <algebra/algebra.hpp>
+
+#define GL_GLEXT_PROTOTYPES 1
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengles2.h>
+
+
 #include "webgl.hpp"
 
 
-namespace WL::GpuApi
+namespace WL
 {
     SDL_GLContext context = nullptr;
     SDL_Window* window = nullptr;
 
-    U32 GetWindowFlagsGL()
+    U32 WebGL::GetWindowFlags()
     {
         return SDL_WINDOW_OPENGL;
     }
 
-    B InitGL(SDL_Window* w)
+    B WebGL::Init(SDL_Window* w)
     {
         window = w;
 
@@ -45,17 +53,17 @@ namespace WL::GpuApi
         return context != nullptr;
     }
 
-    V SetClearColorGL(const Color4& color)
+    V WebGL::SetClearColor(const Color4& color)
     {
         glClearColor(color[0], color[1], color[2], color[3]);
     }
 
-    V ClearPresentSurfaceGL()
+    V WebGL::ClearPresentSurface()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    V PresentGL()
+    V WebGL::Present()
     {
         SDL_GL_SwapWindow(window);
     }

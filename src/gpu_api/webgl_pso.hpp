@@ -23,16 +23,22 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-
-#include <SDL2/SDL.h>
-
+#include "pso.hpp"
+#include "webgl_shader.hpp"
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+    struct WebGLPso : Pso<WebGLPso>
     {
+        WebGLPso();
+        WebGLPso(const Str& vertex, const Str& fragment);
+        ~WebGLPso();
+
+        B Compile(const Str& vertex, const Str& fragment);
+
+        private:
+        WebGLShader vertex;
+        WebGLShader fragment;
     };
+
 }

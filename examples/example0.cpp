@@ -23,10 +23,21 @@
 
 #include "web_lightning.hpp"
 
+#include <iostream>
+
+
 int main()
 {
-    WL::MainSurface::Init();
-    WL::GpuApi::SetClearColor({0.5f, 0.0f, 0.7f, 1.0f});
-    WL::MainSurface::PresentLoop();
-    WL::MainSurface::Destroy();
+    using namespace WL;
+    using GpuApi = WebGL;
+    using MainSurface = MainSurface<GpuApi>;
+
+    if (!MainSurface::Init())
+    {
+        std::cerr<<"Init failed!"<<std::endl;
+    }
+
+    GpuApi::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
+    MainSurface::PresentLoop();
+    MainSurface::Destroy();
 }

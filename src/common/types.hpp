@@ -53,26 +53,19 @@ namespace WL
     using V = void;
 
     template <typename T>
-    using TArray = std::vector<T>;
+    using Array = std::vector<T>;
 
     template <typename T, U64 size>
-    using TStaticArray = std::array<T, size>;
+    using StaticArray = std::array<T, size>;
 
     template <typename K, typename V>
-    using TMap = std::unordered_map<K, V>;
+    using Map = std::unordered_map<K, V>;
 
     template <typename K, typename V>
-    using TSet = std::unordered_set<K, V>;
+    using Set = std::unordered_set<K, V>;
 
     template<typename F, typename S>
-    using TPair = std::pair<F, S>;
+    using Pair = std::pair<F, S>;
 
-    using SStr = std::string;
-
-    enum class EShaderType
-    {
-        Compute = 0,
-        Vertex,
-        Fragment
-    };
+    using Str = std::string;
 }

@@ -28,13 +28,21 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL.h>
-#include <SDL_opengles2.h>
+#include <SDL2/SDL_opengles2.h>
 
-namespace WL::GpuApi
+
+#include "gpu_api.hpp"
+#include "webgl_shader.hpp"
+#include "webgl_pso.hpp"
+
+namespace WL
 {
-    B InitGL(SDL_Window* w);
-    U32 GetWindowFlagsGL();
-    V SetClearColorGL(const Color4& color);
-    V ClearPresentSurfaceGL();
-    V PresentGL();
+    struct WebGL : GpuApi<WebGL>
+    {
+        static B Init(SDL_Window* w);
+        static U32 GetWindowFlags();
+        static V SetClearColor(const Color4& color);
+        static V ClearPresentSurface();
+        static V Present();
+    };
 }

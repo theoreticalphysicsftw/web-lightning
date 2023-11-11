@@ -24,15 +24,22 @@
 #pragma once
 
 #include <common/types.hpp>
-#include <algebra/algebra.hpp>
 
-#include <SDL2/SDL.h>
+#include "shader.hpp"
 
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct GpuApi
+    struct WebGLShader : Shader<WebGLShader>
     {
+        WebGLShader();
+        WebGLShader(const Str& source, EShaderType type);
+        ~WebGLShader();
+
+        B Compile(Str source, EShaderType type);
+
+        private:
+
+        GLuint id;
     };
 }
