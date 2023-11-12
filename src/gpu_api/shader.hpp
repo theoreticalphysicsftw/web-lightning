@@ -30,6 +30,7 @@ namespace WL
     {
         Vertex = 0,
         Fragment,
+        Count,
         Invalid
     };
 
@@ -37,6 +38,6 @@ namespace WL
     struct Shader
     {
         EShaderType type;
-        Shader() : type(EShaderType::Invalid) {}
+        Shader(EShaderType type = EShaderType::Invalid) : type(type) {}
     };
 }

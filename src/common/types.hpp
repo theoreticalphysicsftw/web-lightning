@@ -32,6 +32,8 @@
 
 #include <string>
 
+#include <functional>
+
 namespace WL
 {
     using U8 = uint8_t;
@@ -68,4 +70,7 @@ namespace WL
     using Pair = std::pair<F, S>;
 
     using Str = std::string;
+
+    template <typename T>
+    using Function = std::function<T>;
 }

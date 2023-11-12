@@ -31,6 +31,9 @@ namespace WL
     template <class TGpuApi>
     SDL_Window* MainSurface<TGpuApi>::window = nullptr;
 
+    template <class TGpuApi>
+    typename MainSurface<TGpuApi>::RenderFunction MainSurface<TGpuApi>::renderFunction;
+
     B isWindowClosed = false;
 
 #ifdef __EMSCRIPTEN__
@@ -120,7 +123,7 @@ namespace WL
     template <class TGpuApi>
     V MainSurface<TGpuApi>::Render()
     {
-        TGpuApi::ClearPresentSurface();
+        renderFunction();
     }
 
 
@@ -144,6 +147,13 @@ namespace WL
             PresentLoopIteration();
         }
     #endif
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::AddRenderingCode(const RenderFunction& func) -> V
+    {
+        renderFunction = func;
     }
 }
 

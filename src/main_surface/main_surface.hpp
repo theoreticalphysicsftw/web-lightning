@@ -43,8 +43,12 @@ namespace WL
         static V Destroy();
         static V PresentLoop();
 
-        private:
+        using RenderFunction = Function<void()>;
 
+        static V AddRenderingCode(const RenderFunction& func);
+
+        private:
+        static RenderFunction renderFunction;
         static V PresentLoopIteration();
         static V Render();
         static V ProcessInput();

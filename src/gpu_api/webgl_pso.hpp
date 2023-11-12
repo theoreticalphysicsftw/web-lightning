@@ -25,20 +25,42 @@
 
 #include "pso.hpp"
 #include "webgl_shader.hpp"
+#include "webgl_buffer.hpp"
 
 namespace WL
 {
+    enum class EType
+    {
+        Int = 0,
+        Uint,
+        Float,
+    };
+
+    struct VBLayout
+    {
+        U32 binding;
+        EType type;
+        U32 components;
+    };
+
+    inline static constexpr U32 CMaxVBSlots = 8;
+
     struct WebGLPso : Pso<WebGLPso>
     {
         WebGLPso();
-        WebGLPso(const Str& vertex, const Str& fragment);
         ~WebGLPso();
 
-        B Compile(const Str& vertex, const Str& fragment);
+        auto Compile() -> B;
+        auto AddVBLayout(const VBLayout& layout) -> V;
+        auto BindVB(U32 slot, const WebGLBuffer& buffer) -> V;
+        auto BindIB(const WebGLBuffer& buffer) -> V;
+        auto AddShader(const C* source, U32 size, EShaderType type) -> V;
 
         private:
-        WebGLShader vertex;
-        WebGLShader fragment;
+        GLuint program;
+        GLuint vao;
+        StaticArray<WebGLShader, (U32) EShaderType::Count> shaders;
+        StaticArray<VBLayout, CMaxVBSlots> vbLayouts;
     };
 
 }

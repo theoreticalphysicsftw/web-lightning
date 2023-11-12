@@ -1,3 +1,4 @@
+#include "webgl_buffer.hpp"
 // MIT License
 // 
 // Copyright (c) 2023 Mihail Mladenov
@@ -21,29 +22,35 @@
 // SOFTWARE.
 
 
-#pragma once
-
-#include <common/types.hpp>
-
-#include "shader.hpp"
-#include "webgl_api.hpp"
+#include "webgl_buffer.hpp"
 
 
 namespace WL
 {
-    struct WebGLShader : Shader<WebGLShader>
-    {
-        WebGLShader(const C* source = nullptr, U32 sourceSize = 0, EShaderType type = EShaderType::Invalid);
-        ~WebGLShader();
+	WebGLBuffer::WebGLBuffer(U32 size) : Buffer(size), id(CInvalidId)
+	{
+	}
 
-        auto AddSource(const C* source, U32 sourceSize, EShaderType type) -> V;
-        auto Compile() -> B;
+	WebGLBuffer::~WebGLBuffer()
+	{
+		if (this->id != CInvalidId)
+		{
+			glDeleteBuffers(1, &id);
+		}
+	}
 
-        auto GetNativeId() const -> GLuint { return id; }
+	auto WebGLBuffer::Allocate(U32 size, B onGPU, EUsage usage) -> V
+	{
+		this->size = size;
+		this->onGPU = onGPU;
+		this->usage = usage;
+		glGenBuffers(1, &id);
+	}
 
-        private:
-        const C* source;
-        U32 sourceSize;
-        GLuint id;
-    };
+	auto WebGLBuffer::Update(Byte* data, U32 size) -> V
+	{
+		glBindBuffer(GL_COPY_WRITE_BUFFER, id);
+		glBufferData(GL_COPY_WRITE_BUFFER, size, data, onGPU? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+	}
+
 }

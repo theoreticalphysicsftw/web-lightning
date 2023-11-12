@@ -28,20 +28,23 @@
 
 namespace WL
 {
-    WebGLShader::WebGLShader() : id(0)
-    {
-
-    }
-
-    WebGLShader::WebGLShader(const Str& source, EShaderType type)
+    WebGLShader::WebGLShader(const C* source, U32 size, EShaderType type) :
+        Shader(type), id(0), source(source), sourceSize(size)
     {
     }
 
     WebGLShader::~WebGLShader()
     {
     }
+    
+    auto WebGLShader::AddSource(const C* source, U32 size, EShaderType type) -> V
+    {
+        this->source = source;
+        this->sourceSize = size;
+        this->type = type;
+    }
 
-    B WebGLShader::Compile(Str source, EShaderType type)
+    auto WebGLShader::Compile() -> B
     {
         static const GLenum typeTable[] =
         {
@@ -56,8 +59,8 @@ namespace WL
             return false;
         }
 
-        auto data = source.c_str();
-        GLsizei size = source.size();
+        auto data = source;
+        GLsizei size = sourceSize;
         glShaderSource(id, 1, &data, &size);
         glCompileShader(id);
         GLint result;

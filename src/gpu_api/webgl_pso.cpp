@@ -21,30 +21,86 @@
 // SOFTWARE.
 
 
-#include <SDL2/SDL_opengles2.h>
-
+#include "webgl_api.hpp"
 #include "webgl_pso.hpp"
 
 
 namespace WL
 {
-    WebGLPso::WebGLPso()
+    WebGLPso::WebGLPso() : program(CInvalidId), vao(CInvalidId)
     {
     }
+
 
     WebGLPso::~WebGLPso()
     {
+        if (program != CInvalidId)
+        {
+            glDeleteProgram(program);
+            glDeleteVertexArrays(1, &vao);
+        }
     }
 
-    WebGLPso::WebGLPso(const Str& vertexSrc, const Str& fragmentSrc)
+
+    auto WebGLPso::Compile() -> B
     {
-        Compile(vertexSrc, fragmentSrc);
+        B status = true;
+
+        glGenVertexArrays(1, &vao);
+
+        this->program = glCreateProgram();
+
+        for (auto& shader : shaders)
+        {
+            status = status && shader.Compile();
+            glAttachShader(program, shader.GetNativeId());
+        }
+
+        glLinkProgram(program);
+        GLint linkingDone = 0;
+        glGetProgramiv(program, GL_LINK_STATUS, &linkingDone);
+
+        return status && linkingDone;
     }
 
-    B WebGLPso::Compile(const Str& vertexSrc, const Str& fragmentSrc)
+
+    auto WebGLPso::AddShader(const C* source, U32 size,  EShaderType type) -> V
     {
-        vertex.Compile(vertexSrc, EShaderType::Vertex);
-        fragment.Compile(fragmentSrc, EShaderType::Fragment);
-        return true;
+        shaders[(U32)type].AddSource(source, size, type);
+    }
+
+
+    auto WebGLPso::AddVBLayout(const VBLayout& layout) -> V
+    {
+        vbLayouts[layout.binding] = layout;
+    }
+
+
+    auto WebGLPso::BindVB(U32 slot, const WebGLBuffer& buffer) -> V
+    {
+        static constexpr GLenum typeTable[] =
+        {
+            GL_INT,
+            GL_UNSIGNED_INT,
+            GL_FLOAT
+        };
+        glEnableVertexAttribArray(slot);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer.GetNativeId());
+        
+        const auto& layout = vbLayouts[slot];
+        if (layout.type == EType::Float)
+        {
+            glVertexAttribPointer(slot, layout.components, typeTable[(U32)layout.type], GL_FALSE, 0, nullptr);
+        }
+        else
+        {
+            glVertexAttribIPointer(slot, layout.components, typeTable[(U32)layout.type], 0, nullptr);
+        }
+    }
+
+
+    auto WebGLPso::BindIB(const WebGLBuffer& buffer) -> V
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.GetNativeId());
     }
 }

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "common/types.hpp"
+
 #if __EMSCRIPTEN__
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL_opengles2.h>
@@ -34,8 +36,10 @@
 namespace WL
 {
 #if __EMSCRIPTEN__
-	void InitWebGLApi() {}
+	inline void InitWebGLApi() {}
 #else
-	void InitWebGLApi() { gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress); }
+	inline void InitWebGLApi() { gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress); }
 #endif
+
+	static inline constexpr U32 CInvalidId = U32(~0u);
 }

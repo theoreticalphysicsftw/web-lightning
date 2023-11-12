@@ -23,27 +23,21 @@
 
 #pragma once
 
-#include <common/types.hpp>
-
-#include "shader.hpp"
+#include "buffer.hpp"
 #include "webgl_api.hpp"
-
 
 namespace WL
 {
-    struct WebGLShader : Shader<WebGLShader>
-    {
-        WebGLShader(const C* source = nullptr, U32 sourceSize = 0, EShaderType type = EShaderType::Invalid);
-        ~WebGLShader();
-
-        auto AddSource(const C* source, U32 sourceSize, EShaderType type) -> V;
-        auto Compile() -> B;
-
-        auto GetNativeId() const -> GLuint { return id; }
-
-        private:
-        const C* source;
-        U32 sourceSize;
-        GLuint id;
-    };
+	class WebGLBuffer : Buffer<WebGLBuffer>
+	{
+	public:
+		WebGLBuffer(U32 size = 0);
+		~WebGLBuffer();
+		
+		auto Allocate(U32 size, B onGPU = true, EUsage usage = EUsage::Undefined) -> V;
+		auto Update(Byte* data, U32 size) -> V;
+		auto GetNativeId() const -> GLuint { return id; }
+	private:
+		GLuint id;
+	};
 }
