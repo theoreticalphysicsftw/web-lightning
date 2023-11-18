@@ -21,23 +21,19 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "common/types.hpp"
+#include "rasterized_font.hpp"
 
-int main()
+
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	template <typename GPUAPI>
+	class RasterCache
+	{
+		Map<U32, U32> sizeToFont;
+		ChunkArray<RasterizedFont<GPUAPI>> fonts;
+	};
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
-
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
-
-    return 0;
 }

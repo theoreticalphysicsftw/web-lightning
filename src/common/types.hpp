@@ -27,12 +27,15 @@
 
 #include <vector>
 #include <array>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 
 #include <string>
 
 #include <functional>
+
+#include <variant>
 
 namespace WL
 {
@@ -60,6 +63,9 @@ namespace WL
     template <typename T, U64 size>
     using StaticArray = std::array<T, size>;
 
+    template <typename T>
+    using ChunkArray = std::deque<T>;
+
     template <typename K, typename V>
     using Map = std::unordered_map<K, V>;
 
@@ -73,4 +79,7 @@ namespace WL
 
     template <typename T>
     using Function = std::function<T>;
+
+    template <typename... Ts>
+    using Variant = std::variant<Ts...>;
 }

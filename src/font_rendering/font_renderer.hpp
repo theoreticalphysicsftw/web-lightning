@@ -21,23 +21,25 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include <common/types.hpp>
+#include <algebra/algebra.hpp>
 
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	struct FontRendererOptions
+	{
+		F32 height = 0.05f;
+		Color4 color = Color4(1.f, 0.f, 0.f, 0.f);
+		F32 offsetX = 0;
+		F32 offestY = 0;
+	};
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
-
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
-
-    return 0;
+	template <typename GPUAPI, typename Rasterizer>
+	class FontRenderer
+	{
+	public:
+		auto Draw(const Array<I32> codepoints, const FontRendererOptions& options);
+	};
 }

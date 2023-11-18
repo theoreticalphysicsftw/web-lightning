@@ -39,21 +39,189 @@ namespace WL
     {
         static SDL_Window* window;
 
-        static B Init(const C* appName = "web-lightning");
-        static V Destroy();
-        static V PresentLoop();
+        static auto Init(const C* appName = "web-lightning") -> B;
+        static auto Destroy() -> V;
+        static auto PresentLoop() -> V;
 
-        using RenderFunction = Function<void()>;
+        using RenderFunction = Function<V()>;
 
-        static V AddRenderingCode(const RenderFunction& func);
+        static auto AddRenderingCode(const RenderFunction& func) -> V;
+        static auto UnitsToPixels(F32 units) -> U32;
+        static auto PixelsToUnits(U32 pixels) -> F32;
+        static auto GetAspectRatio() -> F32;
 
         private:
         static RenderFunction renderFunction;
         static V PresentLoopIteration();
         static V Render();
         static V ProcessInput();
+
+        static U32 width;
+        static U32 height;
     };
 }
 
 
-#include "main_surface.tpp"
+namespace WL
+{
+    template <class TGpuApi>
+    SDL_Window* MainSurface<TGpuApi>::window = nullptr;
+
+    template <class TGpuApi>
+    U32 MainSurface<TGpuApi>::width = 0;
+
+    template <class TGpuApi>
+    U32 MainSurface<TGpuApi>::height = 0;
+
+    template <class TGpuApi>
+    typename MainSurface<TGpuApi>::RenderFunction MainSurface<TGpuApi>::renderFunction = []() {};
+
+    B isWindowClosed = false;
+
+#ifdef __EMSCRIPTEN__
+    EM_JS(U32, GetCanvasWidth, (), { return canvas.width; });
+    EM_JS(U32, GetCanvasHeight, (), { return canvas.height; });
+#else
+    U32 GetCanvasWidth() { return 960; }
+    U32 GetCanvasHeight() { return 540; }
+#endif
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::Init(const C* appName) -> B
+    {
+        if (SDL_Init(SDL_INIT_VIDEO) != 0)
+        {
+            isWindowClosed = true;
+            return false;
+        }
+
+        width = GetCanvasWidth();
+        height = GetCanvasHeight();
+
+        window = SDL_CreateWindow(
+            appName,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            width,
+            height,
+            SDL_WINDOW_SHOWN |
+            SDL_WINDOW_RESIZABLE |
+            TGpuApi::GetWindowFlags()
+        );
+
+        if (window == nullptr)
+        {
+            isWindowClosed = true;
+            return false;
+        }
+
+        if (!TGpuApi::Init(window))
+        {
+            isWindowClosed = true;
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::Destroy() -> V
+    {
+        if (window != nullptr)
+        {
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+        }
+        isWindowClosed = true;
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::ProcessInput() -> V
+    {
+        SDL_Event event;
+
+        while (SDL_PollEvent(&event))
+        {
+
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+            {
+                isWindowClosed = true;
+            }
+
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                width = event.window.data1;
+                height = event.window.data2;
+            }
+
+            if (event.type == SDL_KEYDOWN)
+            {
+                //switch (event.key.keysym.sym)
+            }
+        }
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::Render() -> V
+    {
+        renderFunction();
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::PresentLoopIteration() -> V
+    {
+        Render();
+        TGpuApi::Present();
+        ProcessInput();
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::PresentLoop() -> V
+    {
+#ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop(PresentLoopIteration, 0, true);
+#else
+        while (!isWindowClosed)
+        {
+            PresentLoopIteration();
+        }
+#endif
+    }
+
+
+    template <class TGpuApi>
+    auto MainSurface<TGpuApi>::AddRenderingCode(const RenderFunction& func) -> V
+    {
+        renderFunction = func;
+    }
+
+
+    template<class TNativeApi>
+    inline auto WL::MainSurface<TNativeApi>::UnitsToPixels(F32 units) -> U32
+    {
+        return U32(units * width);
+    }
+
+
+    template<class TNativeApi>
+    inline auto WL::MainSurface<TNativeApi>::PixelsToUnits(U32 pixels) -> F32
+    {
+        return F32(pixels) / width;
+    }
+
+
+    template<class TNativeApi>
+    inline auto WL::MainSurface<TNativeApi>::GetAspectRatio() -> F32
+    {
+        return F32(width) / height;
+    }
+}
+
+

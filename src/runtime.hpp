@@ -21,23 +21,51 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "widgets/widget.hpp"
+#include "main_surface/main_surface.hpp"
 
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	template <typename TGPUAPI, typename TFontRenderer>
+	class Runtime
+	{
+	public:
+		using GPUAPI = TGPUAPI;
+		auto static Init() -> B;
+		auto static Loop() -> V;
+		auto static Destroy() -> V;
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
+		using MainSurface = MainSurface<GPUAPI>;
+	private:
+		static ChunkArray<AnyWidget<Runtime>> widgets;
+	};
+}
 
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
 
-    return 0;
+namespace WL
+{
+	template<typename TGPUAPI, typename TFontRenderer>
+	ChunkArray<AnyWidget<Runtime<TGPUAPI, TFontRenderer>>> Runtime<TGPUAPI, TFontRenderer>::widgets;
+
+	template<typename TGPUAPI, typename TFontRenderer>
+	inline auto Runtime<TGPUAPI, TFontRenderer>::Init() -> B
+	{
+		return MainSurface::Init();
+	}
+
+
+	template<typename TGPUAPI, typename TFontRenderer>
+	inline auto Runtime<TGPUAPI, TFontRenderer>::Loop() -> V
+	{
+		return MainSurface::PresentLoop();
+	}
+
+
+	template<typename TGPUAPI, typename TFontRenderer>
+	inline auto Runtime<TGPUAPI, TFontRenderer>::Destroy() -> V
+	{
+		return MainSurface::Destroy();
+	}
 }

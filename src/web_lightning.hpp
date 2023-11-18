@@ -23,6 +23,20 @@
 
 #pragma once
 
+#include "font_rendering/font_renderer.hpp"
+#include "font_rendering/font_rasterizer.hpp"
+#include "font_rendering/font_rasterizer_cpu.hpp"
+
 #include "main_surface/main_surface.hpp"
 #include "gpu_api/gpu_api.hpp"
 #include "gpu_api/webgl.hpp"
+
+#include "runtime.hpp"
+
+namespace WL
+{
+	using GPUAPIDefault = WebGL;
+	using FontRasterizerDefault = FontRasterizerCPU<GPUAPIDefault>;
+	using FontRendererDefault = FontRenderer<GPUAPIDefault, FontRasterizerDefault>;
+	using RuntimeDefault = Runtime<GPUAPIDefault, FontRendererDefault>;
+}

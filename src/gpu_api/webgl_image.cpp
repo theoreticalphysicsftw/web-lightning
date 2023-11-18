@@ -21,23 +21,8 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#include "webgl_image.hpp"
 
-#include <iostream>
-
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
-
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
-
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
-
-    return 0;
 }

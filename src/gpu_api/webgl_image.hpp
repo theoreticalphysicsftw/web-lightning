@@ -21,23 +21,25 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "image.hpp"
+#include "webgl_api.hpp"
 
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	class WebGLImage : Image<WebGLImage>
+	{
+	public:
+		auto Allocate(EFormat format, U32 w, U32 h = 1, U32 d = 1) -> B;
+		auto InitData(void* inData) -> V;
+		auto UpdateData(const Extent& extend, void* inData) -> V;
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
+		U32 height;
+		U32 width;
+		U32 depth;
 
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
-
-    return 0;
+	private:
+		GLuint id;
+	};
 }

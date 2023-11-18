@@ -21,23 +21,32 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "common/types.hpp"
 
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	enum class EFormat
+	{
+		A8,
+		RGBA8,
+		RGBA32,
+		RGBA32Float
+	};
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
+	struct Extent
+	{
+		U32 x;
+		U32 y;
+		U32 z;
+		U32 w;
+		U32 h;
+		U32 d;
+	};
 
-    RT::GPUAPI::SetClearColor({0.5f, 0.0f, 1.0f, 1.0f});
-    RT::MainSurface::AddRenderingCode([]() { RT::GPUAPI::ClearPresentSurface(); });
-    RT::Loop();
-
-    return 0;
+	template <typename NativeImage>
+	class Image
+	{
+	};
 }
