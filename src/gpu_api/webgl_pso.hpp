@@ -29,20 +29,6 @@
 
 namespace WL
 {
-    enum class EType
-    {
-        Int = 0,
-        Uint,
-        Float,
-    };
-
-    struct VBLayout
-    {
-        U32 binding;
-        EType type;
-        U32 components;
-    };
-
     inline static constexpr U32 CMaxVBSlots = 8;
 
     struct WebGLPso : Pso<WebGLPso>

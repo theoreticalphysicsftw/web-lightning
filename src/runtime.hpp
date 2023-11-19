@@ -28,7 +28,7 @@
 
 namespace WL
 {
-	template <typename TGPUAPI, typename TFontRenderer>
+	template <typename TGPUAPI, typename TRenderer>
 	class Runtime
 	{
 	public:
@@ -39,34 +39,50 @@ namespace WL
 
 		using MainSurface = MainSurface<GPUAPI>;
 		using WidgetLayers = ChunkArray<ChunkArray<Widget*>>;
+
 	private:
-		static WidgetLayers widgetLayers;
+		auto static AddWidgetRenderingCode() -> V;
+		inline static WidgetLayers widgetLayers;
 	};
 }
 
 
 namespace WL
 {
-	template<typename TGPUAPI, typename TFontRenderer>
-	Runtime<TGPUAPI, TFontRenderer>::WidgetLayers Runtime<TGPUAPI, TFontRenderer>::widgetLayers;
-
-	template<typename TGPUAPI, typename TFontRenderer>
-	inline auto Runtime<TGPUAPI, TFontRenderer>::Init() -> B
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Init() -> B
 	{
-		return MainSurface::Init();
+		if (!MainSurface::Init())
+		{
+			return false;
+		}
+
+		AddWidgetRenderingCode();
+
+		return true;
 	}
 
 
-	template<typename TGPUAPI, typename TFontRenderer>
-	inline auto Runtime<TGPUAPI, TFontRenderer>::Loop() -> V
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Loop() -> V
 	{
-		return MainSurface::PresentLoop();
+		MainSurface::PresentLoop();
 	}
 
 
-	template<typename TGPUAPI, typename TFontRenderer>
-	inline auto Runtime<TGPUAPI, TFontRenderer>::Destroy() -> V
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Destroy() -> V
 	{
 		return MainSurface::Destroy();
+	}
+
+
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::AddWidgetRenderingCode() -> V
+	{
+		for (auto layer = 0; layer < widgetLayers.size(); ++layer)
+		{
+			TRenderer::CommitDrawCommands();
+		}
 	}
 }

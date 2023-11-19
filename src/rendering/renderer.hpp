@@ -21,48 +21,28 @@
 // SOFTWARE.
 
 
-#include "webgl_shader.hpp"
+#pragma once
+
+#include "common/types.hpp"
 
 namespace WL
 {
-    WebGLShader::WebGLShader(const C* source, U32 size, EShaderType type) :
-        Shader(type), id(0), source(source), sourceSize(size)
-    {
-    }
+	template <typename TRenderers>
+	class Renderer : TRenderers
+	{
+	public:
+		static auto CommitDrawCommands() -> V;
+	private:
+	};
+}
 
-    WebGLShader::~WebGLShader()
-    {
-    }
-    
-    auto WebGLShader::AddSource(const C* source, U32 size, EShaderType type) -> V
-    {
-        this->source = source;
-        this->sourceSize = size;
-        this->type = type;
-    }
 
-    auto WebGLShader::Compile() -> B
-    {
-        static const GLenum typeTable[] =
-        {
-            GL_VERTEX_SHADER,
-            GL_FRAGMENT_SHADER
-        };
-
-        id = glCreateShader(typeTable[(U32)type]);
-        
-        if (id == 0)
-        {
-            return false;
-        }
-
-        auto data = source;
-        GLsizei size = sourceSize;
-        glShaderSource(id, 1, &data, &size);
-        glCompileShader(id);
-        GLint result;
-        glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-
-        return result == GL_TRUE;
-    }
+namespace WL
+{
+	template<typename TRenderers>
+	auto Renderer<TRenderers>::CommitDrawCommands() -> V
+	{
+		TRenderers::FontRenderer::CommitDrawCommands();
+		//TRenderers::BoxRenderer::CommitDrawCommands();
+	}
 }

@@ -37,8 +37,6 @@ namespace WL
     template <class TNativeApi>
     struct MainSurface
     {
-        static SDL_Window* window;
-
         static auto Init(const C* appName = "web-lightning") -> B;
         static auto Destroy() -> V;
         static auto PresentLoop() -> V;
@@ -51,33 +49,22 @@ namespace WL
         static auto GetAspectRatio() -> F32;
 
         private:
-        static RenderFunction renderFunction;
         static V PresentLoopIteration();
         static V Render();
         static V ProcessInput();
 
-        static U32 width;
-        static U32 height;
+        inline static SDL_Window* window = nullptr;
+        inline static RenderFunction renderFunction = []() {};
+
+        inline static U32 width = 0;
+        inline static U32 height = 0;
+        inline static B isWindowClosed = false;
     };
 }
 
 
 namespace WL
 {
-    template <class TGpuApi>
-    SDL_Window* MainSurface<TGpuApi>::window = nullptr;
-
-    template <class TGpuApi>
-    U32 MainSurface<TGpuApi>::width = 0;
-
-    template <class TGpuApi>
-    U32 MainSurface<TGpuApi>::height = 0;
-
-    template <class TGpuApi>
-    typename MainSurface<TGpuApi>::RenderFunction MainSurface<TGpuApi>::renderFunction = []() {};
-
-    B isWindowClosed = false;
-
 #ifdef __EMSCRIPTEN__
     EM_JS(U32, GetCanvasWidth, (), { return canvas.width; });
     EM_JS(U32, GetCanvasHeight, (), { return canvas.height; });

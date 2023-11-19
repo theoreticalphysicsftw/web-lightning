@@ -26,8 +26,24 @@
 
 namespace WL
 {
+    enum class EType
+    {
+        Int = 0,
+        Uint,
+        Float,
+    };
+
+    struct VBLayout
+    {
+        U32 binding;
+        EType type;
+        U32 components;
+    };
+
     template <typename TNativePso>
     struct Pso
     {
+        using EType = EType;
+        using VBLayout = VBLayout;
     };
 }

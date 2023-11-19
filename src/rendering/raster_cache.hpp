@@ -23,16 +23,18 @@
 
 #pragma once
 
-#include <common/types.hpp>
+#include "common/types.hpp"
+#include "rasterized_font.hpp"
+
 
 namespace WL
 {
 	template <typename GPUAPI>
-	class RasterizedFont
+	class RasterCache
 	{
-		using Image = GPUAPI::Image;
-
-		Map<U32, U32> codepointToLayer;
-		Image data;
+	private:
+		Map<U32, U32> sizeToFont;
+		ChunkArray<RasterizedFont<GPUAPI>> fonts;
 	};
+
 }

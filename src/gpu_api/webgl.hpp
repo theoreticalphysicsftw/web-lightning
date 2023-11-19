@@ -26,10 +26,8 @@
 #include <common/types.hpp>
 #include <algebra/algebra.hpp>
 
-#define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengles2.h>
-
+#include "webgl_api.hpp"
 
 #include "gpu_api.hpp"
 #include "webgl_shader.hpp"
