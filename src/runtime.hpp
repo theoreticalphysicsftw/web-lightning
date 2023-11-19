@@ -38,8 +38,9 @@ namespace WL
 		auto static Destroy() -> V;
 
 		using MainSurface = MainSurface<GPUAPI>;
+		using WidgetLayers = ChunkArray<ChunkArray<Widget*>>;
 	private:
-		static ChunkArray<AnyWidget<Runtime>> widgets;
+		static WidgetLayers widgetLayers;
 	};
 }
 
@@ -47,7 +48,7 @@ namespace WL
 namespace WL
 {
 	template<typename TGPUAPI, typename TFontRenderer>
-	ChunkArray<AnyWidget<Runtime<TGPUAPI, TFontRenderer>>> Runtime<TGPUAPI, TFontRenderer>::widgets;
+	Runtime<TGPUAPI, TFontRenderer>::WidgetLayers Runtime<TGPUAPI, TFontRenderer>::widgetLayers;
 
 	template<typename TGPUAPI, typename TFontRenderer>
 	inline auto Runtime<TGPUAPI, TFontRenderer>::Init() -> B

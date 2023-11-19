@@ -23,10 +23,12 @@
 
 #pragma once
 
+#include "widget.hpp"
+
 namespace WL
 {
 	template <typename TGPUAPI>
-	class TextBox
+	class TextBox : Widget
 	{
 	};
 }

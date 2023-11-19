@@ -23,10 +23,14 @@
 
 #pragma once
 
-#include "text_box.hpp"
+#include "common/types.hpp"
 
 namespace WL
 {
-	template <typename TRuntime>
-	using AnyWidget = Variant<TextBox<TRuntime>>;
+	class Widget
+	{
+	public:
+		virtual auto AccumulateDrawCommands() -> V = 0;
+		virtual auto Update(F32 dt) -> V = 0;
+	};
 }

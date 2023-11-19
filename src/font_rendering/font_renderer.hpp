@@ -40,6 +40,27 @@ namespace WL
 	class FontRenderer
 	{
 	public:
-		auto Draw(const Array<I32> codepoints, const FontRendererOptions& options);
+		auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
+		auto CommitDrawCommands() -> V;
+
+	private:
+		GPUAPI::Pso pso;
 	};
+
+}
+
+namespace WL
+{
+	template<typename GPUAPI, typename Rasterizer>
+	inline auto FontRenderer<GPUAPI, Rasterizer>::AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V
+	{
+		return V();
+	}
+
+
+	template<typename GPUAPI, typename Rasterizer>
+	inline auto FontRenderer<GPUAPI, Rasterizer>::CommitDrawCommands() -> V
+	{
+		return V();
+	}
 }

@@ -34,11 +34,18 @@
 #include "gpu_api.hpp"
 #include "webgl_shader.hpp"
 #include "webgl_pso.hpp"
+#include "webgl_buffer.hpp"
+#include "webgl_image.hpp"
 
 namespace WL
 {
     struct WebGL : GpuApi<WebGL>
     {
+        using Shader = WebGLShader;
+        using Pso = WebGLPso;
+        using Buffer = WebGLBuffer;
+        using Image = WebGLImage;
+
         static B Init(SDL_Window* w);
         static U32 GetWindowFlags();
         static V SetClearColor(const Color4& color);
