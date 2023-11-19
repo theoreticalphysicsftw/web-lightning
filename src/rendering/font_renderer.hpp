@@ -40,6 +40,7 @@ namespace WL
 	class FontRenderer
 	{
 	public:
+		static auto Init() -> V;
 		static auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
 		static auto CommitDrawCommands() -> V;
 
@@ -51,10 +52,19 @@ namespace WL
 		inline static GPUAPI::Buffer colorsBuffer;
 	};
 
+
+
 }
 
 namespace WL
 {
+	template<typename GPUAPI, typename Rasterizer>
+	auto FontRenderer<GPUAPI, Rasterizer>::Init() -> V
+	{
+		return V();
+	}
+
+
 	template<typename GPUAPI, typename Rasterizer>
 	auto FontRenderer<GPUAPI, Rasterizer>::AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V
 	{

@@ -21,23 +21,34 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "widget.hpp"
 
-int main()
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	template <typename Runtime>
+	class Box : Widget<Runtime>
+	{
+	public:
+		virtual auto AccumulateDrawCommands() -> V override;
+		virtual auto Update(F32 dt) -> V override;
+	};
+}
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
 
-    Box<RT> box;
+namespace WL
+{
+	template<typename Runtime>
+	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
+	{
 
-    RT::Loop();
+	}
 
-    return 0;
+
+	template<typename Runtime>
+	inline auto Box<Runtime>::Update(F32 dt) -> V
+	{
+
+	}
 }

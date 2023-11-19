@@ -27,8 +27,8 @@
 
 namespace WL
 {
-	template <typename TGPUAPI>
-	class TextBox : Widget
+	template <typename Runtime>
+	class TextBox : Widget<Runtime>
 	{
 	};
 }

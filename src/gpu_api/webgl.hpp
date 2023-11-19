@@ -44,10 +44,11 @@ namespace WL
         using Buffer = WebGLBuffer;
         using Image = WebGLImage;
 
-        static B Init(SDL_Window* w);
-        static U32 GetWindowFlags();
-        static V SetClearColor(const Color4& color);
-        static V ClearPresentSurface();
-        static V Present();
+        static auto Init(SDL_Window* w) -> B;
+        static auto GetWindowFlags() -> U32;
+        static auto SetPresentSurfaceClearColor(const Color4& color) -> V;
+        static auto ClearPresentSurface() -> V;
+        static auto EnablePresentSurfaceTransparency() -> V;
+        static auto Present() -> V;
     };
 }

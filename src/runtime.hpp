@@ -24,7 +24,7 @@
 #pragma once
 
 #include "widgets/widget.hpp"
-#include "main_surface/main_surface.hpp"
+#include "presenting/present_surface.hpp"
 
 namespace WL
 {
@@ -37,11 +37,12 @@ namespace WL
 		auto static Loop() -> V;
 		auto static Destroy() -> V;
 
-		using MainSurface = MainSurface<GPUAPI>;
-		using WidgetLayers = ChunkArray<ChunkArray<Widget*>>;
+		using PresentSurface = PresentSurface<GPUAPI>;
+		using WidgetLayers = ChunkArray<ChunkArray<Widget<Runtime>*>>;
 
 	private:
-		auto static AddWidgetRenderingCode() -> V;
+		auto static WidgetRenderingCode() -> V;
+		inline static B widgetsAreDirty = true;
 		inline static WidgetLayers widgetLayers;
 	};
 }
@@ -52,12 +53,13 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Init() -> B
 	{
-		if (!MainSurface::Init())
+		if (!PresentSurface::Init())
 		{
 			return false;
 		}
 
-		AddWidgetRenderingCode();
+		PresentSurface::EnableTransparency();
+		PresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
 
 		return true;
 	}
@@ -66,22 +68,28 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Loop() -> V
 	{
-		MainSurface::PresentLoop();
+		PresentSurface::PresentLoop();
 	}
 
 
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Destroy() -> V
 	{
-		return MainSurface::Destroy();
+		return PresentSurface::Destroy();
 	}
 
 
 	template<typename TGPUAPI, typename TRenderer>
-	inline auto Runtime<TGPUAPI, TRenderer>::AddWidgetRenderingCode() -> V
+	inline auto Runtime<TGPUAPI, TRenderer>::WidgetRenderingCode() -> V
 	{
-		for (auto layer = 0; layer < widgetLayers.size(); ++layer)
+		TGPUAPI::ClearPresentSurface();
+
+		for (auto layer = 0u; layer < widgetLayers.size(); ++layer)
 		{
+			for (auto wIdx = 0u; wIdx < widgetLayers[layer].size(); ++wIdx)
+			{
+				widgetLayers[layer][wIdx]->AccumulateDrawCommands();
+			}
 			TRenderer::CommitDrawCommands();
 		}
 	}

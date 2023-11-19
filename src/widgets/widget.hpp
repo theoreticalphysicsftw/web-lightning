@@ -27,10 +27,14 @@
 
 namespace WL
 {
+	template <typename Runtime>
 	class Widget
 	{
 	public:
 		virtual auto AccumulateDrawCommands() -> V = 0;
 		virtual auto Update(F32 dt) -> V = 0;
+
+		B visible = true;
+		B occopiesSpace = true;
 	};
 }

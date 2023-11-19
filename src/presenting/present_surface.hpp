@@ -24,6 +24,7 @@
 #pragma once
 
 #include <common/types.hpp>
+#include <algebra/algebra.hpp>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
@@ -34,8 +35,8 @@
 
 namespace WL
 {
-    template <class TNativeApi>
-    struct MainSurface
+    template <class TGPUAPI>
+    struct PresentSurface
     {
         static auto Init(const C* appName = "web-lightning") -> B;
         static auto Destroy() -> V;
@@ -47,6 +48,8 @@ namespace WL
         static auto UnitsToPixels(F32 units) -> U32;
         static auto PixelsToUnits(U32 pixels) -> F32;
         static auto GetAspectRatio() -> F32;
+        static auto SetClearColor(const Color4& color) -> V;
+        static auto EnableTransparency() -> V;
 
         private:
         static V PresentLoopIteration();
@@ -59,6 +62,8 @@ namespace WL
         inline static U32 width = 0;
         inline static U32 height = 0;
         inline static B isWindowClosed = false;
+
+        inline static Color4 clearColor = Color4(1.0f, 1.0f, 1.0f, 1.0f);
     };
 }
 
@@ -74,8 +79,8 @@ namespace WL
 #endif
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::Init(const C* appName) -> B
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::Init(const C* appName) -> B
     {
         if (SDL_Init(SDL_INIT_VIDEO) != 0)
         {
@@ -94,7 +99,7 @@ namespace WL
             height,
             SDL_WINDOW_SHOWN |
             SDL_WINDOW_RESIZABLE |
-            TGpuApi::GetWindowFlags()
+            TGPUAPI::GetWindowFlags()
         );
 
         if (window == nullptr)
@@ -103,19 +108,20 @@ namespace WL
             return false;
         }
 
-        if (!TGpuApi::Init(window))
+        if (!TGPUAPI::Init(window))
         {
             isWindowClosed = true;
             return false;
         }
 
+        TGPUAPI::SetPresentSurfaceClearColor(clearColor);
 
         return true;
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::Destroy() -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::Destroy() -> V
     {
         if (window != nullptr)
         {
@@ -126,8 +132,8 @@ namespace WL
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::ProcessInput() -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::ProcessInput() -> V
     {
         SDL_Event event;
 
@@ -153,24 +159,24 @@ namespace WL
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::Render() -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::Render() -> V
     {
         renderFunction();
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::PresentLoopIteration() -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::PresentLoopIteration() -> V
     {
         Render();
-        TGpuApi::Present();
+        TGPUAPI::Present();
         ProcessInput();
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::PresentLoop() -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::PresentLoop() -> V
     {
 #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(PresentLoopIteration, 0, true);
@@ -183,32 +189,45 @@ namespace WL
     }
 
 
-    template <class TGpuApi>
-    auto MainSurface<TGpuApi>::AddRenderingCode(const RenderFunction& func) -> V
+    template <class TGPUAPI>
+    auto PresentSurface<TGPUAPI>::AddRenderingCode(const RenderFunction& func) -> V
     {
         renderFunction = func;
     }
 
 
-    template<class TNativeApi>
-    inline auto WL::MainSurface<TNativeApi>::UnitsToPixels(F32 units) -> U32
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::UnitsToPixels(F32 units) -> U32
     {
         return U32(units * width);
     }
 
 
-    template<class TNativeApi>
-    inline auto WL::MainSurface<TNativeApi>::PixelsToUnits(U32 pixels) -> F32
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::PixelsToUnits(U32 pixels) -> F32
     {
         return F32(pixels) / width;
     }
 
 
-    template<class TNativeApi>
-    inline auto WL::MainSurface<TNativeApi>::GetAspectRatio() -> F32
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::GetAspectRatio() -> F32
     {
         return F32(width) / height;
     }
+
+
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::SetClearColor(const Color4& color) -> V
+    {
+        clearColor = color;
+        TGPUAPI::SetPresentSurfaceClearColor(color);
+    }
+
+
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::EnableTransparency() -> V
+    {
+        TGPUAPI::EnablePresentSurfaceTransparency();
+    }
 }
-
-

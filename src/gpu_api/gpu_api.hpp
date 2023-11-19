@@ -31,7 +31,7 @@
 
 namespace WL
 {
-    template <class TNativeApi>
+    template <class TGPUAPI>
     struct GpuApi
     {
     };

@@ -54,7 +54,7 @@ namespace WL
         return context != nullptr;
     }
 
-    V WebGL::SetClearColor(const Color4& color)
+    V WebGL::SetPresentSurfaceClearColor(const Color4& color)
     {
         glClearColor(color[0], color[1], color[2], color[3]);
     }
@@ -62,6 +62,11 @@ namespace WL
     V WebGL::ClearPresentSurface()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    auto WebGL::EnablePresentSurfaceTransparency() -> V
+    {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     V WebGL::Present()

@@ -28,11 +28,14 @@
 #include "rendering/font_rasterizer_cpu.hpp"
 #include "rendering/renderer.hpp"
 
-#include "main_surface/main_surface.hpp"
+#include "presenting/present_surface.hpp"
 #include "gpu_api/gpu_api.hpp"
 #include "gpu_api/webgl.hpp"
 
 #include "runtime.hpp"
+
+#include "widgets/box.hpp"
+#include "widgets/text_box.hpp"
 
 namespace WL
 {
