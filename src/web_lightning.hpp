@@ -26,6 +26,7 @@
 #include "rendering/font_renderer.hpp"
 #include "rendering/font_rasterizer.hpp"
 #include "rendering/font_rasterizer_cpu.hpp"
+#include "rendering/box_renderer.hpp"
 #include "rendering/renderer.hpp"
 
 #include "presenting/present_surface.hpp"
@@ -43,11 +44,12 @@ namespace WL
 	using FontRasterizerDefault = FontRasterizerCPU<GPUAPIDefault>;
 	
 	using FontRendererDefault = FontRenderer<GPUAPIDefault, FontRasterizerDefault>;
+	using BoxRendererDefault = BoxRenderer<GPUAPIDefault>;
 
 	struct RenderersDefault
 	{
 		using FontRenderer = FontRendererDefault;
-		using BoxRendererDefault = V;
+		using BoxRenderer = BoxRendererDefault;
 	};
 
 	using RendererDefault = Renderer<RenderersDefault>;

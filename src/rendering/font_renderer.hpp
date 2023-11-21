@@ -25,6 +25,7 @@
 
 #include <common/types.hpp>
 #include <algebra/algebra.hpp>
+#include <rendering/color.hpp>
 
 namespace WL
 {
@@ -40,7 +41,7 @@ namespace WL
 	class FontRenderer
 	{
 	public:
-		static auto Init() -> V;
+		static auto Init() -> B;
 		static auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
 		static auto CommitDrawCommands() -> V;
 
@@ -59,9 +60,9 @@ namespace WL
 namespace WL
 {
 	template<typename GPUAPI, typename Rasterizer>
-	auto FontRenderer<GPUAPI, Rasterizer>::Init() -> V
+	auto FontRenderer<GPUAPI, Rasterizer>::Init() -> B
 	{
-		return V();
+		return true;
 	}
 
 

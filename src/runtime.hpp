@@ -33,12 +33,18 @@ namespace WL
 	{
 	public:
 		using GPUAPI = TGPUAPI;
+		using Renderer = TRenderer;
+		using PresentSurface = PresentSurface<GPUAPI>;
+
 		auto static Init() -> B;
 		auto static Loop() -> V;
 		auto static Destroy() -> V;
+		
+		auto static MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V;
+		auto static Deregister(Widget<Runtime>* widget) -> V;
 
-		using PresentSurface = PresentSurface<GPUAPI>;
-		using WidgetLayers = ChunkArray<ChunkArray<Widget<Runtime>*>>;
+		using WidgetLayer = Set<Widget<Runtime>*>;
+		using WidgetLayers = ChunkArray<WidgetLayer>;
 
 	private:
 		auto static WidgetRenderingCode() -> V;
@@ -53,13 +59,15 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Init() -> B
 	{
-		if (!PresentSurface::Init())
+		if (!(PresentSurface::Init() && Renderer::Init()))
 		{
 			return false;
 		}
 
 		PresentSurface::EnableTransparency();
 		PresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
+
+		widgetLayers.resize(8);
 
 		return true;
 	}
@@ -78,17 +86,40 @@ namespace WL
 		return PresentSurface::Destroy();
 	}
 
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V
+	{
+		widgetLayers[widget->layer].erase(widget);
+		
+		while (widgetLayers.size() <= newLayer)
+		{
+			widgetLayers.push_back(WidgetLayer());
+		}
+
+		widgetLayers[newLayer].insert(widget);
+		widget->layer = newLayer;
+	}
+
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Deregister(Widget<Runtime>* widget) -> V
+	{
+		widgetLayers[widget->layer].erase(widget);
+	}
+
 
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::WidgetRenderingCode() -> V
 	{
 		TGPUAPI::ClearPresentSurface();
 
-		for (auto layer = 0u; layer < widgetLayers.size(); ++layer)
+		for (auto& layer : widgetLayers)
 		{
-			for (auto wIdx = 0u; wIdx < widgetLayers[layer].size(); ++wIdx)
+			for (auto widget : layer)
 			{
-				widgetLayers[layer][wIdx]->AccumulateDrawCommands();
+				if (widget->isVisible)
+				{
+					widget->AccumulateDrawCommands();
+				}
 			}
 			TRenderer::CommitDrawCommands();
 		}

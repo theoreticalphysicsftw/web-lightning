@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <common/utilities.hpp>
+
 #include "buffer.hpp"
 #include "webgl_api.hpp"
 
@@ -34,10 +36,24 @@ namespace WL
 		WebGLBuffer(U32 size = 0);
 		~WebGLBuffer();
 		
-		auto Allocate(U32 size, B onGPU = true, EUsage usage = EUsage::Undefined) -> V;
-		auto Update(Byte* data, U32 size) -> V;
+		auto Allocate(U32 size, B onGPU = true, EUsage usage = EUsage::Undefined) -> B;
+		auto Reallocate(U32 size, B onGPU = true, EUsage usage = EUsage::Undefined) -> B;
 		auto GetNativeId() const -> GLuint { return id; }
+
+		template <typename T>
+		auto Update(const Array<T>& a) -> V;
+		auto Update(const Byte* data, U32 size) -> V;
 	private:
 		GLuint id;
 	};
+}
+
+
+namespace WL
+{
+	template<typename T>
+	inline auto WebGLBuffer::Update(const Array<T>& a) -> V
+	{
+		Update((const Byte*)a.data(), SizeInBytes(a));
+	}
 }

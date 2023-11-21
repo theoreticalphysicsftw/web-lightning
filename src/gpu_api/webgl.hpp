@@ -25,6 +25,7 @@
 
 #include <common/types.hpp>
 #include <algebra/algebra.hpp>
+#include <rendering/color.hpp>
 
 #include <SDL2/SDL.h>
 #include "webgl_api.hpp"

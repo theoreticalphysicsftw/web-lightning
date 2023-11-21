@@ -24,6 +24,7 @@
 #pragma once
 
 #include "widget.hpp"
+#include "algebra/algebra.hpp"
 
 namespace WL
 {
@@ -31,8 +32,17 @@ namespace WL
 	class Box : Widget<Runtime>
 	{
 	public:
+		Box(ColorU32 color = 0, F32 w = 0, F32 h = 0, F32 x = 0, F32 y = 0, F32 r = 0);
+
 		virtual auto AccumulateDrawCommands() -> V override;
-		virtual auto Update(F32 dt) -> V override;
+		virtual auto Update(const UpdateState& s) -> V override;
+
+		ColorU32 color;
+		F32 width;
+		F32 height;
+		F32 offsetX;
+		F32 offsetY;
+		F32 radius;
 	};
 }
 
@@ -40,14 +50,20 @@ namespace WL
 namespace WL
 {
 	template<typename Runtime>
+	Box<Runtime>::Box(ColorU32 color, F32 w, F32 h, F32 x, F32 y, F32 r) 
+		: color(color), width(w), height(h), offsetX(x), offsetY(y), radius(r)
+	{
+	}
+
+	template<typename Runtime>
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
-
+		Runtime::Renderer::BoxRenderer::AccumulateBox(color, width, height, offsetX, offsetY, radius);
 	}
 
 
 	template<typename Runtime>
-	inline auto Box<Runtime>::Update(F32 dt) -> V
+	inline auto Box<Runtime>::Update(const UpdateState& s) -> V
 	{
 
 	}

@@ -39,15 +39,21 @@ namespace WL
 		}
 	}
 
-	auto WebGLBuffer::Allocate(U32 size, B onGPU, EUsage usage) -> V
+	auto WebGLBuffer::Allocate(U32 size, B onGPU, EUsage usage) -> B
 	{
 		this->size = size;
 		this->onGPU = onGPU;
 		this->usage = usage;
 		glGenBuffers(1, &id);
+		return true;
 	}
 
-	auto WebGLBuffer::Update(Byte* data, U32 size) -> V
+	auto WebGLBuffer::Reallocate(U32 size, B onGPU, EUsage usage) -> B
+	{
+		return true;
+	}
+
+	auto WebGLBuffer::Update(const Byte* data, U32 size) -> V
 	{
 		glBindBuffer(GL_COPY_WRITE_BUFFER, id);
 		glBufferData(GL_COPY_WRITE_BUFFER, size, data, onGPU? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);

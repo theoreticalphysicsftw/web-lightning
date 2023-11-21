@@ -27,14 +27,53 @@
 
 namespace WL
 {
-	template <typename Runtime>
+	struct UpdateState
+	{
+		F32 dt;
+		F32 mouseX;
+		F32 mouseY;
+		U32 keyCode;
+	};
+
+	template <typename TRuntime>
 	class Widget
 	{
 	public:
-		virtual auto AccumulateDrawCommands() -> V = 0;
-		virtual auto Update(F32 dt) -> V = 0;
+		using UpdateFunction = Function <V(const UpdateState&)>;
 
-		B visible = true;
+		virtual auto AccumulateDrawCommands() -> V = 0;
+		virtual auto Update(const UpdateState&) -> V = 0;
+		
+		auto MoveToLayer(U32 layer) -> V;
+		
+		B isVisible = true;
 		B occopiesSpace = true;
+
+		UpdateFunction updateOnClick;
+		UpdateFunction updateOnPress;
+		UpdateFunction updateOnHover;
+		UpdateFunction updateOnLeave;
+
+		virtual ~Widget();
+
+	protected:
+		U32 layer = 1;
+		friend TRuntime;
 	};
+}
+
+
+namespace WL
+{
+	template <typename TRuntime>
+	Widget<TRuntime>::~Widget()
+	{
+		TRuntime::Deregister(this);
+	}
+
+	template<typename TRuntime>
+	auto WL::Widget<TRuntime>::MoveToLayer(U32 newLayer) -> V
+	{
+		TRuntime::MoveToLayer(this, newLayer);
+	}
 }

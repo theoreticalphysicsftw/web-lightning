@@ -29,11 +29,11 @@
 
 namespace WL
 {
-    using Vec2 = TVector<F32, 2>;
-    using Vec3 = TVector<F32, 3>;
-    using Vec4 = TVector<F32, 4>;
+    using Vec2 = Vector<F32, 2>;
+    using Vec3 = Vector<F32, 3>;
+    using Vec4 = Vector<F32, 4>;
 
-    using Color2 = Vec2;
-    using Color3 = Vec3;
-    using Color4 = Vec4;
+    using Mat2x2 = Matrix<F32, 2, 2>;
+    using Mat3x3 = Matrix<F32, 3, 3>;
+    using Mat4x4 = Matrix<F32, 4, 4>;
 }

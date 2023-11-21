@@ -23,63 +23,56 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <vector>
-#include <array>
-#include <deque>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <string>
-
-#include <functional>
-
-#include <variant>
+#include <common/types.hpp>
+#include <algebra/algebra.hpp>
 
 namespace WL
 {
-    using U8 = uint8_t;
-    using U16 = uint16_t;
-    using U32 = uint32_t;
-    using U64 = uint64_t;
+	using Color2 = Vec2;
+	using Color3 = Vec3;
+	using Color4 = Vec4;
 
-    using I8 = int8_t;
-    using I16 = int16_t;
-    using I32 = int32_t;
-    using I64 = int64_t;
+	union ColorU32
+	{
+		U32 packed;
+		struct
+		{
+			U8 r;
+			U8 g;
+			U8 b;
+			U8 a;
+		};
 
-    using F32 = float;
-    using F64 = double;
+		ColorU32(U32 raw = 0);
+		ColorU32(U8 r, U8 g, U8 b, U8 a);
+		ColorU32(const Color4 c4);
 
-    using C = char;
-    using Byte = uint8_t;
-    using B = bool;
-    using V = void;
+		operator Color4() const;
+	};
+}
 
-    template <typename T>
-    using Array = std::vector<T>;
+namespace WL
+{
+	inline ColorU32::ColorU32(U32 raw)
+		: packed(raw)
+	{
+	}
 
-    template <typename T, U64 size>
-    using StaticArray = std::array<T, size>;
+	inline ColorU32::ColorU32(U8 r, U8 g, U8 b, U8 a)
+		: r(r), g(g), b(b), a(a)
+	{
+	}
 
-    template <typename T>
-    using ChunkArray = std::deque<T>;
+	inline ColorU32::ColorU32(const Color4 c4)
+	{
+		r = U8(c4[0] * 255);
+		g = U8(c4[1] * 255);
+		b = U8(c4[2] * 255);
+		a = U8(c4[3] * 255);
+	}
 
-    template <typename K, typename V>
-    using Map = std::unordered_map<K, V>;
-
-    template <typename K>
-    using Set = std::unordered_set<K>;
-
-    template<typename F, typename S>
-    using Pair = std::pair<F, S>;
-
-    using Str = std::string;
-
-    template <typename T>
-    using Function = std::function<T>;
-
-    template <typename... Ts>
-    using Variant = std::variant<Ts...>;
+	inline ColorU32::operator Color4() const
+	{
+		return Color4(r / 255.f, g / 255.f, b / 255.f, a / 255.f);
+	}
 }

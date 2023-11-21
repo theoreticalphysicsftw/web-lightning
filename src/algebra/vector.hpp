@@ -29,7 +29,7 @@
 namespace WL
 {
     template <typename T, U32 N>
-    struct TVector
+    struct Vector
     {
         T v[N];
 
@@ -38,6 +38,6 @@ namespace WL
 
         template <typename... Ts>
             requires CAllAreConstructibleFrom<T, Ts...>
-        TVector(Ts... elements) : v{ static_cast<T>(elements)... } {};
+        Vector(Ts... elements) : v{ static_cast<T>(elements)... } {};
     };
 }

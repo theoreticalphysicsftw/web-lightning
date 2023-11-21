@@ -37,10 +37,12 @@ namespace WL
         ~WebGLPso();
 
         auto Compile() -> B;
+        auto Use() -> V;
         auto AddVBLayout(const VBLayout& layout) -> V;
-        auto BindVB(U32 slot, const WebGLBuffer& buffer) -> V;
+        auto BindVB(U32 slot, const WebGLBuffer& buffer, B perInstance = false) -> V;
         auto BindIB(const WebGLBuffer& buffer) -> V;
         auto AddShader(const C* source, U32 size, EShaderType type) -> V;
+        auto DrawInstanced(U32 first, U32 count, U32 instances) -> V;
 
         private:
         GLuint program;

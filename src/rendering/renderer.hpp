@@ -31,7 +31,12 @@ namespace WL
 	class Renderer : TRenderers
 	{
 	public:
+		using FontRenderer = TRenderers::FontRenderer;
+		using BoxRenderer = TRenderers::BoxRenderer;
+
+		static auto Init() -> B;
 		static auto CommitDrawCommands() -> V;
+
 	private:
 	};
 }
@@ -40,9 +45,16 @@ namespace WL
 namespace WL
 {
 	template<typename TRenderers>
+	inline auto Renderer<TRenderers>::Init() -> B
+	{
+		return FontRenderer::Init() && BoxRenderer::Init();
+	}
+
+
+	template<typename TRenderers>
 	auto Renderer<TRenderers>::CommitDrawCommands() -> V
 	{
-		TRenderers::FontRenderer::CommitDrawCommands();
-		//TRenderers::BoxRenderer::CommitDrawCommands();
+		FontRenderer::CommitDrawCommands();
+		BoxRenderer::CommitDrawCommands();
 	}
 }

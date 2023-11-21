@@ -63,10 +63,21 @@ namespace WL
         return status && linkingDone;
     }
 
+    auto WebGLPso::Use() -> V
+    {
+        glUseProgram(program);
+    }
+
 
     auto WebGLPso::AddShader(const C* source, U32 size,  EShaderType type) -> V
     {
         shaders[(U32)type].AddSource(source, size, type);
+    }
+
+
+    auto WebGLPso::DrawInstanced(U32 first, U32 count, U32 instances) -> V
+    {
+        glDrawArraysInstanced(GL_TRIANGLES, first, count, instances);
     }
 
 
@@ -76,7 +87,7 @@ namespace WL
     }
 
 
-    auto WebGLPso::BindVB(U32 slot, const WebGLBuffer& buffer) -> V
+    auto WebGLPso::BindVB(U32 slot, const WebGLBuffer& buffer, B perInstance) -> V
     {
         static constexpr GLenum typeTable[] =
         {
@@ -95,6 +106,11 @@ namespace WL
         else
         {
             glVertexAttribIPointer(slot, layout.components, typeTable[(U32)layout.type], 0, nullptr);
+        }
+
+        if (perInstance)
+        {
+            glVertexAttribDivisor(slot, 1);
         }
     }
 

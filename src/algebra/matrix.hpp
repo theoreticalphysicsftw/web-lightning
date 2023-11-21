@@ -23,3 +23,24 @@
 
 #pragma once
 
+#include "vector.hpp"
+
+namespace WL
+{
+    template <typename T, U32 TRows, U32 TCols>
+    struct Matrix
+    {
+        union
+        {
+            T data[TRows * TCols];
+            Vector<T, TRows> columns[TCols];
+        };
+
+        Vector<T, TRows>& operator[](U32 n) { return columns[n]; }
+        const Vector<T, TRows>&& operator[](U32 n) const { return columns[n]; }
+
+        template <typename... Ts>
+            requires CAllAreConstructibleFrom<T, Ts...>
+        Matrix(Ts... elements) : data{ static_cast<T>(elements)... } {};
+    };
+}

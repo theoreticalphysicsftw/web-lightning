@@ -23,63 +23,13 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <vector>
-#include <array>
-#include <deque>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <string>
-
-#include <functional>
-
-#include <variant>
+#include "types.hpp"
 
 namespace WL
 {
-    using U8 = uint8_t;
-    using U16 = uint16_t;
-    using U32 = uint32_t;
-    using U64 = uint64_t;
-
-    using I8 = int8_t;
-    using I16 = int16_t;
-    using I32 = int32_t;
-    using I64 = int64_t;
-
-    using F32 = float;
-    using F64 = double;
-
-    using C = char;
-    using Byte = uint8_t;
-    using B = bool;
-    using V = void;
-
-    template <typename T>
-    using Array = std::vector<T>;
-
-    template <typename T, U64 size>
-    using StaticArray = std::array<T, size>;
-
-    template <typename T>
-    using ChunkArray = std::deque<T>;
-
-    template <typename K, typename V>
-    using Map = std::unordered_map<K, V>;
-
-    template <typename K>
-    using Set = std::unordered_set<K>;
-
-    template<typename F, typename S>
-    using Pair = std::pair<F, S>;
-
-    using Str = std::string;
-
-    template <typename T>
-    using Function = std::function<T>;
-
-    template <typename... Ts>
-    using Variant = std::variant<Ts...>;
+	template <typename T>
+	U64 SizeInBytes(const Array<T>& array)
+	{
+		return array.size() * sizeof(T);
+	}
 }
