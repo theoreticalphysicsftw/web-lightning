@@ -41,10 +41,11 @@
 namespace WL
 {
 	using GPUAPIDefault = WebGL;
+	using PresentSurfaceDefault = PresentSurface<GPUAPIDefault>;
 	using FontRasterizerDefault = FontRasterizerCPU<GPUAPIDefault>;
 	
 	using FontRendererDefault = FontRenderer<GPUAPIDefault, FontRasterizerDefault>;
-	using BoxRendererDefault = BoxRenderer<GPUAPIDefault>;
+	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
 
 	struct RenderersDefault
 	{

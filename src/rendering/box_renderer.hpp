@@ -28,15 +28,20 @@
 #include <rendering/color.hpp>
 #include <algebra/algebra.hpp>
 
+#include <gpu_api/shader.hpp>
+#include <gpu_api/pso.hpp>
+#include <shaders/common.hpp>
+
 #include "quad.hpp"
 
 namespace WL
 {
-	template <typename TGPUAPI>
+	template <typename TPresentSurface>
 	class BoxRenderer
 	{
 	public:
-		using GPUAPI = TGPUAPI;
+		using PresentSurface = TPresentSurface;
+		using GPUAPI = PresentSurface::GPUAPI;
 		static auto Init() -> B;
 		static auto AccumulateBox(ColorU32 c, F32 h, F32 w, F32 x, F32 y, F32 r) -> V;
 		static auto CommitDrawCommands() -> V;
@@ -46,6 +51,7 @@ namespace WL
 	private:
 		static auto AllocateBuffers() -> B;
 		static auto ReallocateBuffers(U32 newCapacity) -> B;
+		static auto Clear() -> V;
 
 		inline static U32 instanceCapacity = initialBoxInstancesCapacity;
 		inline static U32 instances = 0;
@@ -67,8 +73,8 @@ namespace WL
 
 namespace WL
 {
-	template<typename TGPUAPI>
-	inline auto BoxRenderer<TGPUAPI>::Init() -> B
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::Init() -> B
 	{
 		if (!AllocateBuffers())
 		{
@@ -76,12 +82,22 @@ namespace WL
 		}
 		positionsBuffer.Update((const Byte*)DefaultQuad2D::vertices, sizeof(DefaultQuad2D::vertices));
 
-		return true;
+		pso.AddShader(BoxVert.data(), BoxVert.size(), EShaderType::Vertex);
+		pso.AddShader(BoxFrag.data(), BoxFrag.size(), EShaderType::Fragment);
+		
+		pso.AddVBLayout({ .binding = 0, .type = EType::Float, .components = 2 });
+		pso.AddVBLayout({ .binding = 1, .type = EType::Float, .components = 4 });
+		pso.AddVBLayout({ .binding = 2, .type = EType::Float, .components = 2 });
+		pso.AddVBLayout({ .binding = 3, .type = EType::Uint, .components = 1 });
+		pso.AddVBLayout({ .binding = 4, .type = EType::Float, .components = 1 });
+		pso.AddSimpleConstant(0, EType::Float, "uScreenDims");
+
+		return pso.Compile();
 	}
 
 
-	template<typename TGPUAPI>
-	inline auto BoxRenderer<TGPUAPI>::AccumulateBox(ColorU32 c, F32 h, F32 w, F32 x, F32 y, F32 r) -> V
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::AccumulateBox(ColorU32 c, F32 w, F32 h, F32 x, F32 y, F32 r) -> V
 	{
 		instances++;
 		if (instances > instanceCapacity)
@@ -91,14 +107,19 @@ namespace WL
 
 		colorsBufferCPU.emplace_back(c);
 		radiusesBufferCPU.emplace_back(r);
-		linearTransformsBufferCPU.emplace_back(1.f / w, 0.f, 0.f, 1.f / h);
+		linearTransformsBufferCPU.emplace_back(w, 0.f, 0.f, h);
 		translationsBufferCPU.emplace_back(x, y);
 	}
 
 
-	template<typename TGPUAPI>
-	inline auto BoxRenderer<TGPUAPI>::CommitDrawCommands() -> V
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::CommitDrawCommands() -> V
 	{
+		if (!instances)
+		{
+			return;
+		}
+
 		colorsBuffer.Update(colorsBufferCPU);
 		radiusesBuffer.Update(radiusesBufferCPU);
 		linearTransformsBuffer.Update(linearTransformsBufferCPU);
@@ -110,13 +131,17 @@ namespace WL
 		pso.BindVB(3, colorsBuffer, true);
 		pso.BindVB(4, radiusesBuffer, true);
 
+		pso.UpdateConstant(0, PresentSurface::GetDimensions());
+
 		pso.Use();
 		pso.DrawInstanced(0, DefaultQuad2D::verticesCount, instances);
+
+		Clear();
 	}
 
 
-	template<typename TGPUAPI>
-	inline auto BoxRenderer<TGPUAPI>::AllocateBuffers() -> B
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::AllocateBuffers() -> B
 	{
 		B status =
 			positionsBuffer.Allocate(DefaultQuad2D::verticesCount) &&
@@ -128,8 +153,8 @@ namespace WL
 	}
 
 
-	template<typename TGPUAPI>
-	inline auto BoxRenderer<TGPUAPI>::ReallocateBuffers(U32 newCapacity) -> B
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::ReallocateBuffers(U32 newCapacity) -> B
 	{
 		B status =
 			linearTransformsBuffer.Reallocate(newCapacity, false) &&
@@ -137,5 +162,16 @@ namespace WL
 			colorsBuffer.Reallocate(newCapacity, false) &&
 			radiusesBuffer.Reallocate(newCapacity, false);
 		return status;
+	}
+
+
+	template<typename TPresentSurface>
+	inline auto BoxRenderer<TPresentSurface>::Clear() -> V
+	{
+		instances = 0;
+		colorsBufferCPU.clear();
+		radiusesBufferCPU.clear();
+		linearTransformsBufferCPU.clear();
+		translationsBufferCPU.clear();
 	}
 }

@@ -41,6 +41,7 @@ namespace WL
 		auto static Destroy() -> V;
 		
 		auto static MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V;
+		auto static Register(Widget<Runtime>* widget)->V;
 		auto static Deregister(Widget<Runtime>* widget) -> V;
 
 		using WidgetLayer = Set<Widget<Runtime>*>;
@@ -99,6 +100,14 @@ namespace WL
 		widgetLayers[newLayer].insert(widget);
 		widget->layer = newLayer;
 	}
+
+
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Register(Widget<Runtime>* widget) -> V
+	{
+		widgetLayers[widget->layer].insert(widget);
+	}
+
 
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Deregister(Widget<Runtime>* widget) -> V

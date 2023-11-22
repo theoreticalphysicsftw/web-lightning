@@ -23,55 +23,31 @@
 
 #pragma once
 
-#include <cstring>
-#include <cstdlib>
-
-#include <algorithm>
+#include <iostream>
 
 #include "types.hpp"
 
 namespace WL
 {
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64;
-	inline auto StringLength(const C* cstr) -> U32;
-	template <typename T>
-	inline auto ToString(const T& v) -> Str;
-	inline auto Terminate() -> V;
-
-	template <class TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V;
+	template <typename... Ts>
+	auto Log(Ts... args) -> V;
+	template <typename... Ts>
+	auto LogError(Ts... args) -> V;
 }
 
 
 namespace WL
 {
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64
+	template <typename... Ts>
+	auto Log(Ts... args) -> V
 	{
-		return array.size() * sizeof(T);
+		(std::cout << ... << args) << std::endl;
 	}
 
 
-	inline auto StringLength(const C* cstr) -> U32
+	template <typename... Ts>
+	auto LogError(Ts... args) -> V
 	{
-		return strlen(cstr);
-	}
-
-	template<typename T>
-	inline auto ToString(const T& v) -> Str
-	{
-		return std::to_string(v);
-	}
-
-	inline auto Terminate() -> V
-	{
-		std::abort();
-	}
-
-	template <typename TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V
-	{
-		std::fill(c.begin(), c.end(), value);
+		(std::cerr << ... << args) << std::endl;
 	}
 }

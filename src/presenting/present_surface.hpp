@@ -38,6 +38,8 @@ namespace WL
     template <class TGPUAPI>
     struct PresentSurface
     {
+        using GPUAPI = TGPUAPI;
+
         static auto Init(const C* appName = "web-lightning") -> B;
         static auto Destroy() -> V;
         static auto PresentLoop() -> V;
@@ -50,6 +52,7 @@ namespace WL
         static auto GetAspectRatio() -> F32;
         static auto SetClearColor(const Color4& color) -> V;
         static auto EnableTransparency() -> V;
+        static auto GetDimensions() -> Vec2;
 
         private:
         static V PresentLoopIteration();
@@ -229,5 +232,12 @@ namespace WL
     inline auto WL::PresentSurface<TGPUAPI>::EnableTransparency() -> V
     {
         TGPUAPI::EnablePresentSurfaceTransparency();
+    }
+
+
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::GetDimensions() -> Vec2
+    {
+        return Vec2(width, height);
     }
 }

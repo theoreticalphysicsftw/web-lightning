@@ -29,7 +29,7 @@
 namespace WL
 {
 	template <typename Runtime>
-	class Box : Widget<Runtime>
+	class Box : public Widget<Runtime>
 	{
 	public:
 		Box(ColorU32 color = 0, F32 w = 0, F32 h = 0, F32 x = 0, F32 y = 0, F32 r = 0);
@@ -58,7 +58,11 @@ namespace WL
 	template<typename Runtime>
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
-		Runtime::Renderer::BoxRenderer::AccumulateBox(color, width, height, offsetX, offsetY, radius);
+		auto ar = Runtime::PresentSurface::GetAspectRatio();
+		auto drawHeight = height * ar;
+		auto drawOffsetY = -1.f + offsetY * ar * 2 + drawHeight / 2;
+		auto drawOffsetX = -1.f + offsetX * 2 + width / 2;
+		Runtime::Renderer::BoxRenderer::AccumulateBox(color, width, drawHeight, drawOffsetX, drawOffsetY, radius);
 	}
 
 

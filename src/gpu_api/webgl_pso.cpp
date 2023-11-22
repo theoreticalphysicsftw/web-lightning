@@ -20,15 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <common/logging.hpp>
+#include <common/utilities.hpp>
 
 #include "webgl_api.hpp"
 #include "webgl_pso.hpp"
+#include "webgl_error.hpp"
+
 
 
 namespace WL
 {
     WebGLPso::WebGLPso() : program(CInvalidId), vao(CInvalidId)
     {
+        Fill(ubSlots, -1);
     }
 
 
@@ -60,7 +65,9 @@ namespace WL
         GLint linkingDone = 0;
         glGetProgramiv(program, GL_LINK_STATUS, &linkingDone);
 
-        return status && linkingDone;
+        WEBGL_VALIDATE(glBindVertexArray(vao));
+
+        return status && (linkingDone == GL_TRUE);
     }
 
     auto WebGLPso::Use() -> V
@@ -77,13 +84,68 @@ namespace WL
 
     auto WebGLPso::DrawInstanced(U32 first, U32 count, U32 instances) -> V
     {
+    #ifdef WL_DEBUG
+        GLint result = 0;
+        glValidateProgram(program);
+        glGetProgramiv(program, GL_VALIDATE_STATUS, &result);
+        if (result != GL_TRUE)
+        {
+            GLint length;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+            Str error;
+            error.resize(length);
+            glGetProgramInfoLog(program, length, &length, error.data());
+            LogError("Validation error: ", error);
+        }
+    #endif
         glDrawArraysInstanced(GL_TRIANGLES, first, count, instances);
+    }
+
+
+    auto WebGLPso::GetUBLocation(U32 slot) -> V
+    {
+        if (ubSlots[slot] == -1)
+        {
+            WEBGL_VALIDATE(ubSlots[slot] = glGetUniformLocation(program, ubNames[slot].c_str()));
+        }
     }
 
 
     auto WebGLPso::AddVBLayout(const VBLayout& layout) -> V
     {
         vbLayouts[layout.binding] = layout;
+    }
+
+
+    auto WebGLPso::AddSimpleConstant(U32 slot, EType type, const C* name) -> V
+    {
+        ubNames[slot] = name;
+    }
+
+
+    auto WebGLPso::UpdateConstant(U32 slot, F32 v) -> V
+    {
+        GetUBLocation(slot);
+        WEBGL_VALIDATE(glUniform1f(ubSlots[slot], v));
+    }
+
+
+    auto WebGLPso::UpdateConstant(U32 slot, Vec2 v) -> V
+    {
+        GetUBLocation(slot);
+        WEBGL_VALIDATE(glUniform2f(ubSlots[slot], v[0], v[1]));
+    }
+
+    auto WebGLPso::UpdateConstant(U32 slot, Vec3 v) -> V
+    {
+        GetUBLocation(slot);
+        WEBGL_VALIDATE(glUniform3f(ubSlots[slot], v[0], v[1], v[2]));
+    }
+
+    auto WebGLPso::UpdateConstant(U32 slot, Vec4 v) -> V
+    {
+        GetUBLocation(slot);
+        WEBGL_VALIDATE(glUniform4f(ubSlots[slot], v[0], v[1], v[2], v[3]));
     }
 
 
@@ -95,22 +157,22 @@ namespace WL
             GL_UNSIGNED_INT,
             GL_FLOAT
         };
-        glEnableVertexAttribArray(slot);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer.GetNativeId());
+        WEBGL_VALIDATE(glEnableVertexAttribArray(slot));
+        WEBGL_VALIDATE(glBindBuffer(GL_ARRAY_BUFFER, buffer.GetNativeId()));
         
         const auto& layout = vbLayouts[slot];
         if (layout.type == EType::Float)
         {
-            glVertexAttribPointer(slot, layout.components, typeTable[(U32)layout.type], GL_FALSE, 0, nullptr);
+            WEBGL_VALIDATE(glVertexAttribPointer(slot, layout.components, typeTable[(U32)layout.type], GL_FALSE, 0, nullptr));
         }
         else
         {
-            glVertexAttribIPointer(slot, layout.components, typeTable[(U32)layout.type], 0, nullptr);
+            WEBGL_VALIDATE(glVertexAttribIPointer(slot, layout.components, typeTable[(U32)layout.type], 0, nullptr));
         }
 
         if (perInstance)
         {
-            glVertexAttribDivisor(slot, 1);
+            WEBGL_VALIDATE(glVertexAttribDivisor(slot, 1));
         }
     }
 

@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 
+#include <common/logging.hpp>
+
 #include "webgl_shader.hpp"
 
 namespace WL
@@ -62,6 +64,16 @@ namespace WL
         glCompileShader(id);
         GLint result;
         glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+
+        if (result != GL_TRUE)
+        {
+            GLint maxLength = 0;
+            glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+            Str errorLog;
+            errorLog.resize(maxLength);
+            glGetShaderInfoLog(id, maxLength, &maxLength, errorLog.data());
+            LogError("Shader compile error: ", errorLog);
+        }
 
         return result == GL_TRUE;
     }

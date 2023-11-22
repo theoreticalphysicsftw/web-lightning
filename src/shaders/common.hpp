@@ -23,20 +23,14 @@
 
 #pragma once
 
-#ifdef INCLUDE_GLSL_IN_CPP
-    #define DEFINE_SHADER(SHADER_NAME) extern Str SHADER_NAME;
-    #define BEGIN_SHADER(SHADER_NAME) Str SHADER_NAME = R"(
-    #define END_SHADER() )";
-#else
-    #define DEFINE_SHADER(SHADER_NAME)
-    #define BEGIN_SHADER(SHADER_NAME)
-    #define END_SHADER()
-#endif
+#include <common/types.hpp>
 
-#ifdef __cplusplus
+#define DEFINE_SHADER(SHADER_NAME) extern Str SHADER_NAME;
+
 namespace WL
 {
-    DEFINE_SHADER(OpaqueDefaultVert)
-    DEFINE_SHADER(OpaqueDefaultFrag)
+    // DEFINE_SHADER(OpaqueDefaultVert);
+    // DEFINE_SHADER(OpaqueDefaultFrag);
+    DEFINE_SHADER(BoxVert);
+    DEFINE_SHADER(BoxFrag);
 }
-#endif
