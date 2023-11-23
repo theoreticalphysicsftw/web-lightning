@@ -35,7 +35,7 @@ int main()
         std::cerr<<"Init failed!"<<std::endl;
     }
 
-    Box<RT> box(0xAA00BBFF, 0.2f, 0.2f, 0.2f, 0.2f, 0.02f);
+    Box<RT> box(0xAA00BBFF, 0.3f, 0.3f, 0.1f, 0.1f, 0.125f);
     RT::Register(&box);
     RT::Loop();
 

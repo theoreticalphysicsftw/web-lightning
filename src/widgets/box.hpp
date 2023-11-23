@@ -59,10 +59,11 @@ namespace WL
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
 		auto ar = Runtime::PresentSurface::GetAspectRatio();
-		auto drawHeight = height * ar;
-		auto drawOffsetY = -1.f + offsetY * ar * 2 + drawHeight / 2;
-		auto drawOffsetX = -1.f + offsetX * 2 + width / 2;
-		Runtime::Renderer::BoxRenderer::AccumulateBox(color, width, drawHeight, drawOffsetX, drawOffsetY, radius);
+		auto drawWidth = width * 2.f;
+		auto drawHeight = height * ar * 2.f;
+		auto drawOffsetY = -1.f + offsetY * ar * 2.f + drawHeight / 2.f;
+		auto drawOffsetX = -1.f + offsetX * 2.f + drawWidth / 2.f;
+		Runtime::Renderer::BoxRenderer::AccumulateBox(color, drawWidth, drawHeight, drawOffsetX, drawOffsetY, radius);
 	}
 
 

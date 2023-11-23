@@ -107,7 +107,7 @@ namespace WL
 
 		colorsBufferCPU.emplace_back(c);
 		radiusesBufferCPU.emplace_back(r);
-		linearTransformsBufferCPU.emplace_back(w, 0.f, 0.f, h);
+		linearTransformsBufferCPU.emplace_back(w / 2.f, 0.f, 0.f, h / 2.f);
 		translationsBufferCPU.emplace_back(x, y);
 	}
 
@@ -131,9 +131,10 @@ namespace WL
 		pso.BindVB(3, colorsBuffer, true);
 		pso.BindVB(4, radiusesBuffer, true);
 
-		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
 		pso.Use();
+		pso.UpdateConstant(0, PresentSurface::GetDimensions());
+
 		pso.DrawInstanced(0, DefaultQuad2D::verticesCount, instances);
 
 		Clear();

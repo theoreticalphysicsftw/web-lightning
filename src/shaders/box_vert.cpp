@@ -16,7 +16,7 @@ namespace WL
 
 		layout(location = 0) out vec4 outColor;
 		layout(location = 1) out float outRadius;
-		layout(location = 2) out vec2 outUpperLeft;
+		layout(location = 2) out vec2 outLowerLeft;
 		layout(location = 3) out vec2 outDims;
 
 		void main()
@@ -35,8 +35,7 @@ namespace WL
 						   ) / 255.f;
 			outRadius = radius;
 			outDims = vec2(linearTransform.x, linearTransform.w);
-			//outUpperLeft = (translation + 1.f - outDims / 2.f ) / 2.f + vec2(0.f, outDims.y);
-			outUpperLeft = (translation + 1.f - outDims / 2.f) / 2.f;
+			outLowerLeft = (translation + 1.f - outDims) / 2.f;
 		}
 	)";
 

@@ -30,22 +30,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(
         GLOB
-        WL_SOURCES 
+        WL_SOURCES
         "src/common/*.cpp"
         "src/main_surface/*.cpp"
         "src/gpu_api/*.cpp"
         "src/algebra/*.cpp"
+        "src/rendering/*.cpp"
+        "src/shaders/*.cpp"
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set(USE_FLAGS "-s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_SDL=2 -s OFFSCREEN_FRAMEBUFFER=1")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
+target_include_directories(${PROJECT_NAME} PUBLIC "extern")
+
 endif()
 
 set(WL_SOURCE_DIR "src")
 add_library(${PROJECT_NAME} ${WL_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${WL_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC "extern")
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:WL_DEBUG>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:WL_RELEASE>)
 
 file(GLOB EXAMPLES "examples/*.cpp")
 foreach(EXAMPLE "${EXAMPLES}")
