@@ -77,8 +77,6 @@ int main()
         }
     );
 
-    //Box<RT> box(0xAA00BBFF, 0.2f, 0.2f, 0.1f, 0.1f, 0.05f);
-    //RT::Register(&box);
     RT::Loop();
 
     return 0;
