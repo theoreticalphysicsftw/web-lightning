@@ -1,3 +1,4 @@
 ctags
 out
 .vs
+CMakeSettings.json
