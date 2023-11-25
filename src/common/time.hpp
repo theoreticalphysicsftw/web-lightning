@@ -21,23 +21,32 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#pragma once
 
-#include <iostream>
+#include "types.hpp"
 
-int main()
+#if __EMSCRIPTEN__
+	#include <emscripten/emscripten.h>
+#else
+	#include <chrono>
+#endif
+
+namespace WL
 {
-    using namespace WL;
-    using RT = RuntimeDefault;
+	auto GetTimeStampUS() -> F64;
+}
 
-    if (!RT::Init())
-    {
-        std::cerr<<"Init failed!"<<std::endl;
-    }
 
-    Box<RT> box(0xAA00BBFF, 0.3f, 0.3f, 0.1f, 0.1f, 0.125f);
-    RT::Register(&box);
-    RT::Loop();
-
-    return 0;
+namespace WL
+{
+	inline auto GetTimeStampUS() -> F64
+	{
+	#if __EMSCRIPTEN__
+		return F64(emscripten_get_now() * 1000.0);
+	#else
+		static auto staticTimePoint = std::chrono::steady_clock::now();
+		auto timePoint = std::chrono::steady_clock::now();
+		return F64(std::chrono::duration_cast<std::chrono::nanoseconds>(timePoint - staticTimePoint).count() / 1000.f);
+	#endif
+	}
 }

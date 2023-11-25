@@ -10,7 +10,7 @@ namespace WL
 
 		layout(location = 0) in vec4 inColor;
 		layout(location = 1) in float radius;
-		layout(location = 2) in vec2 lowerLeft;
+		layout(location = 2) in vec2 centerScreen;
 		layout(location = 3) in vec2 dims;
 
 		layout(location = 0) out vec4 outColor;
@@ -27,8 +27,7 @@ namespace WL
 			float alpha = 1.f;
 			if (radius > 0.f)
 			{
-				vec2 center = (lowerLeft + dims / 2.f) * uScreenDims;
-				float distance = roundedBoxSDF(gl_FragCoord.xy - center, dims / 2.f * uScreenDims, radius * uScreenDims.x);
+				float distance = roundedBoxSDF(gl_FragCoord.xy - centerScreen * uScreenDims, dims / 2.f * uScreenDims, radius * uScreenDims.x);
 				alpha = 1.f - smoothstep(0.f, 1.f, distance) 
 ;
 			}

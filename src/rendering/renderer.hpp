@@ -36,6 +36,7 @@ namespace WL
 
 		static auto Init() -> B;
 		static auto CommitDrawCommands() -> V;
+		static auto Clear() -> V;
 
 	private:
 	};
@@ -52,9 +53,17 @@ namespace WL
 
 
 	template<typename TRenderers>
-	auto Renderer<TRenderers>::CommitDrawCommands() -> V
+	inline auto Renderer<TRenderers>::CommitDrawCommands() -> V
 	{
 		FontRenderer::CommitDrawCommands();
 		BoxRenderer::CommitDrawCommands();
+	}
+	
+
+	template<typename TRenderers>
+	inline auto Renderer<TRenderers>::Clear() -> V
+	{
+		FontRenderer::Clear();
+		BoxRenderer::Clear();
 	}
 }

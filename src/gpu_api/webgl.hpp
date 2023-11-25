@@ -51,5 +51,6 @@ namespace WL
         static auto ClearPresentSurface() -> V;
         static auto EnablePresentSurfaceTransparency() -> V;
         static auto Present() -> V;
+        static auto UpdateViewport(U32 width, U32 height, U32 x = 0, U32 y = 0) -> V;
     };
 }

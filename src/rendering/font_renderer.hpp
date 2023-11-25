@@ -44,10 +44,10 @@ namespace WL
 		static auto Init() -> B;
 		static auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
 		static auto CommitDrawCommands() -> V;
+		static auto Clear() -> V;
 
 	private:
 		inline static GPUAPI::Pso pso;
-		inline static GPUAPI::Buffer positionsBuffer;
 		inline static GPUAPI::Buffer linearTransformsBuffer;
 		inline static GPUAPI::Buffer translationsBuffer;
 		inline static GPUAPI::Buffer colorsBuffer;
@@ -75,6 +75,13 @@ namespace WL
 
 	template<typename GPUAPI, typename Rasterizer>
 	auto FontRenderer<GPUAPI, Rasterizer>::CommitDrawCommands() -> V
+	{
+		return V();
+	}
+
+
+	template<typename GPUAPI, typename Rasterizer>
+	inline auto FontRenderer<GPUAPI, Rasterizer>::Clear() -> V
 	{
 		return V();
 	}

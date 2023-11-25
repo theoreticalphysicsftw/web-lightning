@@ -45,13 +45,13 @@ namespace WL
 		static auto Init() -> B;
 		static auto AccumulateBox(ColorU32 c, F32 h, F32 w, F32 x, F32 y, F32 r) -> V;
 		static auto CommitDrawCommands() -> V;
+		static auto Clear() -> V;
 
 		static constexpr U32 initialBoxInstancesCapacity = 1024;
 
 	private:
 		static auto AllocateBuffers() -> B;
 		static auto ReallocateBuffers(U32 newCapacity) -> B;
-		static auto Clear() -> V;
 
 		inline static U32 instanceCapacity = initialBoxInstancesCapacity;
 		inline static U32 instances = 0;

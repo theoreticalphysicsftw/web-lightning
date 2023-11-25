@@ -61,7 +61,7 @@ namespace WL
 		auto ar = Runtime::PresentSurface::GetAspectRatio();
 		auto drawWidth = width * 2.f;
 		auto drawHeight = height * ar * 2.f;
-		auto drawOffsetY = -1.f + offsetY * ar * 2.f + drawHeight / 2.f;
+		auto drawOffsetY = -offsetY * ar * 2.f  + 1.f - height * ar;
 		auto drawOffsetX = -1.f + offsetX * 2.f + drawWidth / 2.f;
 		Runtime::Renderer::BoxRenderer::AccumulateBox(color, drawWidth, drawHeight, drawOffsetX, drawOffsetY, radius);
 	}

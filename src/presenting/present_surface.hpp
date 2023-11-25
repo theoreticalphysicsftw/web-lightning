@@ -24,9 +24,14 @@
 #pragma once
 
 #include <common/types.hpp>
+#include <common/time.hpp>
 #include <algebra/algebra.hpp>
+
+
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
+
+#include "events.hpp"
 
 #if __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -45,7 +50,9 @@ namespace WL
         static auto PresentLoop() -> V;
 
         using RenderFunction = Function<V()>;
+        using PreRenderFunction = Function<V(F32 dt)>;
 
+        static auto AddPreRenderingCode(const PreRenderFunction& func) -> V;
         static auto AddRenderingCode(const RenderFunction& func) -> V;
         static auto UnitsToPixels(F32 units) -> U32;
         static auto PixelsToUnits(U32 pixels) -> F32;
@@ -56,16 +63,17 @@ namespace WL
 
         private:
         static V PresentLoopIteration();
-        static V Render();
         static V ProcessInput();
 
         inline static SDL_Window* window = nullptr;
-        inline static RenderFunction renderFunction = []() {};
+        inline static RenderFunction renderFunction = [](){};
+        inline static PreRenderFunction preRenderFunction = [](F64 dt){};
+
+        inline static F64 timeStamp = 0;
 
         inline static U32 width = 0;
         inline static U32 height = 0;
         inline static B isWindowClosed = false;
-
         inline static Color4 clearColor = Color4(1.0f, 1.0f, 1.0f, 1.0f);
     };
 }
@@ -118,7 +126,7 @@ namespace WL
         }
 
         TGPUAPI::SetPresentSurfaceClearColor(clearColor);
-
+        timeStamp = GetTimeStampUS();
         return true;
     }
 
@@ -152,6 +160,7 @@ namespace WL
             {
                 width = event.window.data1;
                 height = event.window.data2;
+                TGPUAPI::UpdateViewport(width, height);
             }
 
             if (event.type == SDL_KEYDOWN)
@@ -163,18 +172,16 @@ namespace WL
 
 
     template <class TGPUAPI>
-    auto PresentSurface<TGPUAPI>::Render() -> V
-    {
-        renderFunction();
-    }
-
-
-    template <class TGPUAPI>
     auto PresentSurface<TGPUAPI>::PresentLoopIteration() -> V
     {
-        Render();
-        TGPUAPI::Present();
+        auto newTimeStamp = GetTimeStampUS();
+        auto dt = newTimeStamp - timeStamp;
+        timeStamp = newTimeStamp;
+
         ProcessInput();
+        preRenderFunction(dt);
+        renderFunction();
+        TGPUAPI::Present();
     }
 
 
@@ -191,6 +198,12 @@ namespace WL
 #endif
     }
 
+
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::AddPreRenderingCode(const PreRenderFunction& func) -> V
+    {
+        preRenderFunction = func;
+    }
 
     template <class TGPUAPI>
     auto PresentSurface<TGPUAPI>::AddRenderingCode(const RenderFunction& func) -> V

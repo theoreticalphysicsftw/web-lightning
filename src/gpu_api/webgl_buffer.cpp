@@ -23,6 +23,7 @@
 
 
 #include "webgl_buffer.hpp"
+#include "webgl_error.hpp"
 
 
 namespace WL
@@ -55,8 +56,8 @@ namespace WL
 
 	auto WebGLBuffer::Update(const Byte* data, U32 size) -> V
 	{
-		glBindBuffer(GL_COPY_WRITE_BUFFER, id);
-		glBufferData(GL_COPY_WRITE_BUFFER, size, data, onGPU? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+		WEBGL_VALIDATE(glBindBuffer(GL_COPY_WRITE_BUFFER, id));
+		WEBGL_VALIDATE(glBufferData(GL_COPY_WRITE_BUFFER, size, data, onGPU? GL_STATIC_DRAW : GL_DYNAMIC_DRAW));
 	}
 
 }

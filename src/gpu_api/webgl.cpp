@@ -74,4 +74,9 @@ namespace WL
     {
         SDL_GL_SwapWindow(window);
     }
+
+    auto WebGL::UpdateViewport(U32 width, U32 height, U32 x, U32 y) -> V
+    {
+        glViewport(x, y, width, height);
+    }
 }

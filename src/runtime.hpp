@@ -35,6 +35,7 @@ namespace WL
 		using GPUAPI = TGPUAPI;
 		using Renderer = TRenderer;
 		using PresentSurface = PresentSurface<GPUAPI>;
+		using PreRenderFunction = PresentSurface::PreRenderFunction;
 
 		auto static Init() -> B;
 		auto static Loop() -> V;
@@ -43,6 +44,8 @@ namespace WL
 		auto static MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V;
 		auto static Register(Widget<Runtime>* widget)->V;
 		auto static Deregister(Widget<Runtime>* widget) -> V;
+
+		auto static AddPreRenderingCode(const PreRenderFunction& func) -> V;
 
 		using WidgetLayer = Set<Widget<Runtime>*>;
 		using WidgetLayers = ChunkArray<WidgetLayer>;
@@ -117,6 +120,13 @@ namespace WL
 
 
 	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::AddPreRenderingCode(const PreRenderFunction& func) -> V
+	{
+		PresentSurface::AddPreRenderingCode(func);
+	}
+
+
+	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::WidgetRenderingCode() -> V
 	{
 		TGPUAPI::ClearPresentSurface();
@@ -131,6 +141,7 @@ namespace WL
 				}
 			}
 			TRenderer::CommitDrawCommands();
+			TRenderer::Clear();
 		}
 	}
 }

@@ -76,5 +76,5 @@
     }
 	
 #else
-	#define WEBGL_VALIDATE(ARG)
+	#define WEBGL_VALIDATE(ARG) ARG
 #endif
