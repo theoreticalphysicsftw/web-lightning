@@ -55,7 +55,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:WL_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:WL_RELEASE>)
 
 file(GLOB EXAMPLES "examples/*.cpp")
-foreach(EXAMPLE "${EXAMPLES}")
+foreach(EXAMPLE ${EXAMPLES})
     cmake_path(GET EXAMPLE STEM EXAMPLE_NAME)
     configure_file("index.html" ${CMAKE_BINARY_DIR})
     add_executable(${EXAMPLE_NAME} "${EXAMPLE}")
