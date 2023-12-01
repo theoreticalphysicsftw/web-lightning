@@ -23,12 +23,61 @@
 
 #pragma once
 
+#include <stb_truetype.h>
+
+#include <common/types.hpp>
+#include <embedded/embedded_font.hpp>
+
 #include "font_rasterizer.hpp"
+
 
 namespace WL
 {
 	template <typename TGPUAPI>
 	class FontRasterizerCPU : FontRasterizer<FontRasterizerCPU<TGPUAPI>, TGPUAPI>
 	{
+	public:
+		using GPUAPI = TGPUAPI;
+
+		inline static auto Init() -> B;
+		inline static auto AddFont(const Byte* fontData, U32 fontSize) -> U32;
+
+		inline static Map<U64, typename GPUAPI::Image*> fontMaps;
+		inline static Array<stbtt_fontinfo> fontInfos;
+
 	};
+}
+
+
+namespace WL
+{
+	template<typename TGPUAPI>
+	inline auto FontRasterizerCPU<TGPUAPI>::Init() -> B
+	{
+	#ifdef WL_USE_EMBEDDED_FONT
+		stbtt_fontinfo info;
+		
+		if (stbtt_InitFont(&info, OpenSans, 0))
+		{
+			fontInfos.push_back(info);
+			return true;
+		}
+
+		return false;
+	#endif
+	}
+
+
+	template<typename TGPUAPI>
+	inline auto FontRasterizerCPU<TGPUAPI>::AddFont(const Byte* fontData, U32 fontSize) -> U32
+	{
+		stbtt_fontinfo info;
+		if (stbtt_InitFont(&info, fontData, 0))
+		{
+			fontInfos.push_back(info);
+			return fontInfos.size() - 1;
+		}
+
+		return ~0u;
+	}
 }

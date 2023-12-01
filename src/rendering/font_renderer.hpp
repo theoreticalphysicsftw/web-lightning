@@ -37,20 +37,37 @@ namespace WL
 		F32 offestY = 0;
 	};
 
-	template <typename GPUAPI, typename Rasterizer>
+	template <typename TPresentSurface, typename TRasterizer>
 	class FontRenderer
 	{
 	public:
+		using Rasterizer = TRasterizer;
+		using PresentSurface = TPresentSurface;
+		using GPUAPI = PresentSurface::GPUAPI;
 		static auto Init() -> B;
 		static auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
 		static auto CommitDrawCommands() -> V;
 		static auto Clear() -> V;
 
 	private:
+		static auto AllocateBuffers() -> B;
+		static auto ReallocateBuffers(U32 newCapacity) -> B;
+
+
+		inline static U32 initialGlyphInstancesCapacity = 1024;
+		inline static U32 instances = 0;
+
 		inline static GPUAPI::Pso pso;
+
 		inline static GPUAPI::Buffer linearTransformsBuffer;
 		inline static GPUAPI::Buffer translationsBuffer;
 		inline static GPUAPI::Buffer colorsBuffer;
+		inline static GPUAPI::Buffer glyphIndicesBuffer;
+
+		inline static Array<Mat2x2> linearTransformsBufferCPU;
+		inline static Array<Vec2> translationsBufferCPU;
+		inline static Array<ColorU32> colorsBufferCPU;
+		inline static Array<U32> glyphIndicesBufferCPU;
 	};
 
 
@@ -59,30 +76,53 @@ namespace WL
 
 namespace WL
 {
-	template<typename GPUAPI, typename Rasterizer>
-	auto FontRenderer<GPUAPI, Rasterizer>::Init() -> B
+	template <typename TPresentSurface, typename TRasterizer>
+	auto FontRenderer<TPresentSurface, TRasterizer>::Init() -> B
 	{
-		return true;
+		return Rasterizer::Init();
 	}
 
 
-	template<typename GPUAPI, typename Rasterizer>
-	auto FontRenderer<GPUAPI, Rasterizer>::AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V
+	template <typename TPresentSurface, typename TRasterizer>
+	auto FontRenderer<TPresentSurface, TRasterizer>::AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V
 	{
 		return V();
 	}
 
 
-	template<typename GPUAPI, typename Rasterizer>
-	auto FontRenderer<GPUAPI, Rasterizer>::CommitDrawCommands() -> V
+	template <typename TPresentSurface, typename TRasterizer>
+	auto FontRenderer<TPresentSurface, TRasterizer>::CommitDrawCommands() -> V
 	{
 		return V();
 	}
 
 
-	template<typename GPUAPI, typename Rasterizer>
-	inline auto FontRenderer<GPUAPI, Rasterizer>::Clear() -> V
+	template <typename TPresentSurface, typename TRasterizer>
+	inline auto FontRenderer<TPresentSurface, TRasterizer>::Clear() -> V
 	{
 		return V();
+	}
+
+	template <typename TPresentSurface, typename TRasterizer>
+	inline auto FontRenderer<TPresentSurface, TRasterizer>::AllocateBuffers() -> B
+	{
+		B status =
+			linearTransformsBuffer.Allocate(initialGlyphInstancesCapacity, false) &&
+			translationsBuffer.Allocate(initialGlyphInstancesCapacity, false) &&
+			colorsBuffer.Allocate(initialGlyphInstancesCapacity, false) &&
+			glyphIndicesBuffer.Allocate(initialGlyphInstancesCapacity, false);
+		return status;
+	}
+
+
+	template <typename TPresentSurface, typename TRasterizer>
+	inline auto FontRenderer<TPresentSurface, TRasterizer>::ReallocateBuffers(U32 newCapacity) -> B
+	{
+		B status =
+			linearTransformsBuffer.Reallocate(newCapacity, false) &&
+			translationsBuffer.Reallocate(newCapacity, false) &&
+			colorsBuffer.Reallocate(newCapacity, false) &&
+			glyphIndicesBuffer.Reallocate(newCapacity, false);
+		return status;
 	}
 }

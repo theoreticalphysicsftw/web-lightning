@@ -44,7 +44,7 @@ namespace WL
 	using PresentSurfaceDefault = PresentSurface<GPUAPIDefault>;
 	using FontRasterizerDefault = FontRasterizerCPU<GPUAPIDefault>;
 	
-	using FontRendererDefault = FontRenderer<GPUAPIDefault, FontRasterizerDefault>;
+	using FontRendererDefault = FontRenderer<PresentSurfaceDefault, FontRasterizerDefault>;
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
 
 	struct RenderersDefault

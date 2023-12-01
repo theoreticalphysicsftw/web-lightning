@@ -37,6 +37,7 @@ file(
         "src/algebra/*.cpp"
         "src/rendering/*.cpp"
         "src/shaders/*.cpp"
+        "src/embedded/*.cpp"
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
@@ -53,6 +54,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC "extern")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:WL_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:WL_RELEASE>)
+
+option(WL_USE_EMBEDDED_FONT "Embed default font into the library" ON)
+if (WL_USE_EMBEDDED_FONT)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WL_USE_EMBEDDED_FONT)
+endif()
 
 file(GLOB EXAMPLES "examples/*.cpp")
 foreach(EXAMPLE ${EXAMPLES})
@@ -76,3 +82,6 @@ add_subdirectory("extern/Glad")
 target_link_libraries(${PROJECT_NAME} SDL2-static)
 target_link_libraries(${PROJECT_NAME} glad-es3)
 endif()
+
+add_library(stb_truetype "extern/stb_truetype.cpp")
+target_link_libraries(${PROJECT_NAME} stb_truetype)

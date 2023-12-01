@@ -50,7 +50,7 @@ namespace WL
         static auto PresentLoop() -> V;
 
         using RenderFunction = Function<V()>;
-        using PreRenderFunction = Function<V(F32 dt)>;
+        using PreRenderFunction = Function<V(F64 dt)>;
 
         static auto AddPreRenderingCode(const PreRenderFunction& func) -> V;
         static auto AddRenderingCode(const RenderFunction& func) -> V;
@@ -85,8 +85,8 @@ namespace WL
     EM_JS(U32, GetCanvasWidth, (), { return canvas.width; });
     EM_JS(U32, GetCanvasHeight, (), { return canvas.height; });
 #else
-    U32 GetCanvasWidth() { return 960; }
-    U32 GetCanvasHeight() { return 540; }
+    inline U32 GetCanvasWidth() { return 960; }
+    inline U32 GetCanvasHeight() { return 540; }
 #endif
 
 

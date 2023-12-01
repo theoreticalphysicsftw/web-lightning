@@ -23,55 +23,12 @@
 
 #pragma once
 
-#include <cstring>
-#include <cstdlib>
-
-#include <algorithm>
-
-#include "types.hpp"
+#include <common/types.hpp>
 
 namespace WL
 {
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64;
-	inline auto StringLength(const C* cstr) -> U32;
-	template <typename T>
-	inline auto ToString(const T& v) -> Str;
-	inline auto Terminate() -> V;
-
-	template <class TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V;
-}
-
-
-namespace WL
-{
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64
-	{
-		return array.size() * sizeof(T);
-	}
-
-
-	inline auto StringLength(const C* cstr) -> U32
-	{
-		return U32(strlen(cstr));
-	}
-
-	template<typename T>
-	inline auto ToString(const T& v) -> Str
-	{
-		return std::to_string(v);
-	}
-
-	inline auto Terminate() -> V
-	{
-		std::abort();
-	}
-
-	template <typename TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V
-	{
-		std::fill(c.begin(), c.end(), value);
-	}
+#ifdef WL_USE_EMBEDDED_FONT
+	static constexpr U32 OpenSansSize = 130836;
+	extern const Byte OpenSans[OpenSansSize];
+#endif
 }

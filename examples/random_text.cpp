@@ -21,57 +21,27 @@
 // SOFTWARE.
 
 
-#pragma once
+#include "web_lightning.hpp"
 
-#include <cstring>
-#include <cstdlib>
+#include <iostream>
+#include <random>
 
-#include <algorithm>
-
-#include "types.hpp"
-
-namespace WL
+int main()
 {
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64;
-	inline auto StringLength(const C* cstr) -> U32;
-	template <typename T>
-	inline auto ToString(const T& v) -> Str;
-	inline auto Terminate() -> V;
+    using namespace WL;
+    using RT = RuntimeDefault;
 
-	template <class TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V;
-}
+    if (!RT::Init())
+    {
+        std::cerr << "Init failed!" << std::endl;
+    }
 
-
-namespace WL
-{
-	template <typename T>
-	inline auto SizeInBytes(const Array<T>& array) -> U64
-	{
-		return array.size() * sizeof(T);
-	}
+    auto rd = std::random_device();
+    auto mt = std::mt19937(rd());
+    auto dist = std::uniform_int_distribution<U32>(0, ~0u);
 
 
-	inline auto StringLength(const C* cstr) -> U32
-	{
-		return U32(strlen(cstr));
-	}
+    RT::Loop();
 
-	template<typename T>
-	inline auto ToString(const T& v) -> Str
-	{
-		return std::to_string(v);
-	}
-
-	inline auto Terminate() -> V
-	{
-		std::abort();
-	}
-
-	template <typename TContainer>
-	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V
-	{
-		std::fill(c.begin(), c.end(), value);
-	}
+    return 0;
 }
