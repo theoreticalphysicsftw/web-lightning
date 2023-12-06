@@ -24,6 +24,7 @@
 #define __glad_h_
 
 #include <cstdint>
+#include <cstddef>
 
 #ifdef __gl2_h_
 #error OpenGL ES 2 header already included, remove this include, glad already provides it
