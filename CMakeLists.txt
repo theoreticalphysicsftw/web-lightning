@@ -41,10 +41,13 @@ file(
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    set(USE_FLAGS "-s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_SDL=2 -s OFFSCREEN_FRAMEBUFFER=1")
+    set(USE_FLAGS "${USE_FLAGS} -sMIN_WEBGL_VERSION=2")
+    set(USE_FLAGS "${USE_FLAGS} -sMAX_WEBGL_VERSION=2")
+    set(USE_FLAGS "${USE_FLAGS} -sUSE_WEBGL2=1")
+    set(USE_FLAGS "${USE_FLAGS} -sUSE_SDL=2")
+    set(USE_FLAGS "${USE_FLAGS} -sOFFSCREEN_FRAMEBUFFER=1")
+    set(USE_FLAGS "${USE_FLAGS} -sALLOW_MEMORY_GROWTH")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
-target_include_directories(${PROJECT_NAME} PUBLIC "extern")
-
 endif()
 
 set(WL_SOURCE_DIR "src")
@@ -77,10 +80,10 @@ endforeach()
 
 
 if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten"))
-add_subdirectory("extern/SDL2")
-add_subdirectory("extern/Glad")
-target_link_libraries(${PROJECT_NAME} SDL2-static)
-target_link_libraries(${PROJECT_NAME} glad-es3)
+    add_subdirectory("extern/SDL2")
+    add_subdirectory("extern/Glad")
+    target_link_libraries(${PROJECT_NAME} SDL2-static)
+    target_link_libraries(${PROJECT_NAME} glad-es3)
 endif()
 
 add_library(stb_truetype "extern/stb_truetype.cpp")

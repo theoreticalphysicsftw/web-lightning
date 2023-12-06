@@ -4,8 +4,7 @@ namespace WL
 {
 
 	Str BoxVert =
-	R"(
-		#version 300 es
+	R"( #version 300 es
 		precision highp float;
 
 		layout(location = 0) in vec2 position;
@@ -14,10 +13,10 @@ namespace WL
 		layout(location = 3) in uint color;
 		layout(location = 4) in float radius;
 
-		layout(location = 0) out vec4 outColor;
-		layout(location = 1) out float outRadius;
-		layout(location = 2) out vec2 outCenterScreen;
-		layout(location = 3) out vec2 outDims;
+		out vec4 voutColor;
+		out float voutRadius;
+		out vec2 voutCenterScreen;
+	    out vec2 voutDims;
 
 		void main()
 		{
@@ -27,15 +26,15 @@ namespace WL
 			vec2 outPos = linearComponent * position + translation;
 
 			gl_Position = vec4(outPos.x, outPos.y, 0.f, 1.f);
-			outColor = vec4(
+			voutColor = vec4(
 							  (color >> 24) & 0xFFu,
 							  (color >> 16) & 0xFFu,
 							  (color >> 8) & 0xFFu,
 							  color & 0xFFu
 						   ) / 255.f;
-			outRadius = radius;
-			outDims = vec2(linearTransform.x, linearTransform.w);
-			outCenterScreen = (translation + 1.f) / 2.f;
+			voutRadius = radius;
+			voutDims = vec2(linearTransform.x, linearTransform.w);
+			voutCenterScreen = (translation + 1.f) / 2.f;
 		}
 	)";
 

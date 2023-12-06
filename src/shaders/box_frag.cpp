@@ -4,16 +4,15 @@ namespace WL
 { 
 
 	Str BoxFrag =
-	R"(
-		#version 300 es
+	R"( #version 300 es
 		precision highp float;
 
-		layout(location = 0) in vec4 inColor;
-		layout(location = 1) in float radius;
-		layout(location = 2) in vec2 centerScreen;
-		layout(location = 3) in vec2 dims;
+        in vec4 voutColor;
+        in float voutRadius;
+        in vec2 voutCenterScreen;
+        in vec2 voutDims;
 
-		layout(location = 0) out vec4 outColor;
+		out vec4 outColor;
 		
 		uniform vec2 uScreenDims;
 
@@ -25,13 +24,13 @@ namespace WL
 		void main()
 		{
 			float alpha = 1.f;
-			if (radius > 0.f)
+			if (voutRadius > 0.f)
 			{
-				float distance = roundedBoxSDF(gl_FragCoord.xy - centerScreen * uScreenDims, dims / 2.f * uScreenDims, radius * uScreenDims.x);
+				float distance = roundedBoxSDF(gl_FragCoord.xy - voutCenterScreen * uScreenDims, voutDims / 2.f * uScreenDims, voutRadius * uScreenDims.x);
 				alpha = 1.f - smoothstep(0.f, 1.f, distance) 
 ;
 			}
-			outColor = vec4(inColor.xyz, inColor.w * alpha);
+			outColor = vec4(voutColor.xyz, voutColor.w * alpha);
 		}
 	)";
 

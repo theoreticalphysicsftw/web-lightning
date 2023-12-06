@@ -64,6 +64,8 @@ namespace WL
 		}
 
 		return false;
+    #else
+        return true;
 	#endif
 	}
 

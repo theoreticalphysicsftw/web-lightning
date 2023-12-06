@@ -26,8 +26,7 @@
 #include "common/types.hpp"
 
 #if __EMSCRIPTEN__
-#define GL_GLEXT_PROTOTYPES 1
-#include <SDL2/SDL_opengles2.h>
+#include <GLES3/gl3.h>
 #else
 #include <Glad/glad.h>
 #include <SDL2/SDL_video.h>
