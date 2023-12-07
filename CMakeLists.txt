@@ -86,5 +86,5 @@ if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten"))
     target_link_libraries(${PROJECT_NAME} glad-es3)
 endif()
 
-add_library(stb_truetype "extern/stb_truetype.cpp")
-target_link_libraries(${PROJECT_NAME} stb_truetype)
+add_library(stb "extern/stb.cpp")
+target_link_libraries(${PROJECT_NAME} stb)
