@@ -6,17 +6,27 @@ avoid the bloated DOM manipulation, give the ability to do complex effects cheap
 the GPU as well (having an advantage when zooming over the CPU rasterization used by browsers).
 
 ## Building
-    emcmake -B build && cmake --build build -j `nproc`
 
+For WebAssembly/WebGL builds:
+
+    emcmake cmake -B build && cmake --build build -j `nproc`
+    
+For Desktop/WebGL
+
+     cmake -B build && cmake --build build -j `nproc`
+
+    
 ## Usage
 
 ## Progress
 ### General
-- [ ] Create general WebGL rendering interface
-- [ ] Enable font rendering
+- [x] Create general WebGL rendering interface.
+- [ ] Enable CPU font rendering.
+- [ ] Enable GPU font rendering.
 - [ ] Enable general 2D vector rendering on the GPU
 - [ ] API for 3D rendering
 ### Widgets
+- [x] Boxes
 - [ ] Containers
 - [ ] Buttons
 - [ ] Sliders
@@ -24,3 +34,5 @@ the GPU as well (having an advantage when zooming over the CPU rasterization use
 - [ ] Images
 - [ ] Canvases
 - [ ] Input Fields
+
+## Showcase
