@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 
-#include "web_lightning.hpp"
+#include <web_lightning.hpp>
 
 #include <iostream>
 #include <random>
@@ -40,26 +40,33 @@ int main()
     auto rd = std::random_device();
     auto mt = std::mt19937(rd());
     auto dist = std::uniform_int_distribution<U32>(0, ~0u);
+    auto colorDist = std::uniform_int_distribution<U32>(0, 0xFFu);
     auto boxesSize = 1u << 20;
     Array<Box<RT>> boxes;
     boxes.reserve(boxesSize);
     
     RT::AddPreRenderingCode
     (
-        [boxesSize, &mt, &dist, &boxes](F64 dt)
+        [boxesSize, &mt, &dist, &colorDist, &boxes](F64 dt)
         {
             static U32 currentBoxes = 0;
+            static constexpr U32 boxesBatch = 128;
             if (currentBoxes < boxesSize && dt / 1000.0 < 32)
             {
-                for (auto i = 0u; (i < 128 && currentBoxes < boxesSize); ++i)
+                for (auto i = 0u; (i < boxesBatch && currentBoxes < boxesSize); ++i)
                 {
                     auto w = dist(mt) / F32(~0u);
                     auto h = dist(mt) / F32(~0u);
                     auto x = dist(mt) / F32(~0u);
                     auto y = dist(mt) / F32(~0u);
                     auto r = dist(mt) / F32(~0u);
-                    auto c = dist(mt);
-                    boxes.emplace_back(c | 0xFF, w / 8.f, h / 8.f, x, y / 2.f, r);
+                    ColorU32 color;
+                    color.y = colorDist(mt);
+                    color.cr = ClampedU8(colorDist(mt) + 125u);
+                    color.cb = ClampedU8(colorDist(mt) + 125u);
+                    color.a = 0xFFu;
+                    auto rgbColor = YCbCrAToRGBA(color);
+                    boxes.emplace_back(rgbColor, w / 8.f, h / 8.f, x, y / 2.f, r);
                     RT::Register(&boxes.back());
                     currentBoxes++;
                 }
