@@ -29,6 +29,7 @@
 #include <algorithm>
 
 #include "types.hpp"
+#include "concepts.hpp"
 
 namespace WL
 {
@@ -41,6 +42,10 @@ namespace WL
 
 	template <class TContainer>
 	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V;
+	
+	template <typename T>
+		requires CIsArithmetic<T>
+	inline auto ClampedU8(T v) -> U8;
 }
 
 
@@ -73,5 +78,12 @@ namespace WL
 	inline auto Fill(TContainer& c, const typename TContainer::value_type& value) -> V
 	{
 		std::fill(c.begin(), c.end(), value);
+	}
+
+	template<typename T>
+		requires CIsArithmetic<T>
+	inline auto ClampedU8(T v) -> U8
+	{
+		return U8(std::max(T(0), std::min(v, T(0xFF))));
 	}
 }
