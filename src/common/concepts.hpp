@@ -31,4 +31,10 @@ namespace WL
 {
     template <typename T, typename... Ts>
     concept CAllAreConstructibleFrom = (std::constructible_from<Ts, T> && ...); 
+
+    template <typename T>
+    concept CIsIntegral = std::integral<T>;
+
+    template <typename T>
+    concept CIsArithmetic = std::floating_point<T> || std::integral<T>;
 }
