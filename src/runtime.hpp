@@ -34,8 +34,8 @@ namespace WL
 	public:
 		using GPUAPI = TGPUAPI;
 		using Renderer = TRenderer;
-		using PresentSurface = PresentSurface<GPUAPI>;
-		using PreRenderFunction = PresentSurface::PreRenderFunction;
+		using GPUPresentSurface = PresentSurface<GPUAPI>;
+		using PreRenderFunction = GPUPresentSurface::PreRenderFunction;
 
 		auto static Init() -> B;
 		auto static Loop() -> V;
@@ -63,13 +63,13 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Init() -> B
 	{
-		if (!(PresentSurface::Init() && Renderer::Init()))
+		if (!(GPUPresentSurface::Init() && Renderer::Init()))
 		{
 			return false;
 		}
 
-		PresentSurface::EnableTransparency();
-		PresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
+		GPUPresentSurface::EnableTransparency();
+		GPUPresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
 
 		widgetLayers.resize(8);
 
@@ -80,14 +80,14 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Loop() -> V
 	{
-		PresentSurface::PresentLoop();
+		GPUPresentSurface::PresentLoop();
 	}
 
 
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Destroy() -> V
 	{
-		return PresentSurface::Destroy();
+		return GPUPresentSurface::Destroy();
 	}
 
 	template<typename TGPUAPI, typename TRenderer>
@@ -122,7 +122,7 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::AddPreRenderingCode(const PreRenderFunction& func) -> V
 	{
-		PresentSurface::AddPreRenderingCode(func);
+		GPUPresentSurface::AddPreRenderingCode(func);
 	}
 
 

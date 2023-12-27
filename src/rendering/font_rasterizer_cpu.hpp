@@ -26,9 +26,11 @@
 #include <stb_truetype.h>
 
 #include <common/types.hpp>
+#include <common/unicode.hpp>
 #include <embedded/embedded_font.hpp>
 
 #include "font_rasterizer.hpp"
+#include "rasterized_font.hpp"
 
 
 namespace WL
@@ -38,11 +40,19 @@ namespace WL
 	{
 	public:
 		using GPUAPI = TGPUAPI;
+		using Image = typename GPUAPI::Image;
+
+		static constexpr U32 CDefaultAtlasSize = 2048;
+		static constexpr U32 CDefaultAA = 2;
 
 		inline static auto Init() -> B;
 		inline static auto AddFont(const Byte* fontData, U32 fontSize) -> U32;
+		inline static auto BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> const Image&;
 
-		inline static Map<U64, typename GPUAPI::Image*> fontMaps;
+	private:
+		static constexpr U32 CInitialFontCapacity = 128;
+
+		inline static Array<RasterizedFont<GPUAPI>> fonts;
 		inline static Array<stbtt_fontinfo> fontInfos;
 
 	};
@@ -54,12 +64,15 @@ namespace WL
 	template<typename TGPUAPI>
 	inline auto FontRasterizerCPU<TGPUAPI>::Init() -> B
 	{
+		fonts.reserve(CInitialFontCapacity);
+
 	#ifdef WL_USE_EMBEDDED_FONT
 		stbtt_fontinfo info;
 		
 		if (stbtt_InitFont(&info, OpenSans, 0))
 		{
 			fontInfos.push_back(info);
+			fonts.emplace_back();
 			return true;
 		}
 
@@ -81,5 +94,25 @@ namespace WL
 		}
 
 		return ~0u;
+	}
+
+
+	template<typename TGPUAPI>
+	inline auto FontRasterizerCPU<TGPUAPI>::BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> const Image&
+	{
+		Image* img = nullptr;
+
+		stbtt_pack_context spc;
+		Byte* bitmapData = Allocate(CDefaultAtlasSize * CDefaultAtlasSize);
+		stbtt_PackBegin(&spc, bitmapData, CDefaultAtlasSize, CDefaultAtlasSize, 0, 1, nullptr);
+		stbtt_PackSetOversampling(&spc, CDefaultAA, CDefaultAA);
+
+		for (auto& range : ranges)
+		{
+
+		}
+
+		stbtt_PackEnd(&spc);
+		return *img;
 	}
 }

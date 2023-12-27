@@ -23,29 +23,17 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <common/unicode.hpp>
-
+#include "types.hpp"
 
 namespace WL
 {
-	struct AtlasGlyphDesc
+	struct UnicodeRange
 	{
-		// Texture coordinates in atlas
-		F32 U0;
-		F32 V0;
-		F32 U1;
-		F32 V1;
+		U32 firstChar;
+		U32 lastChar;
+		
+		constexpr auto Count() -> U32 const { return lastChar - firstChar + 1; }
 	};
 
-	template <typename TGPUAPI>
-	class RasterizedFont
-	{
-	public:
-		using GPUAPI = TGPUAPI;
-		using Image = GPUAPI::Image;
-
-		Map<U32, AtlasGlyphDesc> codepointToGlyph;
-		Map<U32, Image*> heightToAtlas;
-	};
+	inline static constexpr UnicodeRange BasicLatin = { 0x0020, 0x007F };
 }

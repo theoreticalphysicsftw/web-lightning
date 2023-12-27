@@ -79,7 +79,12 @@ namespace WL
 	template <typename TPresentSurface, typename TRasterizer>
 	auto FontRenderer<TPresentSurface, TRasterizer>::Init() -> B
 	{
-		return Rasterizer::Init();
+		if (!Rasterizer::Init())
+		{
+			return false;
+		}
+
+
 	}
 
 

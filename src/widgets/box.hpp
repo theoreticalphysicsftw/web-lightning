@@ -58,7 +58,7 @@ namespace WL
 	template<typename Runtime>
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
-		auto ar = Runtime::PresentSurface::GetAspectRatio();
+		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
 		auto drawWidth = width * 2.f;
 		auto drawHeight = height * ar * 2.f;
 		auto drawOffsetY = -offsetY * ar * 2.f  + 1.f - height * ar;
