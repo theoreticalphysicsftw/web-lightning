@@ -23,17 +23,25 @@
 
 #pragma once
 
-#include "types.hpp"
+#include <common/types.hpp>
+#include <common/unicode.hpp>
 
 namespace WL
 {
-	struct UnicodeRange
+	struct Config
 	{
-		U32 firstChar;
-		U32 lastChar;
-		
-		constexpr auto Count() const -> U32 { return lastChar - firstChar + 1; }
-	};
+		U32 defaultFontHeight = 16;
+		B useFontAtlases = true;
+		Array<UnicodeRange> defaultFontRanges;
 
-	inline static constexpr UnicodeRange CBasicLatin = { 0x0020, 0x007F };
+		inline Config();
+	};
+}
+
+namespace WL
+{
+	inline Config::Config()
+	{
+		defaultFontRanges.push_back(CBasicLatin);
+	}
 }

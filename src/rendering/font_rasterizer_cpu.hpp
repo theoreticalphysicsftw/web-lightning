@@ -27,6 +27,7 @@
 
 #include <common/types.hpp>
 #include <common/unicode.hpp>
+#include <common/memory.hpp>
 #include <embedded/embedded_font.hpp>
 
 #include "font_rasterizer.hpp"
@@ -47,7 +48,8 @@ namespace WL
 
 		inline static auto Init() -> B;
 		inline static auto AddFont(const Byte* fontData, U32 fontSize) -> U32;
-		inline static auto BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> const Image&;
+		inline static auto BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
+		inline static auto BuildAtlases(U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
 
 	private:
 		static constexpr U32 CInitialFontCapacity = 128;
@@ -98,21 +100,64 @@ namespace WL
 
 
 	template<typename TGPUAPI>
-	inline auto FontRasterizerCPU<TGPUAPI>::BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> const Image&
+	inline auto FontRasterizerCPU<TGPUAPI>::BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> V
 	{
-		Image* img = nullptr;
-
 		stbtt_pack_context spc;
 		Byte* bitmapData = Allocate(CDefaultAtlasSize * CDefaultAtlasSize);
 		stbtt_PackBegin(&spc, bitmapData, CDefaultAtlasSize, CDefaultAtlasSize, 0, 1, nullptr);
 		stbtt_PackSetOversampling(&spc, CDefaultAA, CDefaultAA);
 
+		Array<stbtt_packedchar> stbRangesCoords;
+		Array<stbtt_pack_range> stbRanges;
+		U32 totalGlyphs = 0;
+
+		stbRanges.reserve(ranges.size());
 		for (auto& range : ranges)
 		{
-
+			stbtt_pack_range r;
+			r.font_size = fontHeight;
+			r.first_unicode_codepoint_in_range = range.firstChar;
+			r.array_of_unicode_codepoints = nullptr;
+			r.num_chars = range.Count();
+			totalGlyphs += r.num_chars;
+			stbRanges.push_back(r);
 		}
 
+		stbRangesCoords.resize(totalGlyphs);
+		auto rangesCoordsPtr = stbRangesCoords.data();
+		for (auto& stbRange : stbRanges)
+		{
+			stbRange.chardata_for_range = rangesCoordsPtr;
+			rangesCoordsPtr += stbRange.num_chars;
+		}
+
+		stbtt_PackFontRanges(&spc, fontInfos[fontIndex].data, 0, stbRanges.data(), stbRanges.size());
 		stbtt_PackEnd(&spc);
-		return *img;
+
+		for (auto& r : stbRanges)
+		{
+			for (auto i = 0; i < r.num_chars; ++i)
+			{
+				auto cp = r.first_unicode_codepoint_in_range + i;
+				auto scale = 1.f / CDefaultAtlasSize;
+				AtlasGlyphDesc glyphDesc =
+				{
+					.U0 = r.chardata_for_range[i].x0 * scale,
+					.V0 = r.chardata_for_range[i].y0 * scale,
+					.U1 = r.chardata_for_range[i].x1 * scale,
+					.V1 = r.chardata_for_range[i].y1 * scale
+				};
+				fonts[fontIndex].codePointAndHeightToGlyph.emplace(U64(cp) | U64(fontHeight) << 32, glyphDesc);
+			}
+		}
+	}
+
+	template<typename TGPUAPI>
+	inline auto FontRasterizerCPU<TGPUAPI>::BuildAtlases(U32 fontHeight, const Array<UnicodeRange>& ranges) -> V
+	{
+		for (auto i = 0u; i < fonts.size(); ++i)
+		{
+			BuildAtlas(i, fontHeight, ranges);
+		}
 	}
 }

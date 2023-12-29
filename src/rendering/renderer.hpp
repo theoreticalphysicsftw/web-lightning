@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "common/types.hpp"
+#include <common/types.hpp>
 
 namespace WL
 {

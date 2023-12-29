@@ -45,7 +45,7 @@ namespace WL
 		using GPUAPI = TGPUAPI;
 		using Image = GPUAPI::Image;
 
-		Map<U32, AtlasGlyphDesc> codepointToGlyph;
+		Map<U64, AtlasGlyphDesc> codePointAndHeightToGlyph;
 		Map<U32, Image*> heightToAtlas;
 	};
 }

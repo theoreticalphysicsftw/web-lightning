@@ -25,15 +25,24 @@
 
 #include "types.hpp"
 
+#include <cstdlib>
+
 namespace WL
 {
-	struct UnicodeRange
-	{
-		U32 firstChar;
-		U32 lastChar;
-		
-		constexpr auto Count() const -> U32 { return lastChar - firstChar + 1; }
-	};
+    inline auto Allocate(U64 size) -> Byte*;
+    inline auto Deallocate(V* ptr) -> V;
+}
 
-	inline static constexpr UnicodeRange CBasicLatin = { 0x0020, 0x007F };
+
+namespace WL
+{
+    inline auto Allocate(U64 size) -> Byte*
+    {
+        return (Byte*) malloc(size);
+    }
+
+    inline auto Deallocate(V* ptr) -> V
+    {
+        free(ptr);
+    }
 }

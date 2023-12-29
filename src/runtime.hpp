@@ -23,8 +23,10 @@
 
 #pragma once
 
-#include "widgets/widget.hpp"
-#include "presenting/present_surface.hpp"
+#include <widgets/widget.hpp>
+#include <presenting/present_surface.hpp>
+
+#include "config.hpp"
 
 namespace WL
 {
@@ -37,7 +39,7 @@ namespace WL
 		using GPUPresentSurface = PresentSurface<GPUAPI>;
 		using PreRenderFunction = GPUPresentSurface::PreRenderFunction;
 
-		auto static Init() -> B;
+		auto static Init(const Config& cfg = Config()) -> B;
 		auto static Loop() -> V;
 		auto static Destroy() -> V;
 		
@@ -61,11 +63,16 @@ namespace WL
 namespace WL
 {
 	template<typename TGPUAPI, typename TRenderer>
-	inline auto Runtime<TGPUAPI, TRenderer>::Init() -> B
+	inline auto Runtime<TGPUAPI, TRenderer>::Init(const Config& cfg) -> B
 	{
 		if (!(GPUPresentSurface::Init() && Renderer::Init()))
 		{
 			return false;
+		}
+
+		if (cfg.useFontAtlases)
+		{
+			Renderer::FontRenderer::Rasterizer::BuildAtlases(cfg.defaultFontHeight, cfg.defaultFontRanges);
 		}
 
 		GPUPresentSurface::EnableTransparency();
