@@ -25,9 +25,10 @@
 
 #include <algebra/algebra.hpp>
 
+#include "color.hpp"
+
 namespace WL
 {
-
 	struct DefaultQuad2D
 	{
 		static constexpr U32 verticesCount = 6;
@@ -41,5 +42,31 @@ namespace WL
 			Vec2(1.f, -1.f),
 			Vec2(1.f, 1.f)
 		};
+	};
+
+	template <typename TGPUAPI>
+	struct QuadDesc2D
+	{
+		using GPUAPI = TGPUAPI;
+		using Image = typename GPUAPI::Image;
+
+		F32 offsetX = 0;
+		F32 offsetY = 0;
+		F32 width = 0;
+		F32 height = 0;
+
+		// Texture coordinates
+		F32 u0 = 0;
+		F32 v0 = 0;
+		F32 u1 = 0;
+		F32 v1 = 0;
+
+		// Radius if it has rounded corners
+		F32 radius;
+		
+		ColorU32 color = 0;
+
+		Image* texture;
+		B textured = false;
 	};
 }

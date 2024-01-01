@@ -55,18 +55,19 @@ int main()
             {
                 for (auto i = 0u; (i < boxesBatch && currentBoxes < boxesSize); ++i)
                 {
-                    auto w = dist(mt) / F32(~0u);
-                    auto h = dist(mt) / F32(~0u);
-                    auto x = dist(mt) / F32(~0u);
-                    auto y = dist(mt) / F32(~0u);
-                    auto r = dist(mt) / F32(~0u);
+                    Box<RT>::BoxDesc desc;
+                    desc.width = dist(mt) / F32(~0u) / 8.f;
+                    desc.height = dist(mt) / F32(~0u) / 8.f;
+                    desc.offsetX = dist(mt) / F32(~0u);
+                    desc.offsetY = dist(mt) / F32(~0u) / 2.f;
+                    desc.radius = dist(mt) / F32(~0u);
                     ColorU32 color;
                     color.y = colorDist(mt);
                     color.cr = ClampedU8(colorDist(mt) + 125u);
                     color.cb = ClampedU8(colorDist(mt) + 125u);
                     color.a = 0xFFu;
-                    auto rgbColor = YCbCrAToRGBA(color);
-                    boxes.emplace_back(rgbColor, w / 8.f, h / 8.f, x, y / 2.f, r);
+                    desc.color = YCbCrAToRGBA(color);
+                    boxes.emplace_back(desc);
                     RT::Register(&boxes.back());
                     currentBoxes++;
                 }

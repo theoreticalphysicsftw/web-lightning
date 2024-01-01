@@ -24,7 +24,7 @@
 #pragma once
 
 #include "widget.hpp"
-#include "algebra/algebra.hpp"
+#include "rendering/quad.hpp"
 
 namespace WL
 {
@@ -32,17 +32,15 @@ namespace WL
 	class Box : public Widget<Runtime>
 	{
 	public:
-		Box(ColorU32 color = 0, F32 w = 0, F32 h = 0, F32 x = 0, F32 y = 0, F32 r = 0);
+		using GPUAPI = typename Runtime::GPUAPI;
+		using BoxDesc = QuadDesc2D<GPUAPI>;
+
+		Box(const BoxDesc& desc);
 
 		virtual auto AccumulateDrawCommands() -> V override;
 		virtual auto Update(const UpdateState& s) -> V override;
 
-		ColorU32 color;
-		F32 width;
-		F32 height;
-		F32 offsetX;
-		F32 offsetY;
-		F32 radius;
+		BoxDesc desc;
 	};
 }
 
@@ -50,8 +48,8 @@ namespace WL
 namespace WL
 {
 	template<typename Runtime>
-	Box<Runtime>::Box(ColorU32 color, F32 w, F32 h, F32 x, F32 y, F32 r) 
-		: color(color), width(w), height(h), offsetX(x), offsetY(y), radius(r)
+	Box<Runtime>::Box(const BoxDesc& desc)
+		: desc(desc)
 	{
 	}
 
@@ -59,11 +57,14 @@ namespace WL
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
 		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
-		auto drawWidth = width * 2.f;
-		auto drawHeight = height * ar * 2.f;
-		auto drawOffsetY = -offsetY * ar * 2.f  + 1.f - height * ar;
-		auto drawOffsetX = -1.f + offsetX * 2.f + drawWidth / 2.f;
-		Runtime::Renderer::BoxRenderer::AccumulateBox(color, drawWidth, drawHeight, drawOffsetX, drawOffsetY, radius);
+		auto drawWidth = desc.width * 2.f;
+		auto drawHeight = desc.height * ar * 2.f;
+		auto drawOffsetY = -desc.offsetY * ar * 2.f  + 1.f - desc.height * ar;
+		auto drawOffsetX = -1.f + desc.offsetX * 2.f + drawWidth / 2.f;
+		if (!desc.textured)
+		{
+			Runtime::Renderer::BoxRenderer::AccumulateBox(desc.color, drawWidth, drawHeight, drawOffsetX, drawOffsetY, desc.radius);
+		}
 	}
 
 
