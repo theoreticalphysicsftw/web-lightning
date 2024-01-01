@@ -28,7 +28,10 @@
 #include <common/types.hpp>
 #include <common/unicode.hpp>
 #include <common/memory.hpp>
+
 #include <embedded/embedded_font.hpp>
+
+#include <gpu_api/image.hpp>
 
 #include "font_rasterizer.hpp"
 #include "rasterized_font.hpp"
@@ -41,7 +44,7 @@ namespace WL
 	{
 	public:
 		using GPUAPI = TGPUAPI;
-		using Image = typename GPUAPI::Image;
+		using Image = typename RasterizedFont<GPUAPI>::Image;
 
 		static constexpr U32 CDefaultAtlasSize = 2048;
 		static constexpr U32 CDefaultAA = 2;
@@ -142,14 +145,25 @@ namespace WL
 				auto scale = 1.f / CDefaultAtlasSize;
 				AtlasGlyphDesc glyphDesc =
 				{
-					.U0 = r.chardata_for_range[i].x0 * scale,
-					.V0 = r.chardata_for_range[i].y0 * scale,
-					.U1 = r.chardata_for_range[i].x1 * scale,
-					.V1 = r.chardata_for_range[i].y1 * scale
+					.u0 = r.chardata_for_range[i].x0 * scale,
+					.v0 = r.chardata_for_range[i].y0 * scale,
+					.u1 = r.chardata_for_range[i].x1 * scale,
+					.v1 = r.chardata_for_range[i].y1 * scale,
+					.xOffset0 = r.chardata_for_range[i].xoff,
+					.yOffset0 = r.chardata_for_range[i].yoff,
+					.xOffset1 = r.chardata_for_range[i].xoff2,
+					.yOffset1 = r.chardata_for_range[i].yoff2,
+					.xAdvance = r.chardata_for_range[i].xadvance
 				};
 				fonts[fontIndex].codePointAndHeightToGlyph.emplace(U64(cp) | U64(fontHeight) << 32, glyphDesc);
 			}
 		}
+
+		Image* atlas = new Image;
+		atlas->Allocate(EFormat::A8, CDefaultAtlasSize, CDefaultAtlasSize, 1);
+		atlas->InitData(bitmapData);
+
+		Deallocate(bitmapData);
 	}
 
 	template<typename TGPUAPI>
