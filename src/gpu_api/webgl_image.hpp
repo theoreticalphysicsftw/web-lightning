@@ -35,10 +35,11 @@ namespace WL
 		auto InitData(void* inData) -> V;
 		auto UpdateData(const Extent& extend, void* inData) -> V;
 
-		U32 height;
-		U32 width;
-		U32 depth;
-
+		EFormat format = EFormat::Invalid;
+		U32 height = 0;
+		U32 width = 0;
+		U32 depth = 0;
+		
 	private:
 		GLuint id;
 	};

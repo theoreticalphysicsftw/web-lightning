@@ -29,10 +29,11 @@ namespace WL
 {
 	enum class EFormat
 	{
-		A8,
+		A8 = 0,
 		RGBA8,
 		RGBA32,
-		RGBA32Float
+		RGBA32Float,
+		Invalid
 	};
 
 	struct Extent

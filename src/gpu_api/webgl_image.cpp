@@ -22,7 +22,102 @@
 
 
 #include "webgl_image.hpp"
+#include "webgl_error.hpp"
 
 namespace WL
 {
+	auto WebGLImage::Allocate(EFormat f, U32 w, U32 h, U32 d) -> B
+	{
+		WEBGL_VALIDATE(glGenTextures(1, &id));
+		format = f;
+		width = w;
+		height = h;
+		depth = d;
+
+		return true;
+	}
+
+	static GLint formatToGLInternalFormat[] =
+	{
+		GL_R8,
+		GL_RGBA8,
+		GL_RGBA32UI,
+		GL_RGBA32F
+	};
+
+	static GLenum formatToGLFormat[] =
+	{
+		GL_RED,
+		GL_RGBA,
+		GL_RGBA_INTEGER,
+		GL_RGBA
+	};
+
+	static GLenum formatToGLType[] =
+	{
+		GL_UNSIGNED_BYTE,
+		GL_UNSIGNED_BYTE,
+		GL_UNSIGNED_INT,
+		GL_FLOAT
+	};
+
+	auto WebGLImage::InitData(void* inData) -> V
+	{
+
+		auto glFormat = formatToGLFormat[U32(format)];
+		auto glInternalFormat = formatToGLInternalFormat[U32(format)];
+		auto glType = formatToGLType[U32(format)];
+
+		if (depth > 1)
+		{
+			WEBGL_VALIDATE(glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, inData));
+		}
+		else
+		{
+			WEBGL_VALIDATE(glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, width, height, 0, glFormat, glType, inData));
+		}
+	}
+
+
+	auto WebGLImage::UpdateData(const Extent& extent, void* inData) -> V
+	{
+		auto glFormat = formatToGLFormat[U32(format)];
+		auto glType = formatToGLType[U32(format)];
+
+		if (depth > 1)
+		{
+			WEBGL_VALIDATE(
+							 glTexSubImage3D(
+								              GL_TEXTURE_2D_ARRAY,
+								              0,
+								              extent.x,
+											  extent.y,
+								              extent.z,
+								              extent.w,
+								              extent.h,
+								              extent.d,
+											  glFormat,
+											  glType,
+											  inData
+						                    )
+			              );
+		}
+		else
+		{
+			WEBGL_VALIDATE(
+							 glTexSubImage2D(
+								              GL_TEXTURE_2D,
+								              0,
+								              extent.x,
+											  extent.y,
+								              extent.w,
+								              extent.h,
+											  glFormat,
+											  glType,
+											  inData
+						                    )
+			              );
+		}
+
+	}
 }
