@@ -28,12 +28,19 @@
 
 namespace WL
 {
+	extern GLint gFormatToGLInternalFormat[];
+	extern GLenum gFormatToGLFormat[];
+	extern GLenum gFormatToGLType[];
+
 	class WebGLImage : Image<WebGLImage>
 	{
 	public:
+		WebGLImage(const RawCPUImage* cpuImage = nullptr);
 		auto Allocate(EFormat format, U32 w, U32 h = 1, U32 d = 1) -> B;
-		auto InitData(void* inData) -> V;
+		auto InitData(V* inData) -> V;
 		auto UpdateData(const Extent& extend, void* inData) -> V;
+
+		auto GetNativeId() const -> GLuint { return id; }
 
 		EFormat format = EFormat::Invalid;
 		U32 height = 0;

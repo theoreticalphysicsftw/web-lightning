@@ -26,6 +26,30 @@
 
 namespace WL
 {
+	GLint gFormatToGLInternalFormat[] =
+	{
+		GL_R8,
+		GL_RGBA8,
+		GL_RGBA32UI,
+		GL_RGBA32F
+	};
+
+	GLenum gFormatToGLFormat[] =
+	{
+		GL_RED,
+		GL_RGBA,
+		GL_RGBA_INTEGER,
+		GL_RGBA
+	};
+
+	GLenum gFormatToGLType[] =
+	{
+		GL_UNSIGNED_BYTE,
+		GL_UNSIGNED_BYTE,
+		GL_UNSIGNED_INT,
+		GL_FLOAT
+	};
+
 	auto WebGLImage::Allocate(EFormat f, U32 w, U32 h, U32 d) -> B
 	{
 		WEBGL_VALIDATE(glGenTextures(1, &id));
@@ -37,43 +61,31 @@ namespace WL
 		return true;
 	}
 
-	static GLint formatToGLInternalFormat[] =
+	WebGLImage::WebGLImage(const RawCPUImage* img)
 	{
-		GL_R8,
-		GL_RGBA8,
-		GL_RGBA32UI,
-		GL_RGBA32F
-	};
+		if (img != nullptr)
+		{
+			Allocate(img->format, img->width, img->height, 1);
+			InitData((V*)img->data.data());
+		}
+	}
 
-	static GLenum formatToGLFormat[] =
-	{
-		GL_RED,
-		GL_RGBA,
-		GL_RGBA_INTEGER,
-		GL_RGBA
-	};
 
-	static GLenum formatToGLType[] =
-	{
-		GL_UNSIGNED_BYTE,
-		GL_UNSIGNED_BYTE,
-		GL_UNSIGNED_INT,
-		GL_FLOAT
-	};
-
-	auto WebGLImage::InitData(void* inData) -> V
+	auto WebGLImage::InitData(V* inData) -> V
 	{
 
-		auto glFormat = formatToGLFormat[U32(format)];
-		auto glInternalFormat = formatToGLInternalFormat[U32(format)];
-		auto glType = formatToGLType[U32(format)];
-
+		auto glFormat = gFormatToGLFormat[U32(format)];
+		auto glInternalFormat = gFormatToGLInternalFormat[U32(format)];
+		auto glType = gFormatToGLType[U32(format)];
+		
 		if (depth > 1)
 		{
+			WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D_ARRAY, id));
 			WEBGL_VALIDATE(glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, inData));
 		}
 		else
 		{
+			WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D, id));
 			WEBGL_VALIDATE(glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, width, height, 0, glFormat, glType, inData));
 		}
 	}
@@ -81,11 +93,12 @@ namespace WL
 
 	auto WebGLImage::UpdateData(const Extent& extent, void* inData) -> V
 	{
-		auto glFormat = formatToGLFormat[U32(format)];
-		auto glType = formatToGLType[U32(format)];
+		auto glFormat = gFormatToGLFormat[U32(format)];
+		auto glType = gFormatToGLType[U32(format)];
 
 		if (depth > 1)
 		{
+			WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D_ARRAY, id));
 			WEBGL_VALIDATE(
 							 glTexSubImage3D(
 								              GL_TEXTURE_2D_ARRAY,
@@ -104,6 +117,7 @@ namespace WL
 		}
 		else
 		{
+			WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D, id));
 			WEBGL_VALIDATE(
 							 glTexSubImage2D(
 								              GL_TEXTURE_2D,

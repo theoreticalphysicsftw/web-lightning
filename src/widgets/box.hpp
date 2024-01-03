@@ -56,15 +56,15 @@ namespace WL
 	template<typename Runtime>
 	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
 	{
+		auto renderDesc = desc;
 		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
-		auto drawWidth = desc.width * 2.f;
-		auto drawHeight = desc.height * ar * 2.f;
-		auto drawOffsetY = -desc.offsetY * ar * 2.f  + 1.f - desc.height * ar;
-		auto drawOffsetX = -1.f + desc.offsetX * 2.f + drawWidth / 2.f;
-		if (!desc.textured)
-		{
-			Runtime::Renderer::BoxRenderer::AccumulateBox(desc.color, drawWidth, drawHeight, drawOffsetX, drawOffsetY, desc.radius);
-		}
+		renderDesc.width = desc.width * 2.f;
+		renderDesc.height = desc.height * ar * 2.f;
+		renderDesc.offsetY = -desc.offsetY * ar * 2.f  + 1.f - desc.height * ar;
+		renderDesc.offsetX = -1.f + desc.offsetX * 2.f + renderDesc.width / 2.f;
+
+		Runtime::Renderer::BoxRenderer::AccumulateBox(renderDesc);
+
 	}
 
 

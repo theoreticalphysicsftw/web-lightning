@@ -29,8 +29,8 @@
 
 namespace WL
 {
-    // DEFINE_SHADER(OpaqueDefaultVert);
-    // DEFINE_SHADER(OpaqueDefaultFrag);
+    DEFINE_SHADER(TexturedQuadVert);
+    DEFINE_SHADER(TexturedQuadFrag);
     DEFINE_SHADER(BoxVert);
     DEFINE_SHADER(BoxFrag);
 }

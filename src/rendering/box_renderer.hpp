@@ -25,7 +25,10 @@
 
 #include <common/types.hpp>
 #include <common/utilities.hpp>
+
 #include <rendering/color.hpp>
+#include <rendering/textured_quad_renderer.hpp>
+
 #include <algebra/algebra.hpp>
 
 #include <gpu_api/shader.hpp>
@@ -42,8 +45,14 @@ namespace WL
 	public:
 		using PresentSurface = TPresentSurface;
 		using GPUAPI = PresentSurface::GPUAPI;
+		using TexturedQuadRenderer = TexturedQuadRenderer<PresentSurface>;
+		using QuadDesc = TexturedQuadRenderer::QuadDesc;
+		using Buffer = GPUAPI::Buffer;
+		using Image = GPUAPI::Image;
+		using Pso = GPUAPI::Pso;
+
 		static auto Init() -> B;
-		static auto AccumulateBox(ColorU32 c, F32 h, F32 w, F32 x, F32 y, F32 r) -> V;
+		static auto AccumulateBox(const QuadDesc& desc) -> V;
 		static auto CommitDrawCommands() -> V;
 		static auto Clear() -> V;
 
@@ -53,20 +62,24 @@ namespace WL
 		static auto AllocateBuffers() -> B;
 		static auto ReallocateBuffers(U32 newCapacity) -> B;
 
+		inline static TexturedQuadRenderer texturedQuadRenderer;
+
 		inline static U32 instanceCapacity = initialBoxInstancesCapacity;
 		inline static U32 instances = 0;
 
-		inline static GPUAPI::Pso pso;
-		inline static GPUAPI::Buffer positionsBuffer;
-		inline static GPUAPI::Buffer linearTransformsBuffer;
-		inline static GPUAPI::Buffer translationsBuffer;
-		inline static GPUAPI::Buffer colorsBuffer;
-		inline static GPUAPI::Buffer radiusesBuffer;
+		inline static Pso pso;
+		inline static Buffer positionsBuffer;
+		inline static Buffer linearTransformsBuffer;
+		inline static Buffer translationsBuffer;
+		inline static Buffer colorsBuffer;
+		inline static Buffer radiusesBuffer;
 
 		inline static Array<Mat2x2> linearTransformsBufferCPU;
 		inline static Array<Vec2> translationsBufferCPU;
 		inline static Array<ColorU32> colorsBufferCPU;
 		inline static Array<F32> radiusesBufferCPU;
+
+		inline static Map<const Image*, Array<QuadDesc>> texturedDescs;
 	};
 }
 
@@ -76,7 +89,7 @@ namespace WL
 	template<typename TPresentSurface>
 	inline auto BoxRenderer<TPresentSurface>::Init() -> B
 	{
-		if (!AllocateBuffers())
+		if (!(texturedQuadRenderer.Init() && AllocateBuffers()))
 		{
 			return false;
 		}
@@ -97,25 +110,32 @@ namespace WL
 
 
 	template<typename TPresentSurface>
-	inline auto BoxRenderer<TPresentSurface>::AccumulateBox(ColorU32 c, F32 w, F32 h, F32 x, F32 y, F32 r) -> V
+	inline auto BoxRenderer<TPresentSurface>::AccumulateBox(const QuadDesc& desc) -> V
 	{
-		instances++;
-		if (instances > instanceCapacity)
+		if (desc.textured)
 		{
-			ReallocateBuffers(instanceCapacity * 2);
+			texturedDescs[desc.texture].push_back(desc);
 		}
+		else
+		{
+			instances++;
+			if (instances > instanceCapacity)
+			{
+				ReallocateBuffers(instanceCapacity * 2);
+			}
 
-		colorsBufferCPU.emplace_back(c);
-		radiusesBufferCPU.emplace_back(r);
-		linearTransformsBufferCPU.emplace_back(w / 2.f, 0.f, 0.f, h / 2.f);
-		translationsBufferCPU.emplace_back(x, y);
+			colorsBufferCPU.emplace_back(desc.color);
+			radiusesBufferCPU.emplace_back(desc.radius);
+			linearTransformsBufferCPU.emplace_back(desc.width / 2.f, 0.f, 0.f, desc.height / 2.f);
+			translationsBufferCPU.emplace_back(desc.offsetX, desc.offsetY);
+		}
 	}
 
 
 	template<typename TPresentSurface>
 	inline auto BoxRenderer<TPresentSurface>::CommitDrawCommands() -> V
 	{
-		if (!instances)
+		if (!instances && texturedDescs.empty())
 		{
 			return;
 		}
@@ -136,6 +156,16 @@ namespace WL
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
 		pso.DrawInstanced(0, DefaultQuad2D::verticesCount, instances);
+		// Commit textured quads with the same texture to abuse instancing
+		// and reduce the number of draw calls.
+		for (auto& descsArray : texturedDescs)
+		{
+			for (auto& desc : descsArray.second)
+			{
+				texturedQuadRenderer.AccumulateQuad(desc);
+			}
+			texturedQuadRenderer.CommitDrawCommands();
+		}
 
 		Clear();
 	}
@@ -174,5 +204,6 @@ namespace WL
 		radiusesBufferCPU.clear();
 		linearTransformsBufferCPU.clear();
 		translationsBufferCPU.clear();
+		texturedDescs.clear();
 	}
 }

@@ -33,6 +33,7 @@ namespace WL
 	public:
 		using FontRenderer = TRenderers::FontRenderer;
 		using BoxRenderer = TRenderers::BoxRenderer;
+		using TexturedQuadRenderer = TRenderers::TexturedQuadRenderer;
 
 		static auto Init() -> B;
 		static auto CommitDrawCommands() -> V;

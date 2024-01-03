@@ -28,12 +28,13 @@
 #include "pso.hpp"
 #include "webgl_shader.hpp"
 #include "webgl_buffer.hpp"
+#include "webgl_image.hpp"
 
 namespace WL
 {
     inline static constexpr U32 CMaxVBSlots = 8;
     inline static constexpr U32 CMaxUBSlots = 8;
-
+    inline static constexpr U32 CMaxTextureSlots = 8;
     struct WebGLPso : Pso<WebGLPso>
     {
         WebGLPso();
@@ -43,12 +44,14 @@ namespace WL
         auto Use() -> V;
         auto AddVBLayout(const VBLayout& layout) -> V;
         auto AddSimpleConstant(U32 slot, EType type, const C* = "") -> V;
+        auto AddTexture(U32 slot, const C* = "") -> V;
         auto UpdateConstant(U32 slot, F32 v) -> V;
         auto UpdateConstant(U32 slot, Vec2 v) -> V;
         auto UpdateConstant(U32 slot, Vec3 v) -> V;
         auto UpdateConstant(U32 slot, Vec4 v) -> V;
         auto BindVB(U32 slot, const WebGLBuffer& buffer, B perInstance = false) -> V;
         auto BindIB(const WebGLBuffer& buffer) -> V;
+        auto BindTexture(const WebGLImage& tex, U32 slot = 0) -> V;
         auto AddShader(const C* source, U32 size, EShaderType type) -> V;
         auto DrawInstanced(U32 first, U32 count, U32 instances) -> V;
 
@@ -59,6 +62,9 @@ namespace WL
         GLuint vao;
         StaticArray<WebGLShader, (U32) EShaderType::Count> shaders;
         StaticArray<VBLayout, CMaxVBSlots> vbLayouts;
+
+        StaticArray<Str, CMaxTextureSlots> texNames;
+        StaticArray<I32, CMaxTextureSlots> texSlots;
         StaticArray<Str, CMaxUBSlots> ubNames;
         StaticArray<I32, CMaxUBSlots> ubSlots;
     };

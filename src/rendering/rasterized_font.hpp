@@ -32,10 +32,16 @@ namespace WL
 	struct AtlasGlyphDesc
 	{
 		// Texture coordinates in atlas
-		F32 U0;
-		F32 V0;
-		F32 U1;
-		F32 V1;
+		F32 u0;
+		F32 v0;
+		F32 u1;
+		F32 v1;
+		// Screenspace quad position
+		F32 xOffset0;
+		F32 yOffset0;
+		F32 xOffset1;
+		F32 yOffset1;
+		F32 xAdvance;
 	};
 
 	template <typename TGPUAPI>

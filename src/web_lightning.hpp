@@ -23,20 +23,23 @@
 
 #pragma once
 
-#include "rendering/font_renderer.hpp"
-#include "rendering/font_rasterizer.hpp"
-#include "rendering/font_rasterizer_cpu.hpp"
-#include "rendering/box_renderer.hpp"
-#include "rendering/renderer.hpp"
+#include <rendering/font_renderer.hpp>
+#include <rendering/font_rasterizer.hpp>
+#include <rendering/font_rasterizer_cpu.hpp>
+#include <rendering/box_renderer.hpp>
+#include <rendering/textured_quad_renderer.hpp>
+#include <rendering/renderer.hpp>
 
-#include "presenting/present_surface.hpp"
-#include "gpu_api/gpu_api.hpp"
-#include "gpu_api/webgl.hpp"
+#include <presenting/present_surface.hpp>
+#include <gpu_api/gpu_api.hpp>
+#include <gpu_api/webgl.hpp>
 
-#include "runtime.hpp"
+#include <runtime.hpp>
 
-#include "widgets/box.hpp"
-#include "widgets/text_box.hpp"
+#include <widgets/box.hpp>
+#include <widgets/text_box.hpp>
+
+#include <decoders/webp.hpp>
 
 namespace WL
 {
@@ -46,11 +49,13 @@ namespace WL
 	
 	using FontRendererDefault = FontRenderer<PresentSurfaceDefault, FontRasterizerDefault>;
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
+	using TexturedQuadRendererDefault = TexturedQuadRenderer<PresentSurfaceDefault>;
 
 	struct RenderersDefault
 	{
 		using FontRenderer = FontRendererDefault;
 		using BoxRenderer = BoxRendererDefault;
+		using TexturedQuadRenderer = TexturedQuadRendererDefault;
 	};
 
 	using RendererDefault = Renderer<RenderersDefault>;

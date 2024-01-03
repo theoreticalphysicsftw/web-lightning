@@ -34,6 +34,7 @@ namespace WL
     WebGLPso::WebGLPso() : program(CInvalidId), vao(CInvalidId)
     {
         Fill(ubSlots, -1);
+        Fill(texSlots, -1);
     }
 
 
@@ -123,6 +124,12 @@ namespace WL
     }
 
 
+    auto WebGLPso::AddTexture(U32 slot, const C* name) -> V
+    {
+        texNames[slot] = name;
+    }
+
+
     auto WebGLPso::UpdateConstant(U32 slot, F32 v) -> V
     {
         GetUBLocation(slot);
@@ -179,6 +186,26 @@ namespace WL
 
     auto WebGLPso::BindIB(const WebGLBuffer& buffer) -> V
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.GetNativeId());
+        WEBGL_VALIDATE(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.GetNativeId()));
+    }
+
+
+    auto WebGLPso::BindTexture(const WebGLImage& tex, U32 slot) -> V
+    {
+        if (tex.depth > 1)
+        {
+            WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D_ARRAY, tex.GetNativeId()));
+        }
+        else
+        {
+            WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D, tex.GetNativeId()));
+        }
+        WEBGL_VALIDATE(glActiveTexture(GL_TEXTURE0 + slot));
+
+        if (texSlots[slot] == -1)
+        {
+            WEBGL_VALIDATE(texSlots[slot] = glGetUniformLocation(program, texNames[slot].c_str()));
+        }
+        WEBGL_VALIDATE(glUniform1i(texSlots[slot], slot));
     }
 }
