@@ -23,39 +23,31 @@
 
 #pragma once
 
-#include "common/types.hpp"
+#include <libwebp/src/webp/decode.h>
+
+#include <common/types.hpp>
+#include <gpu_api/image.hpp>
 
 namespace WL
 {
-	enum class EFormat
-	{
-		A8 = 0,
-		RGBA8,
-		RGBA32,
-		RGBA32Float,
-		Invalid
-	};
+	inline auto DecodeWebP(Byte* data, U32 size) -> RawCPUImage;
+}
 
-	struct Extent
+namespace WL
+{
+	inline auto DecodeWebP(Byte* data, U32 size) -> RawCPUImage
 	{
-		U32 x;
-		U32 y;
-		U32 z;
-		U32 w;
-		U32 h;
-		U32 d;
-	};
+		RawCPUImage result;
+		result.format = EFormat::RGBA8;
+		I32 width, height;
 
-	template <typename NativeImage>
-	class Image
-	{
-	};
+		WebPGetInfo(data, size, &width, &height);
+		result.width = width;
+		result.height = height;
+		result.data.resize(result.height * result.width * sizeof(U32));
 
-	struct RawCPUImage
-	{
-		EFormat format;
-		U32 height;
-		U32 width;
-		Array<Byte> data;
-	};
+		WebPDecodeRGBAInto(data, size, result.data.data(), result.data.size(), result.width * sizeof(U32));
+
+		return result;
+	}
 }

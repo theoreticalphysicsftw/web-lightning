@@ -40,6 +40,15 @@ file(
         "src/embedded/*.cpp"
     )
 
+file(
+        GLOB
+        LIBWEBP_SOURCES
+        "extern/libwebp/src/dec/*.c"
+        "extern/libwebp/src/dsp/*.c"
+        "extern/libwebp/src/demux/*.c"
+        "extern/libwebp/src/utils/*.c"
+    )
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set(USE_FLAGS "${USE_FLAGS} -sMIN_WEBGL_VERSION=2")
     set(USE_FLAGS "${USE_FLAGS} -sMAX_WEBGL_VERSION=2")
@@ -87,4 +96,10 @@ if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten"))
 endif()
 
 add_library(stb "extern/stb.cpp")
+add_library(libwebp ${LIBWEBP_SOURCES})
+target_include_directories(libwebp PUBLIC "extern/libwebp")
+target_include_directories(libwebp PUBLIC "extern/libwebp")
+
 target_link_libraries(${PROJECT_NAME} stb)
+target_link_libraries(${PROJECT_NAME} libwebp)
+
