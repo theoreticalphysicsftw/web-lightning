@@ -46,6 +46,9 @@ namespace WL
 	template <typename T>
 		requires CIsArithmetic<T>
 	inline auto ClampedU8(T v) -> U8;
+
+	template <typename T>
+	inline auto Max(const T& v0, const T& v1);
 }
 
 
@@ -85,5 +88,11 @@ namespace WL
 	inline auto ClampedU8(T v) -> U8
 	{
 		return U8(std::max(T(0), std::min(v, T(0xFF))));
+	}
+
+	template <typename T>
+	inline auto Max(const T& v0, const T& v1)
+	{
+		return std::max(v0, v1);
 	}
 }

@@ -58,6 +58,18 @@ namespace WL
 		height = h;
 		depth = d;
 
+		glBindTexture(GL_TEXTURE_2D, id);
+		if (depth > 1)
+		{
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+
 		return true;
 	}
 
@@ -88,6 +100,7 @@ namespace WL
 			WEBGL_VALIDATE(glBindTexture(GL_TEXTURE_2D, id));
 			WEBGL_VALIDATE(glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, width, height, 0, glFormat, glType, inData));
 		}
+
 	}
 
 

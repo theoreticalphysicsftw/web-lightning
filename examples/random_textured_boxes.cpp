@@ -43,6 +43,7 @@ int main()
     }
 
     auto rawImage = DecodeWebP(GTestImgWebp, CTestImgWebpSize);
+
     RT::GPUAPI::Image image(&rawImage);
 
     auto rd = std::random_device();
@@ -57,7 +58,7 @@ int main()
         [boxesSize, &mt, &dist, &image, &boxes](F64 dt)
         {
             static U32 currentBoxes = 0;
-            static constexpr U32 boxesBatch = 1;
+            static constexpr U32 boxesBatch = 64;
             if (currentBoxes < boxesSize && dt / 1000.0 < 32)
             {
                 for (auto i = 0u; (i < boxesBatch && currentBoxes < boxesSize); ++i)
@@ -71,10 +72,14 @@ int main()
                     desc.offsetX = dist(mt) / F32(~0u);
                     desc.offsetY = dist(mt) / F32(~0u) / 2.f;
                     desc.radius = dist(mt) / F32(~0u);
-                    desc.u0 = 0.f;
-                    desc.v0 = 0.f;
-                    desc.u1 = 1.f;
-                    desc.v1 = 1.f;
+
+                    auto maxSide = Max(desc.width, desc.height);
+
+                    desc.u0 = 0.5f - F32(desc.width) / maxSide/ 2.f;
+                    desc.v0 = 0.5f - F32(desc.height) / maxSide / 2.f;
+                    desc.u1 = 0.5f + F32(desc.width) / maxSide / 2.f;
+                    desc.v1 = 0.5f + F32(desc.height) / maxSide / 2.f;
+
                     boxes.emplace_back(desc);
                     RT::Register(&boxes.back());
                     currentBoxes++;
