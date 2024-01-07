@@ -38,6 +38,7 @@
 
 #include <widgets/box.hpp>
 #include <widgets/text_box.hpp>
+#include <widgets/grid.hpp>
 
 #include <decoders/webp.hpp>
 

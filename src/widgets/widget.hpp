@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,19 +35,31 @@ namespace WL
 		U32 keyCode;
 	};
 
+	struct BBox
+	{
+		F32 x0;
+		F32 y0;
+		F32 x1;
+		F32 y1;
+
+		inline BBox(F32 x0 = 0, F32 y0 = 0, F32 x1 = 0, F32 y1 = 0);
+	};
+
 	template <typename TRuntime>
 	class Widget
 	{
 	public:
 		using UpdateFunction = Function <V(const UpdateState&)>;
 
-		virtual auto AccumulateDrawCommands() -> V = 0;
+		virtual auto AccumulateDrawCommands() const -> V = 0;
 		virtual auto Update(const UpdateState&) -> V = 0;
+		virtual auto GetBBox(const Widget* w = nullptr) const -> BBox = 0;
 		
 		auto MoveToLayer(U32 layer) -> V;
 		
 		B isVisible = true;
 		B occopiesSpace = true;
+		B relativelyPositioned = true;
 
 		UpdateFunction updateOnClick;
 		UpdateFunction updateOnPress;
@@ -56,6 +68,7 @@ namespace WL
 
 		virtual ~Widget();
 
+		Widget* ancestor = nullptr;
 	protected:
 		U32 layer = 1;
 		friend TRuntime;
@@ -65,6 +78,11 @@ namespace WL
 
 namespace WL
 {
+	inline BBox::BBox(F32 x0, F32 y0, F32 x1, F32 y1) :
+		x0(x0), y0(y0), x1(x1), y1(y1)
+	{
+	}
+
 	template <typename TRuntime>
 	Widget<TRuntime>::~Widget()
 	{

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,17 +28,19 @@
 
 namespace WL
 {
-	template <typename Runtime>
-	class Box : public Widget<Runtime>
+	template <typename TRuntime>
+	class Box : public Widget<TRuntime>
 	{
 	public:
+		using Runtime = TRuntime;
 		using GPUAPI = typename Runtime::GPUAPI;
 		using BoxDesc = QuadDesc2D<GPUAPI>;
 
 		Box(const BoxDesc& desc);
 
-		virtual auto AccumulateDrawCommands() -> V override;
+		virtual auto AccumulateDrawCommands() const -> V override;
 		virtual auto Update(const UpdateState& s) -> V override;
+		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const -> BBox override;
 
 		BoxDesc desc;
 	};
@@ -47,14 +49,14 @@ namespace WL
 
 namespace WL
 {
-	template<typename Runtime>
-	Box<Runtime>::Box(const BoxDesc& desc)
+	template<typename TRuntime>
+	Box<TRuntime>::Box(const BoxDesc& desc)
 		: desc(desc)
 	{
 	}
 
-	template<typename Runtime>
-	inline auto Box<Runtime>::AccumulateDrawCommands() -> V
+	template<typename TRuntime>
+	inline auto Box<TRuntime>::AccumulateDrawCommands() const -> V
 	{
 		auto renderDesc = desc;
 		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
@@ -63,14 +65,27 @@ namespace WL
 		renderDesc.offsetY = -desc.offsetY * ar * 2.f  + 1.f - desc.height * ar;
 		renderDesc.offsetX = -1.f + desc.offsetX * 2.f + renderDesc.width / 2.f;
 
+		if (this->ancestor && this->relativelyPositioned)
+		{
+			auto bBox = this->ancestor->GetBBox(this);
+			renderDesc.offsetY -= 2.f * ar * bBox.y0;
+			renderDesc.offsetX += 2.f * bBox.x0;
+		}
+
 		Runtime::Renderer::BoxRenderer::AccumulateBox(renderDesc);
 
 	}
 
 
-	template<typename Runtime>
-	inline auto Box<Runtime>::Update(const UpdateState& s) -> V
+	template<typename TRuntime>
+	inline auto Box<TRuntime>::Update(const UpdateState& s) -> V
 	{
 
+	}
+
+	template<typename TRuntime>
+	inline auto Box<TRuntime>::GetBBox(const Widget<TRuntime>* w) const -> BBox
+	{
+		return BBox(desc.offsetX, desc.offsetY, desc.offsetX + desc.width, desc.offsetY + desc.height);
 	}
 }
