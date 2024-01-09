@@ -54,6 +54,7 @@ namespace WL
 
 	private:
 		auto static WidgetRenderingCode() -> V;
+		auto static ResizeLayers(U32 newSize) -> V;
 		inline static B widgetsAreDirty = true;
 		inline static WidgetLayers widgetLayers;
 	};
@@ -78,7 +79,7 @@ namespace WL
 		GPUPresentSurface::EnableTransparency();
 		GPUPresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
 
-		widgetLayers.resize(8);
+		ResizeLayers(8);
 
 		return true;
 	}
@@ -102,10 +103,7 @@ namespace WL
 	{
 		widgetLayers[widget->layer].erase(widget);
 		
-		while (widgetLayers.size() <= newLayer)
-		{
-			widgetLayers.push_back(WidgetLayer());
-		}
+		ResizeLayers(newLayer + 1);
 
 		widgetLayers[newLayer].insert(widget);
 		widget->layer = newLayer;
@@ -140,15 +138,21 @@ namespace WL
 
 		for (auto& layer : widgetLayers)
 		{
-			for (auto widget : layer)
+			for (auto widgetPtr : layer)
 			{
-				if (widget->isVisible)
+				if (widgetPtr->isVisible)
 				{
-					widget->AccumulateDrawCommands();
+					widgetPtr->AccumulateDrawCommands();
 				}
 			}
 			TRenderer::CommitDrawCommands();
 			TRenderer::Clear();
 		}
+	}
+
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::ResizeLayers(U32 newSize) -> V
+	{
+		widgetLayers.resize(newSize);
 	}
 }

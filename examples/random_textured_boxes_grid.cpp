@@ -87,8 +87,6 @@ int main()
                 box.desc.width = dist(mt) * cellSize;
                 box.desc.height = dist(mt) * cellSize;
                 box.desc.radius = dist(mt) * cellSize;
-                box.desc.offsetX = (cellSize - box.desc.width) / 2.f;
-                box.desc.offsetY = (cellSize - box.desc.height) / 2.f;
 
                 auto maxSide = Max(box.desc.width, box.desc.height);
 

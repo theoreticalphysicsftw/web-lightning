@@ -59,7 +59,8 @@ namespace WL
 		
 		B isVisible = true;
 		B occopiesSpace = true;
-		B relativelyPositioned = true;
+		B relativelyPositioned = false;
+		B centered = false;
 
 		UpdateFunction updateOnClick;
 		UpdateFunction updateOnPress;

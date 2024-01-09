@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <common/error.hpp>
+
 #include "widget.hpp"
 #include "rendering/quad.hpp"
 
@@ -60,17 +62,34 @@ namespace WL
 	{
 		auto renderDesc = desc;
 		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
+
+		auto positionedOffsetX = desc.offsetX;
+		auto positionedOffsetY = desc.offsetY;
+
+		if (this->relativelyPositioned)
+		{
+			WL_ASSERT(this->ancestor);
+			auto bBox = this->ancestor->GetBBox(this);
+
+			positionedOffsetX += bBox.x0;
+			positionedOffsetY += bBox.y0;
+			
+			if (this->centered)
+			{
+				positionedOffsetX += (bBox.x1 - bBox.x0 - desc.width) / 2.f;
+				positionedOffsetY += (bBox.y1 - bBox.y0 - desc.height) / 2.f;
+			}
+		}
+		else if (this->centered)
+		{
+			positionedOffsetX = (1.f - desc.width) / 2.f;
+			positionedOffsetY = (1.f / ar - desc.height) / 2.f;
+		}
+
 		renderDesc.width = desc.width * 2.f;
 		renderDesc.height = desc.height * ar * 2.f;
-		renderDesc.offsetY = -desc.offsetY * ar * 2.f  + 1.f - desc.height * ar;
-		renderDesc.offsetX = -1.f + desc.offsetX * 2.f + renderDesc.width / 2.f;
-
-		if (this->ancestor && this->relativelyPositioned)
-		{
-			auto bBox = this->ancestor->GetBBox(this);
-			renderDesc.offsetY -= 2.f * ar * bBox.y0;
-			renderDesc.offsetX += 2.f * bBox.x0;
-		}
+		renderDesc.offsetY = -positionedOffsetY * ar * 2.f  + 1.f - desc.height * ar;
+		renderDesc.offsetX = -1.f + positionedOffsetX * 2.f + renderDesc.width / 2.f;
 
 		Runtime::Renderer::BoxRenderer::AccumulateBox(renderDesc);
 

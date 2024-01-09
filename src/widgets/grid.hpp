@@ -43,6 +43,8 @@ namespace WL
 
 		auto PlaceInCell(Widget<TRuntime>* w, U32 linearIdx) -> V;
 		auto PlaceInCell(Widget<TRuntime>* w, U32 cellX, U32 cellY);
+		
+		B centeredCells = true;
 
 	private:
 		Map<Widget<TRuntime>*, U32> slots;
@@ -103,6 +105,11 @@ namespace WL
 		w->ancestor = this;
 		w->relativelyPositioned = true;
 		slots[w] = linearIdx;
+
+		if (centeredCells)
+		{
+			w->centered = true;
+		}
 	}
 
 	template<typename TRuntime>
