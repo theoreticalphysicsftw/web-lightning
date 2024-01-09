@@ -142,7 +142,7 @@ namespace WL
 			{
 				if (widgetPtr->isVisible)
 				{
-					widgetPtr->AccumulateDrawCommands();
+					widgetPtr->AccumulateDrawState();
 				}
 			}
 			TRenderer::CommitDrawCommands();

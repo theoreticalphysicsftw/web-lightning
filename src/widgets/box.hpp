@@ -40,7 +40,7 @@ namespace WL
 
 		Box(const BoxDesc& desc);
 
-		virtual auto AccumulateDrawCommands() const -> V override;
+		virtual auto AccumulateDrawState() const -> V override;
 		virtual auto Update(const UpdateState& s) -> V override;
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const -> BBox override;
 
@@ -58,7 +58,7 @@ namespace WL
 	}
 
 	template<typename TRuntime>
-	inline auto Box<TRuntime>::AccumulateDrawCommands() const -> V
+	inline auto Box<TRuntime>::AccumulateDrawState() const -> V
 	{
 		auto renderDesc = desc;
 		auto ar = Runtime::GPUPresentSurface::GetAspectRatio();

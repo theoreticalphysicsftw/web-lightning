@@ -37,7 +37,7 @@ namespace WL
 
 		Container(F32 maxWidth = 0.f, F32 maxHeight = 0.f, F32 offsetX = 0.f, F32 offsetY = 0.f);
 
-		virtual auto AccumulateDrawCommands() const->V override;
+		virtual auto AccumulateDrawState() const->V override;
 		virtual auto Update(const UpdateState& s) -> V override;
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const->BBox override;
 
@@ -68,11 +68,11 @@ namespace WL
 	}
 
 	template<typename TRuntime>
-	inline auto Container<TRuntime>::AccumulateDrawCommands() const -> V override
+	inline auto Container<TRuntime>::AccumulateDrawState() const -> V override
 	{
 		for (auto widgetPtr : widgets)
 		{
-			widgetPtr->AccumulateDrawCommands();
+			widgetPtr->AccumulateDrawState();
 		}
 	}
 

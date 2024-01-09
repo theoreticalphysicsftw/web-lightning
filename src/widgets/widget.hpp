@@ -51,7 +51,7 @@ namespace WL
 	public:
 		using UpdateFunction = Function <V(const UpdateState&)>;
 
-		virtual auto AccumulateDrawCommands() const -> V = 0;
+		virtual auto AccumulateDrawState() const -> V = 0;
 		virtual auto Update(const UpdateState&) -> V = 0;
 		virtual auto GetBBox(const Widget* w = nullptr) const -> BBox = 0;
 		

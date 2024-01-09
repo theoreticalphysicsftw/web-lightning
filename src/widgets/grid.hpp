@@ -37,7 +37,7 @@ namespace WL
 
 		Grid(F32 offsetX = 0, F32 offsetY = 0, F32 cellSize = 0, U32 cellsX = 0, U32 cellsY = 0);
 
-		virtual auto AccumulateDrawCommands() const -> V override;
+		virtual auto AccumulateDrawState() const -> V override;
 		virtual auto Update(const UpdateState& s) -> V override;
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const->BBox override;
 
@@ -66,11 +66,11 @@ namespace WL
 	}
 
 	template<typename TRuntime>
-	inline auto Grid<TRuntime>::AccumulateDrawCommands() const -> V
+	inline auto Grid<TRuntime>::AccumulateDrawState() const -> V
 	{
 		for (auto& widgetPtr : slots)
 		{
-			widgetPtr.first->AccumulateDrawCommands();
+			widgetPtr.first->AccumulateDrawState();
 		}
 	}
 

@@ -45,7 +45,7 @@ namespace WL
 		using PresentSurface = TPresentSurface;
 		using GPUAPI = PresentSurface::GPUAPI;
 		static auto Init() -> B;
-		static auto AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
+		static auto AccumulateDrawState(const Array<I32> codepoints, const FontRendererOptions& options) -> V;
 		static auto CommitDrawCommands() -> V;
 		static auto Clear() -> V;
 
@@ -89,7 +89,7 @@ namespace WL
 
 
 	template <typename TPresentSurface, typename TRasterizer>
-	auto FontRenderer<TPresentSurface, TRasterizer>::AccumulateDrawCommands(const Array<I32> codepoints, const FontRendererOptions& options) -> V
+	auto FontRenderer<TPresentSurface, TRasterizer>::AccumulateDrawState(const Array<I32> codepoints, const FontRendererOptions& options) -> V
 	{
 		return V();
 	}
