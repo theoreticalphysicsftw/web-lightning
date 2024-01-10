@@ -215,7 +215,7 @@ namespace WL
     template<class TGPUAPI>
     inline auto WL::PresentSurface<TGPUAPI>::UnitsToPixels(F32 units) -> U32
     {
-        return U32(units * width);
+        return U32(units * width + 0.5);
     }
 
 

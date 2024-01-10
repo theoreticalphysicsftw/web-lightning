@@ -106,6 +106,7 @@ namespace WL
 		if (instances > instanceCapacity)
 		{
 			ReallocateBuffers(instanceCapacity * 2);
+			instanceCapacity *= 2;
 		}
 
 		uvsBufferCPU.emplace_back(desc.u0, desc.v0, desc.u1, desc.v1);

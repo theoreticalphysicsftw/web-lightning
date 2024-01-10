@@ -29,6 +29,8 @@
 
 namespace WL
 {
+    DEFINE_SHADER(FontAtlasTextVert);
+    DEFINE_SHADER(FontAtlasTextFrag);
     DEFINE_SHADER(TexturedQuadVert);
     DEFINE_SHADER(TexturedQuadFrag);
     DEFINE_SHADER(BoxVert);

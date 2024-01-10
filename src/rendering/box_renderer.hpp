@@ -122,6 +122,7 @@ namespace WL
 			if (instances > instanceCapacity)
 			{
 				ReallocateBuffers(instanceCapacity * 2);
+				instanceCapacity *= 2;
 			}
 
 			colorsBufferCPU.emplace_back(desc.color);

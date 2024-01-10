@@ -53,6 +53,9 @@ namespace WL
 		inline static auto AddFont(const Byte* fontData, U32 fontSize) -> U32;
 		inline static auto BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
 		inline static auto BuildAtlases(U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
+		inline static auto GetRasterizedFont(U16 fontIndex) -> Array<RasterizedFont<GPUAPI>>&;
+
+		inline static Set<U32> availableAtlases;
 
 	private:
 		static constexpr U32 CInitialFontCapacity = 128;
@@ -163,6 +166,8 @@ namespace WL
 		atlas->Allocate(EFormat::A8, CDefaultAtlasSize, CDefaultAtlasSize, 1);
 		atlas->InitData(bitmapData);
 
+		availableAtlases.insert(fontIndex | (fontHeight << 16));
+
 		Deallocate(bitmapData);
 	}
 
@@ -173,5 +178,11 @@ namespace WL
 		{
 			BuildAtlas(i, fontHeight, ranges);
 		}
+	}
+
+	template<typename TGPUAPI>
+	inline auto FontRasterizerCPU<TGPUAPI>::GetRasterizedFont(U16 fontIndex) -> Array<RasterizedFont<GPUAPI>>&
+	{
+		return fonts[fontIndex];
 	}
 }

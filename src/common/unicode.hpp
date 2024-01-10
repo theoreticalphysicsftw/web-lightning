@@ -29,10 +29,10 @@ namespace WL
 {
 	struct UnicodeRange
 	{
-		U32 firstChar;
-		U32 lastChar;
+		I32 firstChar;
+		I32 lastChar;
 		
-		constexpr auto Count() const -> U32 { return lastChar - firstChar + 1; }
+		constexpr auto Count() const -> I32 { return lastChar - firstChar + 1; }
 	};
 
 	inline static constexpr UnicodeRange CBasicLatin = { 0x0020, 0x007F };
