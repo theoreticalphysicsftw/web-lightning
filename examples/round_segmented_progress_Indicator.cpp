@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,33 @@
 // SOFTWARE.
 
 
-#pragma once
+#include "web_lightning.hpp"
 
-#include "vector.hpp"
-#include "matrix.hpp"
-#include "arithmetic.hpp"
+#include <iostream>
 
-namespace WL
+int main()
 {
-    using Vec2 = Vector<F32, 2>;
-    using Vec3 = Vector<F32, 3>;
-    using Vec4 = Vector<F32, 4>;
+    using namespace WL;
+    using RT = RuntimeDefault;
 
-    using Mat2x2 = Matrix<F32, 2, 2>;
-    using Mat3x3 = Matrix<F32, 3, 3>;
-    using Mat4x4 = Matrix<F32, 4, 4>;
+    if (!RT::Init())
+    {
+        std::cerr << "Init failed!" << std::endl;
+    }
 
+    ProgressIndicator::RoundSegmented<RT>::Desc desc;
+    desc.emptyColor = 0x161616FF;
+    desc.filledColor = 0xF0F000FF;
+    desc.radius = 0.2f;
+    desc.width = 0.05f;
+    desc.gapSize = 0.02f;
+    desc.segments = 8;
+    ProgressIndicator::RoundSegmented<RT> pi(desc);
+    pi.centered = true;
+
+    RT::Register(&pi);
+
+    RT::Loop();
+
+    return 0;
 }

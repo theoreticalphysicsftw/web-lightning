@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 - 2024 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,58 +25,52 @@
 
 namespace WL
 {
-
-	Str FontAtlasTextVert =
+	Str CircularArcVert =
 		R"( #version 300 es
 		precision highp float;
 
-		layout(location = 0) in vec4 linearTransform;
-		layout(location = 1) in vec2 translation;
-		layout(location = 2) in vec4 uvBbox;
-		layout(location = 3) in uint color;
+		layout(location = 0) in vec2 center;
+		layout(location = 1) in vec4 params;
+		layout(location = 2) in uint color;
 
-		out vec2 voutUV;
+		out vec2 voutCenter;
+		out vec4 voutParams;
 		out vec4 voutColor;
 
-	    vec2 positions[6] = vec2[6]
-		(
-			vec2(-1.f, -1.f),
-			vec2(1.f, -1.f),
-			vec2(-1.f, 1.f),
-
-			vec2(-1.f, 1.f),
-			vec2(1.f, -1.f),
-			vec2(1.f, 1.f)
-		);
-
-		vec4 uvTransforms[6] = vec4[6]
-		(
-			vec4(1.f, 0.f, 0.f, 1.f),
-			vec4(0.f, 0.f, 1.f, 1.f),
-			vec4(1.f, 1.f, 0.f, 0.f),
-
-			vec4(1.f, 1.f, 0.f, 0.f),
-			vec4(0.f, 0.f, 1.f, 1.f),
-			vec4(0.f, 1.f, 1.f, 0.f)
-		);
+		uniform vec2 uScreenDims;
 
 		void main()
 		{
-			mat2x2 linearComponent;
-			linearComponent[0] = linearTransform.xy;
-			linearComponent[1] = linearTransform.zw;
-			vec2 outPos = linearComponent * positions[gl_VertexID] + translation;
+			float radius = params.x;
+			float width = params.y;
+			float arcStart = params.z;
+			float arcEnd = params.w;
 
-			gl_Position = vec4(outPos.x, outPos.y, 0.f, 1.f);
+			float ar = uScreenDims.x / uScreenDims.y;
+			
+			vec2 startVert = vec2(cos(arcStart), sin(arcStart) * ar) * radius + center;
+			vec2 endVert = vec2(cos(arcEnd), sin(arcEnd) * ar) * radius + center;
+			// Scale to create a bounding triangle;
+			float scale = radius / length((endVert - startVert) / 2.f - center);
+
+			vec2 positions[3] = vec2[3]
+			(
+				center,
+				startVert * scale,
+				endVert * scale
+			);
+
+			gl_Position = vec4(positions[gl_VertexID], 0.f, 1.f);
+
+			voutCenter = center;
+			voutParams = params;
 
 			voutColor = vec4(
 							  (color >> 24) & 0xFFu,
 							  (color >> 16) & 0xFFu,
 							  (color >> 8) & 0xFFu,
 							  color & 0xFFu
-						   ) / 255.f;			
-
-			voutUV = uvBbox.xy * uvTransforms[gl_VertexID].xy + uvBbox.zw * uvTransforms[gl_VertexID].zw;
+						   ) / 255.f;
 		}
 	)";
 

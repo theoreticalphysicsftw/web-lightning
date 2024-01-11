@@ -74,7 +74,7 @@ namespace WL
         inline static U32 width = 0;
         inline static U32 height = 0;
         inline static B isWindowClosed = false;
-        inline static Color4 clearColor = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+        inline static Color4 clearColor = Color4(0.0f, 0.0f, 0.0f, 0.0f);
     };
 }
 
@@ -101,6 +101,9 @@ namespace WL
 
         width = GetCanvasWidth();
         height = GetCanvasHeight();
+
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
         window = SDL_CreateWindow(
             appName,

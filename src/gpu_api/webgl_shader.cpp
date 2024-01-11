@@ -51,6 +51,12 @@ namespace WL
             GL_FRAGMENT_SHADER
         };
 
+        static const C* nameTable[] =
+        {
+            "Vertex",
+            "Fragment"
+        };
+
         id = glCreateShader(typeTable[(U32)type]);
         
         if (id == 0)
@@ -72,7 +78,7 @@ namespace WL
             Str errorLog;
             errorLog.resize(maxLength);
             glGetShaderInfoLog(id, maxLength, &maxLength, errorLog.data());
-            LogError("Shader compile error: ", errorLog);
+            LogError(nameTable[U32(type)], " shader compile error: ", errorLog);
         }
 
         return result == GL_TRUE;

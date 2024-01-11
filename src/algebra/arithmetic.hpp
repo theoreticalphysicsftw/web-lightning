@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,18 +23,41 @@
 
 #pragma once
 
-#include "vector.hpp"
-#include "matrix.hpp"
-#include "arithmetic.hpp"
+#include <cmath>
 
 namespace WL
 {
-    using Vec2 = Vector<F32, 2>;
-    using Vec3 = Vector<F32, 3>;
-    using Vec4 = Vector<F32, 4>;
+    inline auto ArcCos(F32 s) -> F32;
+    inline auto ArcSin(F32 s) -> F32;
+    inline auto Sin(F32 a) -> F32;
+    inline auto Cos(F32 a) -> F32;
+}
 
-    using Mat2x2 = Matrix<F32, 2, 2>;
-    using Mat3x3 = Matrix<F32, 3, 3>;
-    using Mat4x4 = Matrix<F32, 4, 4>;
+namespace WL::ConstF32
+{
+    static constexpr F32 CPi = 3.1415927410125732421875;
+}
 
+
+namespace WL
+{
+    inline auto ArcCos(F32 c) -> F32
+    {
+        return std::acos(c);
+    }
+
+    inline auto ArcSin(F32 s) -> F32
+    {
+        return std::asin(s);
+    }
+
+    inline auto Sin(F32 a) -> F32
+    {
+        return std::asin(a);
+    }
+
+    inline auto Cos(F32 a) -> F32
+    {
+        return std::cos(a);
+    }
 }

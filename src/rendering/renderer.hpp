@@ -34,6 +34,7 @@ namespace WL
 		using FontRenderer = TRenderers::FontRenderer;
 		using BoxRenderer = TRenderers::BoxRenderer;
 		using TexturedQuadRenderer = TRenderers::TexturedQuadRenderer;
+		using ArcRenderer = TRenderers::ArcRenderer;
 
 		static auto Init() -> B;
 		static auto CommitDrawCommands() -> V;
@@ -49,7 +50,7 @@ namespace WL
 	template<typename TRenderers>
 	inline auto Renderer<TRenderers>::Init() -> B
 	{
-		return FontRenderer::Init() && BoxRenderer::Init();
+		return FontRenderer::Init() && BoxRenderer::Init() && ArcRenderer::Init();
 	}
 
 
@@ -58,6 +59,7 @@ namespace WL
 	{
 		FontRenderer::CommitDrawCommands();
 		BoxRenderer::CommitDrawCommands();
+		ArcRenderer::CommitDrawCommands();
 	}
 	
 
@@ -66,5 +68,6 @@ namespace WL
 	{
 		FontRenderer::Clear();
 		BoxRenderer::Clear();
+		ArcRenderer::Clear();
 	}
 }

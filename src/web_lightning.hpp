@@ -28,6 +28,7 @@
 #include <rendering/font_rasterizer_cpu.hpp>
 #include <rendering/box_renderer.hpp>
 #include <rendering/textured_quad_renderer.hpp>
+#include <rendering/circular_arc_renderer.hpp>
 #include <rendering/renderer.hpp>
 
 #include <presenting/present_surface.hpp>
@@ -40,6 +41,8 @@
 #include <widgets/text_box.hpp>
 #include <widgets/grid.hpp>
 
+#include <widgets/progress_indicators/round_segmented.hpp>
+
 #include <decoders/webp.hpp>
 
 namespace WL
@@ -51,12 +54,14 @@ namespace WL
 	using FontRendererDefault = FontRenderer<PresentSurfaceDefault, FontRasterizerDefault>;
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
 	using TexturedQuadRendererDefault = TexturedQuadRenderer<PresentSurfaceDefault>;
+	using ArcRendererDefault = CircularArcRenderer<PresentSurfaceDefault>;
 
 	struct RenderersDefault
 	{
 		using FontRenderer = FontRendererDefault;
 		using BoxRenderer = BoxRendererDefault;
 		using TexturedQuadRenderer = TexturedQuadRendererDefault;
+		using ArcRenderer = ArcRendererDefault;
 	};
 
 	using RendererDefault = Renderer<RenderersDefault>;

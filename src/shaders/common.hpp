@@ -35,4 +35,6 @@ namespace WL
     DEFINE_SHADER(TexturedQuadFrag);
     DEFINE_SHADER(BoxVert);
     DEFINE_SHADER(BoxFrag);
+    DEFINE_SHADER(CircularArcVert);
+    DEFINE_SHADER(CircularArcFrag);
 }
