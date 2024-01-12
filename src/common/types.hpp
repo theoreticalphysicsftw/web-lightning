@@ -82,4 +82,10 @@ namespace WL
 
     template <typename... Ts>
     using Variant = std::variant<Ts...>;
+
+    template <U32 size>
+    struct StorageType
+    {
+        StaticArray<Byte, size> data;
+    };
 }
