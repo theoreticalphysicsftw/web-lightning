@@ -36,6 +36,8 @@
 #include <functional>
 
 #include <variant>
+#include <utility>
+#include <type_traits>
 
 namespace WL
 {
@@ -56,6 +58,7 @@ namespace WL
     using Byte = uint8_t;
     using B = bool;
     using V = void;
+    using Void = V;
 
     template <typename T>
     using Array = std::vector<T>;
@@ -65,6 +68,9 @@ namespace WL
 
     template <typename T>
     using ChunkArray = std::deque<T>;
+
+    template <typename T>
+    using Deque = std::deque<T>;
 
     template <typename K, typename V>
     using Map = std::unordered_map<K, V>;
@@ -88,4 +94,21 @@ namespace WL
     {
         StaticArray<Byte, size> data;
     };
+
+    template <typename T>
+    using RemoveReference = std::remove_reference_t<T>;
+
+    template <typename T>
+    [[nodiscard]]
+    constexpr T&& Forward(RemoveReference<T>&& t) noexcept
+    {
+        return std::forward<T>(t);
+    }
+
+    template <typename T>
+    [[nodiscard]]
+    constexpr T&& Forward(RemoveReference<T>& t) noexcept
+    {
+        return std::forward<T>(t);
+    }
 }

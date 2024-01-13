@@ -26,6 +26,7 @@
 #include "types.hpp"
 
 #include <concepts>
+#include <type_traits>
 
 namespace WL
 {
@@ -37,4 +38,13 @@ namespace WL
 
     template <typename T>
     concept CIsArithmetic = std::floating_point<T> || std::integral<T>;
+
+    template <typename T, typename U>
+    struct SizeAtLeast : std::integral_constant<bool, sizeof(T) >= sizeof(U)> {};
+
+    template <typename T, typename U>
+    concept CSizeAtLeast = SizeAtLeast<T, U>::value;
+
+    template <typename T, typename U>
+    concept CSizeAtMost = CSizeAtLeast<U, T>;
 }

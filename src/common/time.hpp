@@ -34,6 +34,7 @@
 namespace WL
 {
 	auto GetTimeStampUS() -> F64;
+	auto UsToS(F32 us) -> F32;
 }
 
 
@@ -48,5 +49,10 @@ namespace WL
 		auto timePoint = std::chrono::steady_clock::now();
 		return F64(std::chrono::duration_cast<std::chrono::nanoseconds>(timePoint - staticTimePoint).count() / 1000.f);
 	#endif
+	}
+
+	auto UsToS(F32 us) -> F32
+	{
+		return us / 1E6;
 	}
 }
