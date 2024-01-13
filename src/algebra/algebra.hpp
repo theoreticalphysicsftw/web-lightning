@@ -36,5 +36,4 @@ namespace WL
     using Mat2x2 = Matrix<F32, 2, 2>;
     using Mat3x3 = Matrix<F32, 3, 3>;
     using Mat4x4 = Matrix<F32, 4, 4>;
-
 }

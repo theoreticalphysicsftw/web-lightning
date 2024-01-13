@@ -26,18 +26,71 @@
 #include <common/types.hpp>
 #include <common/concepts.hpp>
 
+#include "arithmetic.hpp"
+#include "common.hpp"
+
 namespace WL
 {
     template <typename T, U32 N>
     struct Vector
     {
-        T v[N];
+        T data[N];
 
-        T& operator[](U32 n) { return v[n]; }
-        const T& operator[](U32 n) const { return v[n]; }
+        T& operator[](U32 n) { return data[n]; }
+        const T& operator[](U32 n) const { return data[n]; }
 
         template <typename... Ts>
             requires CAllAreConstructibleFrom<T, Ts...>
-        Vector(Ts... elements) : v{ static_cast<T>(elements)... } {};
+        Vector(Ts... elements) : data{ static_cast<T>(elements)... } {};
+
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, +);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, -);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, *);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, /);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, %);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Vector, N, +);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Vector, N, -);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Vector, N, *);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Vector, N, /);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Vector, N, %);
     };
+    
+    #define WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(FUNCTION_NAME) \
+        template <typename T, U32 N> \
+        Vector<T, N>& FUNCTION_NAME (const Vector<T, N>& v) \
+        { \
+            Vector<T, N>& result; \
+            for (auto i = 0; i < N; ++i) \
+            { \
+                result.data[i] = FUNCTION_NAME(v.data[i]); \
+            } \
+            return result; \
+        }
+
+    WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(Sin);
+    WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(Cos);
+    WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(ArcSin);
+    WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(ArcCos);
+
+    #undef WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION
+
+    #define WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(OP) \
+        template <typename T, U32 N> \
+        Vector<T, N>& operator OP (T scalar, const Vector<T, N>& v) \
+        { \
+            Vector<T, N> result; \
+            for (auto i = 0; i < N; ++i) \
+            { \
+                result.data[i] = scalar OP v.data[i]; \
+            } \
+            return result; \
+        }
+    
+    WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(+);
+    WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(-);
+    WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(*);
+    WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(/);
+    WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(%);
+
+    #undef WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR
 }

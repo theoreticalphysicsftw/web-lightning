@@ -42,5 +42,33 @@ namespace WL
         template <typename... Ts>
             requires CAllAreConstructibleFrom<T, Ts...>
         Matrix(Ts... elements) : data{ static_cast<T>(elements)... } {};
+
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Matrix, TRows * TCols, +);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Matrix, TRows * TCols, -);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Matrix, TRows * TCols, *);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR(Matrix, TRows * TCols, / );
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Matrix, TRows * TCols, +);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Matrix, TRows * TCols, -);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Matrix, TRows * TCols, *);
+        WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(Matrix, TRows * TCols, / );
     };
+
+    #define WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(FUNCTION_NAME) \
+        template <typename T, U32 TRows, U32 TCols> \
+        Matrix<T, TRows, TCols>& FUNCTION_NAME (const Matrix<T, TRows, TCols>& v) \
+        { \
+            Matrix<T, TRows, TCols>& result; \
+            for (auto i = 0; i < TRows * TCols; ++i) \
+            { \
+                result.data[i] = FUNCTION_NAME(v.data[i]); \
+            } \
+            return result; \
+        }
+
+    WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(Sin);
+    WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(Cos);
+    WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(ArcSin);
+    WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(ArcCos);
+
+    #undef WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION
 }

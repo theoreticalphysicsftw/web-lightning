@@ -23,54 +23,25 @@
 
 #pragma once
 
-#include <cmath>
-#include <limits>
-#include <common/types.hpp>
-
-namespace WL
-{
-    template <typename T>
-    using Limits = std::numeric_limits<T>;
-
-    inline auto ArcCos(F32 s) -> F32;
-    inline auto ArcSin(F32 s) -> F32;
-    inline auto Sin(F32 a) -> F32;
-    inline auto Cos(F32 a) -> F32;
-    inline auto Frac(F32 n) -> F32;
-}
-
-namespace WL::ConstF32
-{
-    static constexpr F32 CPi = 3.1415927410125732421875f;
-    static constexpr F32 C2Pi = 2.f * CPi;
-}
-
-
-namespace WL
-{
-    inline auto ArcCos(F32 c) -> F32
-    {
-        return std::acos(c);
+#define WL_DEFINE_COMPONENT_WISE_OPERATOR(CLASS, COMPONENTS, OP) \
+    CLASS& operator OP (const CLASS& other) \
+    { \
+        CLASS result; \
+        for (auto i = 0u; i < COMPONENTS; ++i) \
+        { \
+            result.data[i] = this->data[i] OP other.data[i]; \
+        } \
+        return result; \
     }
 
-    inline auto ArcSin(F32 s) -> F32
-    {
-        return std::asin(s);
+#define WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(CLASS, COMPONENTS, OP) \
+    CLASS& operator OP (T scalar) \
+    { \
+        CLASS result; \
+        for (auto i = 0u; i < COMPONENTS; ++i) \
+        { \
+            result.data[i] = this->data[i] OP scalar; \
+        } \
+        return result; \
     }
 
-    inline auto Sin(F32 a) -> F32
-    {
-        return std::asin(a);
-    }
-
-    inline auto Cos(F32 a) -> F32
-    {
-        return std::cos(a);
-    }
-
-    inline auto Frac(F32 n) -> F32
-    {
-        F32 integralPart;
-        return std::modf(n, &integralPart);
-    }
-}
