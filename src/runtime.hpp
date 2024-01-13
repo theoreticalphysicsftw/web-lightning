@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,8 @@ namespace WL
 		using WidgetLayers = ChunkArray<WidgetLayer>;
 
 	private:
-		auto static WidgetRenderingCode() -> V;
+		auto static RenderWidgets() -> V;
+		auto static UpdateWidgets(const UpdateState& updateState) -> V;
 		auto static ResizeLayers(U32 newSize) -> V;
 		inline static B widgetsAreDirty = true;
 		inline static WidgetLayers widgetLayers;
@@ -77,7 +78,8 @@ namespace WL
 		}
 
 		GPUPresentSurface::EnableTransparency();
-		GPUPresentSurface::AddRenderingCode([](){WidgetRenderingCode();});
+		GPUPresentSurface::AddRenderingCode([](){RenderWidgets();});
+		GPUPresentSurface::AddUpdateCode([](const UpdateState& us){UpdateWidgets(us);});
 
 		ResizeLayers(8);
 
@@ -132,7 +134,7 @@ namespace WL
 
 
 	template<typename TGPUAPI, typename TRenderer>
-	inline auto Runtime<TGPUAPI, TRenderer>::WidgetRenderingCode() -> V
+	inline auto Runtime<TGPUAPI, TRenderer>::RenderWidgets() -> V
 	{
 		TGPUAPI::ClearPresentSurface();
 
@@ -147,6 +149,18 @@ namespace WL
 			}
 			TRenderer::CommitDrawCommands();
 			TRenderer::Clear();
+		}
+	}
+
+	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::UpdateWidgets(const UpdateState& updateState) -> V
+	{
+		for (auto& layer : widgetLayers)
+		{
+			for (auto widgetPtr : layer)
+			{
+				widgetPtr->Update(updateState);
+			}
 		}
 	}
 

@@ -47,6 +47,7 @@ namespace WL
 	class Label : public Widget<TRuntime>
 	{
 	public:
+		using Base = Widget<TRuntime>;
 		using Runtime = TRuntime;
 		using GPUAPI = typename Runtime::GPUAPI;
 		using BoxDesc = QuadDesc2D<GPUAPI>;
@@ -108,7 +109,7 @@ namespace WL
 	template<typename TRuntime>
 	inline auto Label<TRuntime>::Update(const UpdateState& s) -> V
 	{
-
+		Base::Update(s);
 	}
 
 	template<typename TRuntime>

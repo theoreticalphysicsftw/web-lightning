@@ -40,6 +40,14 @@
 
 namespace WL
 {
+    struct UpdateState
+    {
+        F32 dt;
+        F32 mouseX;
+        F32 mouseY;
+        U32 keyCode;
+    };
+
     template <class TGPUAPI>
     struct PresentSurface
     {
@@ -50,9 +58,11 @@ namespace WL
         static auto PresentLoop() -> V;
 
         using RenderFunction = Function<V()>;
-        using PreRenderFunction = Function<V(F64 dt)>;
+        using UpdateFunction = Function<V(const UpdateState&)>;
+        using PreRenderFunction = Function<V(F32 dt)>;
 
         static auto AddPreRenderingCode(const PreRenderFunction& func) -> V;
+        static auto AddUpdateCode(const UpdateFunction& func) -> V;
         static auto AddRenderingCode(const RenderFunction& func) -> V;
         static auto UnitsToPixels(F32 units) -> U32;
         static auto PixelsToUnits(U32 pixels) -> F32;
@@ -62,12 +72,13 @@ namespace WL
         static auto GetDimensions() -> Vec2;
 
         private:
-        static V PresentLoopIteration();
-        static V ProcessInput();
+        static auto PresentLoopIteration() -> V;
+        static auto ProcessInput() -> UpdateState;
 
         inline static SDL_Window* window = nullptr;
         inline static RenderFunction renderFunction = [](){};
-        inline static PreRenderFunction preRenderFunction = [](F64 dt){};
+        inline static UpdateFunction updateFunction = [](const UpdateState& updateState) {};
+        inline static PreRenderFunction preRenderFunction = [](F32 dt){};
 
         inline static F64 timeStamp = 0;
 
@@ -147,8 +158,9 @@ namespace WL
 
 
     template <class TGPUAPI>
-    auto PresentSurface<TGPUAPI>::ProcessInput() -> V
+    auto PresentSurface<TGPUAPI>::ProcessInput() -> UpdateState
     {
+        UpdateState us;
         SDL_Event event;
 
         while (SDL_PollEvent(&event))
@@ -171,18 +183,22 @@ namespace WL
                 //switch (event.key.keysym.sym)
             }
         }
+
+        auto newTimeStamp = GetTimeStampUS();
+        auto dt = newTimeStamp - timeStamp;
+        timeStamp = newTimeStamp;
+        us.dt = dt;
+
+        return us;
     }
 
 
     template <class TGPUAPI>
     auto PresentSurface<TGPUAPI>::PresentLoopIteration() -> V
     {
-        auto newTimeStamp = GetTimeStampUS();
-        auto dt = newTimeStamp - timeStamp;
-        timeStamp = newTimeStamp;
-
-        ProcessInput();
-        preRenderFunction(dt);
+        auto updateState = ProcessInput();
+        updateFunction(updateState);
+        preRenderFunction(updateState.dt);
         renderFunction();
         TGPUAPI::Present();
     }
@@ -206,6 +222,12 @@ namespace WL
     inline auto WL::PresentSurface<TGPUAPI>::AddPreRenderingCode(const PreRenderFunction& func) -> V
     {
         preRenderFunction = func;
+    }
+
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::AddUpdateCode(const UpdateFunction& func) -> V
+    {
+        updateFunction = func;
     }
 
     template <class TGPUAPI>

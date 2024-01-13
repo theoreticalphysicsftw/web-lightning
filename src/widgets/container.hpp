@@ -32,6 +32,7 @@ namespace WL
 	class Container : public Widget<TRuntime>
 	{
 	public:
+		using Base = Widget<TRuntime>;
 		using Runtime = TRuntime;
 		using GPUAPI = typename Runtime::GPUAPI;
 
@@ -79,6 +80,7 @@ namespace WL
 	template<typename TRuntime>
 	inline auto Container<TRuntime>::Update(const UpdateState& s) -> V override
 	{
+		Base::Update(s);
 		for (auto widgetPtr : widgets)
 		{
 			widgetPtr->Update(s);

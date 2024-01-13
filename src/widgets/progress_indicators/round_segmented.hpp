@@ -41,6 +41,9 @@ namespace WL::ProgressIndicator
 		F32 width = 0.f;
 		F32 gapSize = 0.f;
 		U32 segments = 0;
+		B timer = true;
+		F32 period = 0.f;
+		U32 blinksPerPeriod = 0;
 		ColorU32 emptyColor = 0;
 		ColorU32 filledColor = 0;
 	};
@@ -49,7 +52,9 @@ namespace WL::ProgressIndicator
 	class RoundSegmented : public Widget<TRuntime>
 	{
 	public:
+		using Base = Widget<TRuntime>;
 		using Runtime = TRuntime;
+		using Animation = Base::Animation;
 		using GPUAPI = typename Runtime::GPUAPI;
 		using Desc = RoundSegmentedDesc;
 
@@ -60,9 +65,9 @@ namespace WL::ProgressIndicator
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const->BBox override;
 
 		RoundSegmentedDesc desc;
-
 	private:
-		U32 filledSegments = 0;
+		U32 activeSegment = 0;
+		Color4 activeSegmentColor;
 	};
 }
 
@@ -73,6 +78,34 @@ namespace WL::ProgressIndicator
 	RoundSegmented<TRuntime>::RoundSegmented(const RoundSegmentedDesc& desc)
 		: desc(desc)
 	{
+		if (desc.timer)
+		{
+			typename Animation::TransformsArray segmentTransforms;
+			segmentTransforms.emplace_back(&activeSegment, 0u, desc.segments);
+			Animation segmentAnimation
+			(
+				Forward<typename Animation::TransformsArray>(segmentTransforms),
+				[&desc] (Animation::TransformsArray& ta, F32 t, F32 dt, F32 duration)
+				{
+					auto newValue = DiscretePeriodicIncrement(desc.period / desc.segments, 0u, desc.segments, t);
+					ta[0].SetProperty(newValue);
+				}
+			);
+			this->AddParallelAnimation(Forward<Animation>(segmentAnimation));
+
+			typename Animation::TransformsArray colorTransforms;
+			colorTransforms.emplace_back(&activeSegmentColor, desc.emptyColor.operator Color4(), desc.filledColor.operator Color4());
+			Animation colorAnimation
+			(
+				Forward<typename Animation::TransformsArray>(colorTransforms),
+				[&desc](Animation::TransformsArray& ta, F32 t, F32 dt, F32 duration)
+				{
+					auto newValue = OscillateDownwards(desc.period / desc.segments / desc.blinksPerPeriod, desc.filledColor.operator Color4(), desc.emptyColor.operator Color4(), t);
+					ta[0].SetProperty(newValue);
+				}
+			);
+			this->AddParallelAnimation(Forward<Animation>(colorAnimation));
+		}
 	}
 
 	template<typename TRuntime>
@@ -115,7 +148,8 @@ namespace WL::ProgressIndicator
 		F32 deltaAngle = 2.f * ConstF32::CPi / desc.segments - gapAngle;
 		for (auto i = 0u; i < desc.segments; ++i)
 		{
-			auto color = (i < filledSegments) ? desc.filledColor : desc.emptyColor;
+			//auto color = (i < activeSegment) ? desc.emptyColor : (i == activeSegment)? ColorU32(activeSegmentColor) : desc.filledColor;
+			auto color = ColorU32(activeSegmentColor);
 			Runtime::Renderer::ArcRenderer::AccumulateArc(renderCenter, renderRadius, renderWidth, initAngle, initAngle + deltaAngle, color);
 			initAngle += deltaAngle + gapAngle;
 		}
@@ -127,7 +161,7 @@ namespace WL::ProgressIndicator
 	template<typename TRuntime>
 	inline auto RoundSegmented<TRuntime>::Update(const UpdateState& s) -> V
 	{
-
+		Base::Update(s);
 	}
 
 	template<typename TRuntime>

@@ -60,7 +60,7 @@ namespace WL
 
 		ColorU32(U32 raw = 0);
 		ColorU32(U8 r, U8 g, U8 b, U8 a);
-		ColorU32(const Color4 c4);
+		ColorU32(const Color4& c4);
 
 		operator Color4() const;
 	};
@@ -85,7 +85,7 @@ namespace WL
 	{
 	}
 
-	inline ColorU32::ColorU32(const Color4 c4)
+	inline ColorU32::ColorU32(const Color4& c4)
 	{
 		r = U8(c4[0] * 255);
 		g = U8(c4[1] * 255);

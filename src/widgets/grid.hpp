@@ -32,6 +32,7 @@ namespace WL
 	class Grid : public Widget<TRuntime>
 	{
 	public:
+		using Base = Widget<TRuntime>;
 		using Runtime = TRuntime;
 		using GPUAPI = typename Runtime::GPUAPI;
 
@@ -77,6 +78,7 @@ namespace WL
 	template<typename TRuntime>
 	inline auto Grid<TRuntime>::Update(const UpdateState& s) -> V
 	{
+		Base::Update(s);
 		for (auto& widgetPtr : slots)
 		{
 			widgetPtr.first->Update(s);

@@ -23,18 +23,12 @@
 
 #pragma once
 
-#include "common/types.hpp"
+#include <common/types.hpp>
+#include <animation/simple.hpp>
+#include <presenting/present_surface.hpp>
 
 namespace WL
 {
-	struct UpdateState
-	{
-		F32 dt;
-		F32 mouseX;
-		F32 mouseY;
-		U32 keyCode;
-	};
-
 	struct BBox
 	{
 		F32 x0;
@@ -50,10 +44,14 @@ namespace WL
 	{
 	public:
 		using UpdateFunction = Function <V(const UpdateState&)>;
+		using Animation = WL::Animation::Simple<TRuntime>;
 
 		virtual auto AccumulateDrawState() const -> V = 0;
-		virtual auto Update(const UpdateState&) -> V = 0;
+		virtual auto Update(const UpdateState&) -> V;
 		virtual auto GetBBox(const Widget* w = nullptr) const -> BBox = 0;
+
+		auto AddSerialAnimation(Animation&& a) -> V;
+		auto AddParallelAnimation(Animation&& a) -> V;
 		
 		auto MoveToLayer(U32 layer) -> V;
 		
@@ -72,6 +70,9 @@ namespace WL
 		Widget* ancestor = nullptr;
 	protected:
 		U32 layer = 1;
+
+		Deque<Animation> serialAnimationChain;
+		Array<Animation> parallelAnimationChain;
 		friend TRuntime;
 	};
 }
@@ -88,6 +89,57 @@ namespace WL
 	Widget<TRuntime>::~Widget()
 	{
 		TRuntime::Deregister(this);
+	}
+
+	template<typename TRuntime>
+	inline auto Widget<TRuntime>::Update(const UpdateState& s) -> V
+	{
+		auto dtS = UsToS(s.dt);
+		I32 doneIndex = -1;
+		for (auto i = 0u; i < serialAnimationChain.size(); ++i)
+		{
+			auto& animation = serialAnimationChain[i];
+			if (animation.Done())
+			{
+				doneIndex = i;
+			}
+			else
+			{
+				animation.Execute(dtS);
+				
+				if (!animation.Done())
+				{
+					break;
+				}
+				else
+				{
+					doneIndex = i;
+				}
+			}
+		}
+
+		while (doneIndex >= 0)
+		{
+			serialAnimationChain.pop_front();
+			doneIndex--;
+		}
+
+		for (auto& animation : parallelAnimationChain)
+		{
+			animation.Execute(dtS);
+		}
+	}
+
+	template<typename TRuntime>
+	inline auto Widget<TRuntime>::AddSerialAnimation(Animation&& a) -> V
+	{
+		serialAnimationChain.emplace_back(Forward<Animation>(a));
+	}
+
+	template<typename TRuntime>
+	inline auto Widget<TRuntime>::AddParallelAnimation(Animation&& a) -> V
+	{
+		parallelAnimationChain.emplace_back(Forward<Animation>(a));
 	}
 
 	template<typename TRuntime>
