@@ -37,11 +37,13 @@ int main()
 
     ProgressIndicator::RoundSegmented<RT>::Desc desc;
     desc.emptyColor = 0x161616FF;
-    desc.filledColor = 0xF0F000FF;
+    desc.filledColor = 0xF0F0F0FF;
     desc.radius = 0.2f;
     desc.width = 0.05f;
     desc.gapSize = 0.02f;
     desc.segments = 8;
+    desc.period = 30;
+    desc.blinksPerPeriod = 3;
     ProgressIndicator::RoundSegmented<RT> pi(desc);
     pi.centered = true;
 
