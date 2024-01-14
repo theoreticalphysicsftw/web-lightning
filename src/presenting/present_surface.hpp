@@ -84,8 +84,12 @@ namespace WL
 
         inline static U32 width = 0;
         inline static U32 height = 0;
+        inline static U32 samples = 8;
         inline static B isWindowClosed = false;
         inline static Color4 clearColor = Color4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        inline static GPUAPI::RenderTarget presentTarget;
+        inline static GPUAPI::RenderTarget offscreenTargetMS;
     };
 }
 
@@ -113,9 +117,6 @@ namespace WL
         width = GetCanvasWidth();
         height = GetCanvasHeight();
 
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-
         window = SDL_CreateWindow(
             appName,
             SDL_WINDOWPOS_CENTERED,
@@ -140,6 +141,9 @@ namespace WL
         }
 
         TGPUAPI::SetPresentSurfaceClearColor(clearColor);
+        auto presentBufferID = TGPUAPI::GetAttachedFrameBufferID();
+        presentTarget.Wrap(presentBufferID);
+        offscreenTargetMS.Init(width, height, samples);
         timeStamp = GetTimeStampUS();
         return true;
     }
@@ -175,6 +179,8 @@ namespace WL
             {
                 width = event.window.data1;
                 height = event.window.data2;
+                offscreenTargetMS.Recreate(width, height, samples);
+                offscreenTargetMS.Bind();
                 TGPUAPI::UpdateViewport(width, height);
             }
 
@@ -200,7 +206,10 @@ namespace WL
         updateFunction(updateState);
         preRenderFunction(updateState.dt);
         renderFunction();
+        offscreenTargetMS.BlitTo(presentTarget);
+        presentTarget.Bind();
         TGPUAPI::Present();
+        offscreenTargetMS.Bind();
     }
 
 
@@ -219,13 +228,13 @@ namespace WL
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::AddPreRenderingCode(const PreRenderFunction& func) -> V
+    inline auto PresentSurface<TGPUAPI>::AddPreRenderingCode(const PreRenderFunction& func) -> V
     {
         preRenderFunction = func;
     }
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::AddUpdateCode(const UpdateFunction& func) -> V
+    inline auto PresentSurface<TGPUAPI>::AddUpdateCode(const UpdateFunction& func) -> V
     {
         updateFunction = func;
     }
@@ -238,28 +247,28 @@ namespace WL
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::UnitsToPixels(F32 units) -> U32
+    inline auto PresentSurface<TGPUAPI>::UnitsToPixels(F32 units) -> U32
     {
         return U32(units * width + 0.5);
     }
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::PixelsToUnits(U32 pixels) -> F32
+    inline auto PresentSurface<TGPUAPI>::PixelsToUnits(U32 pixels) -> F32
     {
         return F32(pixels) / width;
     }
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::GetAspectRatio() -> F32
+    inline auto PresentSurface<TGPUAPI>::GetAspectRatio() -> F32
     {
         return F32(width) / height;
     }
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::SetClearColor(const Color4& color) -> V
+    inline auto PresentSurface<TGPUAPI>::SetClearColor(const Color4& color) -> V
     {
         clearColor = color;
         TGPUAPI::SetPresentSurfaceClearColor(color);
@@ -267,14 +276,14 @@ namespace WL
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::EnableTransparency() -> V
+    inline auto PresentSurface<TGPUAPI>::EnableTransparency() -> V
     {
         TGPUAPI::EnablePresentSurfaceTransparency();
     }
 
 
     template<class TGPUAPI>
-    inline auto WL::PresentSurface<TGPUAPI>::GetDimensions() -> Vec2
+    inline auto PresentSurface<TGPUAPI>::GetDimensions() -> Vec2
     {
         return Vec2(width, height);
     }

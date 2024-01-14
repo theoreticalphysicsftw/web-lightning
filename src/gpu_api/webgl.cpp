@@ -1,4 +1,5 @@
 #include "webgl.hpp"
+#include "webgl.hpp"
 // MIT License
 // 
 // Copyright (c) 2023 Mihail Mladenov
@@ -74,6 +75,13 @@ namespace WL
     auto WebGL::EnableSampleCoverage() -> V
     {
         glEnable(GL_SAMPLE_COVERAGE);
+    }
+
+    auto WebGL::GetAttachedFrameBufferID() -> U32
+    {
+        GLint result;
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &result);
+        return result;
     }
 
     V WebGL::Present()

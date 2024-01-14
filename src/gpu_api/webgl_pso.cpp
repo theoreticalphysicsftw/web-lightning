@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 
 namespace WL
 {
-    WebGLPso::WebGLPso() : program(CInvalidId), vao(CInvalidId)
+    WebGLPso::WebGLPso() : program(CInvalidID), vao(CInvalidID)
     {
         Fill(ubSlots, -1);
         Fill(texSlots, -1);
@@ -40,7 +40,7 @@ namespace WL
 
     WebGLPso::~WebGLPso()
     {
-        if (program != CInvalidId)
+        if (program != CInvalidID)
         {
             glDeleteProgram(program);
             glDeleteVertexArrays(1, &vao);

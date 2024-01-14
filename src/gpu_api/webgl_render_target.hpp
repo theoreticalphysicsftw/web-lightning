@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 - 2024 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,26 @@
 
 #pragma once
 
-#include <common/types.hpp>
-#include <algebra/algebra.hpp>
-#include <rendering/color.hpp>
-
-#include <SDL2/SDL.h>
+#include "render_target.hpp"
 #include "webgl_api.hpp"
-
-#include "gpu_api.hpp"
-#include "webgl_shader.hpp"
-#include "webgl_pso.hpp"
-#include "webgl_buffer.hpp"
-#include "webgl_image.hpp"
-#include "webgl_render_target.hpp"
 
 namespace WL
 {
-    struct WebGL : GpuApi<WebGL>
-    {
-        using Shader = WebGLShader;
-        using Pso = WebGLPso;
-        using Buffer = WebGLBuffer;
-        using Image = WebGLImage;
-        using RenderTarget = WebGLRenderTarget;
-
-        static auto Init(SDL_Window* w) -> B;
-        static auto GetWindowFlags() -> U32;
-        static auto SetPresentSurfaceClearColor(const Color4& color) -> V;
-        static auto ClearPresentSurface() -> V;
-        static auto EnablePresentSurfaceTransparency() -> V;
-        static auto EnableSampleCoverage() -> V;
-        static auto GetAttachedFrameBufferID() -> U32;
-        static auto Present() -> V;
-        static auto UpdateViewport(U32 width, U32 height, U32 x = 0, U32 y = 0) -> V;
-    };
+	class WebGLRenderTarget : RenderTarget<WebGLRenderTarget>
+	{
+	public:
+		using NativeID = GLuint;
+		auto Init(U32 width, U32 height, U32 samples = 1, B withDepth = true) -> V;
+		auto Wrap(NativeID frameBufferID) -> V;
+		auto Bind() -> V;
+		auto BlitTo(const WebGLRenderTarget& other) const -> V;
+		auto Recreate(U32 width, U32 height, U32 samples = 1, B withDepth = true) -> V;
+		~WebGLRenderTarget();
+	private:
+		auto Destroy() -> V;
+		NativeID frameBufferID = CInvalidID;
+		NativeID colorBufferID = CInvalidID;
+		NativeID depthBufferID = CInvalidID;
+		B wrapped;
+	};
 }

@@ -1,7 +1,7 @@
 #include "webgl_buffer.hpp"
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,13 @@
 
 namespace WL
 {
-	WebGLBuffer::WebGLBuffer(U32 size) : Buffer(size), id(CInvalidId)
+	WebGLBuffer::WebGLBuffer(U32 size) : Buffer(size), id(CInvalidID)
 	{
 	}
 
 	WebGLBuffer::~WebGLBuffer()
 	{
-		if (this->id != CInvalidId)
+		if (this->id != CInvalidID)
 		{
 			glDeleteBuffers(1, &id);
 		}

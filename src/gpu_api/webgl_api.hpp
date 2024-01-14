@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,5 +40,5 @@ namespace WL
 	inline void InitWebGLApi() { gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress); }
 #endif
 
-	static inline constexpr U32 CInvalidId = U32(~0u);
+	static inline constexpr U32 CInvalidID = U32(~0u);
 }
