@@ -78,6 +78,7 @@ namespace WL
 		}
 
 		GPUPresentSurface::EnableTransparency();
+		GPUPresentSurface::GPUAPI::EnableSampleCoverage();
 		GPUPresentSurface::AddRenderingCode([](){RenderWidgets();});
 		GPUPresentSurface::AddUpdateCode([](const UpdateState& us){UpdateWidgets(us);});
 

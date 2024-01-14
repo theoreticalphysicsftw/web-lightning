@@ -50,6 +50,7 @@ namespace WL
         static auto SetPresentSurfaceClearColor(const Color4& color) -> V;
         static auto ClearPresentSurface() -> V;
         static auto EnablePresentSurfaceTransparency() -> V;
+        static auto EnableSampleCoverage() -> V;
         static auto Present() -> V;
         static auto UpdateViewport(U32 width, U32 height, U32 x = 0, U32 y = 0) -> V;
     };

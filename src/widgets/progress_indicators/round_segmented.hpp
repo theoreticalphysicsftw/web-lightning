@@ -43,7 +43,7 @@ namespace WL::ProgressIndicator
 		U32 segments = 0;
 		B timer = true;
 		F32 period = 0.f;
-		U32 blinksPerPeriod = 0;
+		F32 blinksPerPeriod = 0;
 		ColorU32 emptyColor = 0;
 		ColorU32 filledColor = 0;
 	};
@@ -80,31 +80,23 @@ namespace WL::ProgressIndicator
 	{
 		if (desc.timer)
 		{
-			typename Animation::TransformsArray segmentTransforms;
-			segmentTransforms.emplace_back(&activeSegment, 0u, desc.segments);
+			typename Animation::TransformsArray transforms;
+			transforms.emplace_back(&activeSegment, 0u, desc.segments);
+			transforms.emplace_back(&activeSegmentColor, desc.emptyColor.operator Color4(), desc.filledColor.operator Color4());
 			Animation segmentAnimation
 			(
-				Forward<typename Animation::TransformsArray>(segmentTransforms),
+				Forward<typename Animation::TransformsArray>(transforms),
 				[&desc] (Animation::TransformsArray& ta, F32 t, F32 dt, F32 duration)
 				{
-					auto newValue = DiscretePeriodicIncrement(desc.period / desc.segments, 0u, desc.segments, t);
-					ta[0].SetProperty(newValue);
+					auto activeSegmentPeriod = desc.period / desc.segments;
+					auto newActiveSegment = DiscretePeriodicIncrement(desc.period / desc.segments, 0u, desc.segments, t);
+					auto activeSegmentT = Frac(t / activeSegmentPeriod) * activeSegmentPeriod;
+					auto newColor = Oscillate(activeSegmentPeriod / (desc.blinksPerPeriod + 0.5f), desc.filledColor.operator Color4(), desc.emptyColor.operator Color4(), activeSegmentT);
+					ta[0].SetProperty(newActiveSegment);
+					ta[1].SetProperty(newColor);
 				}
 			);
 			this->AddParallelAnimation(Forward<Animation>(segmentAnimation));
-
-			typename Animation::TransformsArray colorTransforms;
-			colorTransforms.emplace_back(&activeSegmentColor, desc.emptyColor.operator Color4(), desc.filledColor.operator Color4());
-			Animation colorAnimation
-			(
-				Forward<typename Animation::TransformsArray>(colorTransforms),
-				[&desc](Animation::TransformsArray& ta, F32 t, F32 dt, F32 duration)
-				{
-					auto newValue = OscillateDownwards(desc.period / desc.segments / desc.blinksPerPeriod, desc.filledColor.operator Color4(), desc.emptyColor.operator Color4(), t);
-					ta[0].SetProperty(newValue);
-				}
-			);
-			this->AddParallelAnimation(Forward<Animation>(colorAnimation));
 		}
 	}
 
@@ -148,8 +140,7 @@ namespace WL::ProgressIndicator
 		F32 deltaAngle = 2.f * ConstF32::CPi / desc.segments - gapAngle;
 		for (auto i = 0u; i < desc.segments; ++i)
 		{
-			//auto color = (i < activeSegment) ? desc.emptyColor : (i == activeSegment)? ColorU32(activeSegmentColor) : desc.filledColor;
-			auto color = ColorU32(activeSegmentColor);
+			auto color = (i < activeSegment) ? desc.emptyColor : (i == activeSegment)? ColorU32(activeSegmentColor) : desc.filledColor;
 			Runtime::Renderer::ArcRenderer::AccumulateArc(renderCenter, renderRadius, renderWidth, initAngle, initAngle + deltaAngle, color);
 			initAngle += deltaAngle + gapAngle;
 		}

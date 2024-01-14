@@ -1,3 +1,4 @@
+#include "webgl.hpp"
 // MIT License
 // 
 // Copyright (c) 2023 Mihail Mladenov
@@ -68,6 +69,11 @@ namespace WL
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    auto WebGL::EnableSampleCoverage() -> V
+    {
+        glEnable(GL_SAMPLE_COVERAGE);
     }
 
     V WebGL::Present()
