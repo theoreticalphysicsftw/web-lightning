@@ -57,9 +57,9 @@ namespace WL
     
     #define WL_DEFINE_VECTOR_COMPONENT_WISE_FUNCTION(FUNCTION_NAME) \
         template <typename T, U32 N> \
-        Vector<T, N>& FUNCTION_NAME (const Vector<T, N>& v) \
+        Vector<T, N> FUNCTION_NAME (const Vector<T, N>& v) \
         { \
-            Vector<T, N>& result; \
+            Vector<T, N> result; \
             for (auto i = 0; i < N; ++i) \
             { \
                 result.data[i] = FUNCTION_NAME(v.data[i]); \
@@ -76,7 +76,7 @@ namespace WL
 
     #define WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(OP) \
         template <typename T, U32 N> \
-        Vector<T, N>& operator OP (T scalar, const Vector<T, N>& v) \
+        Vector<T, N> operator OP (T scalar, const Vector<T, N>& v) \
         { \
             Vector<T, N> result; \
             for (auto i = 0; i < N; ++i) \

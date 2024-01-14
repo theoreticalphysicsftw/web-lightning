@@ -83,6 +83,9 @@ namespace WL
 		template <typename U>
 		auto SetProperty(U v) -> V;
 
+		template <typename U>
+		auto GetProperty() -> U;
+
 	private:
 		EType type;
 		Storage* propertyPtr;
@@ -115,6 +118,14 @@ namespace WL
 	inline auto PropertyTransform<T>::SetProperty(U v) -> V
 	{
 		*((U*)propertyPtr) = v;
+	}
+
+	template<typename T>
+		requires CSizeAtMost<T, PropertyTransformStorage>
+	template<typename U>
+	inline auto PropertyTransform<T>::GetProperty() -> U
+	{
+		return *((U*)propertyPtr);
 	}
 
 	template<typename T>

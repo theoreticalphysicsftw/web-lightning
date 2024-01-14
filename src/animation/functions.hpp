@@ -30,7 +30,7 @@ namespace WL
 {
 	// Oscillate in a range form high to low value returning to the high value in certainp period.
 	template <typename T>
-	auto OscillateDownwards(F32 period, T range0, T range1, F32 currentTime) -> T;
+	auto Oscillate(F32 period, T range0, T range1, F32 currentTime) -> T;
 
 	template <typename T>
 	auto DiscretePeriodicIncrement(F32 treshold, T range0, T range1, F32 currentTime) -> T;
@@ -40,11 +40,11 @@ namespace WL
 namespace WL
 {
 	template<typename T>
-	auto OscillateDownwards(F32 period, T range0, T range1, F32 currentTime) -> T
+	auto Oscillate(F32 period, T range0, T range1, F32 currentTime) -> T
 	{
-		auto normalizedT = Frac((currentTime * period / ConstF32::C2Pi) / ConstF32::C2Pi) * ConstF32::C2Pi;
+		auto normalizedT = Frac((currentTime * ConstF32::C2Pi / period) / ConstF32::C2Pi) * ConstF32::C2Pi;
 		auto t = ((Cos(normalizedT) + 1.f) / 2.f);
-		return range0 * t + range1 * (1.f - t);
+		return (range0 * t) + (range1 * (1.f - t));
 	}
 
 	template<typename T>
