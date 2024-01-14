@@ -102,4 +102,3 @@ target_include_directories(libwebp PUBLIC "extern/libwebp")
 
 target_link_libraries(${PROJECT_NAME} stb)
 target_link_libraries(${PROJECT_NAME} libwebp)
-
