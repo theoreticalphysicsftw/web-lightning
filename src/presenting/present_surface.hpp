@@ -57,7 +57,7 @@ namespace WL
     {
         using GPUAPI = TGPUAPI;
 
-        static auto Init(const Str& appName, B resizableWindow = true, B borderlessWindow = false) -> B;
+        static auto Init(const Str& appName, U32 w = 0, U32 h = 0, B resizableWindow = true, B borderlessWindow = false) -> B;
         static auto Destroy() -> V;
         static auto PresentLoop() -> V;
 
@@ -110,7 +110,7 @@ namespace WL
 
 
     template <class TGPUAPI>
-    auto PresentSurface<TGPUAPI>::Init(const Str& appName, B resizableWindow, B borderlessWindow) -> B
+    auto PresentSurface<TGPUAPI>::Init(const Str& appName, U32 w, U32 h, B resizableWindow, B borderlessWindow) -> B
     {
         if (SDL_Init(SDL_INIT_VIDEO) != 0)
         {
@@ -118,8 +118,8 @@ namespace WL
             return false;
         }
 
-        width = GetCanvasWidth();
-        height = GetCanvasHeight();
+        width = w? w : GetCanvasWidth();
+        height = h? h : GetCanvasHeight();
 
         U32 extraFlags = 0;
         extraFlags |= resizableWindow ? SDL_WINDOW_RESIZABLE : 0;

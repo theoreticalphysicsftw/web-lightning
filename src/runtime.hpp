@@ -67,7 +67,7 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Init(const Config& cfg) -> B
 	{
-		if (!(GPUPresentSurface::Init(cfg.appName, cfg.resizableWindow, cfg.borderlessWindow) && Renderer::Init()))
+		if (!(GPUPresentSurface::Init(cfg.appName, cfg.width, cfg.height, cfg.resizableWindow, cfg.borderlessWindow) && Renderer::Init()))
 		{
 			return false;
 		}
