@@ -102,3 +102,7 @@ target_include_directories(libwebp PUBLIC "extern/libwebp")
 
 target_link_libraries(${PROJECT_NAME} stb)
 target_link_libraries(${PROJECT_NAME} libwebp)
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} "Dwmapi.lib")
+endif()

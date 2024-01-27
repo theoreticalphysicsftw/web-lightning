@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,11 @@
 #include "events.hpp"
 
 #if __EMSCRIPTEN__
-#include <emscripten/emscripten.h>
+    #include <emscripten/emscripten.h>
+#elif _WIN32
+    #include "present_surface_win32.hpp"
+#elif __linux__
+    #include "present_surface_x11.hpp"
 #endif
 
 
@@ -53,7 +57,7 @@ namespace WL
     {
         using GPUAPI = TGPUAPI;
 
-        static auto Init(const C* appName = "web-lightning") -> B;
+        static auto Init(const Str& appName, B resizableWindow = true, B borderlessWindow = false) -> B;
         static auto Destroy() -> V;
         static auto PresentLoop() -> V;
 
@@ -106,7 +110,7 @@ namespace WL
 
 
     template <class TGPUAPI>
-    auto PresentSurface<TGPUAPI>::Init(const C* appName) -> B
+    auto PresentSurface<TGPUAPI>::Init(const Str& appName, B resizableWindow, B borderlessWindow) -> B
     {
         if (SDL_Init(SDL_INIT_VIDEO) != 0)
         {
@@ -117,14 +121,23 @@ namespace WL
         width = GetCanvasWidth();
         height = GetCanvasHeight();
 
+        U32 extraFlags = 0;
+        extraFlags |= resizableWindow ? SDL_WINDOW_RESIZABLE : 0;
+        extraFlags |= borderlessWindow ? SDL_WINDOW_BORDERLESS : 0;
+
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
         window = SDL_CreateWindow(
-            appName,
+            appName.c_str(),
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             width,
             height,
             SDL_WINDOW_SHOWN |
-            SDL_WINDOW_RESIZABLE |
+            extraFlags |
             TGPUAPI::GetWindowFlags()
         );
 
@@ -133,6 +146,8 @@ namespace WL
             isWindowClosed = true;
             return false;
         }
+
+        EnableWindowTransparency(window);
 
         if (!TGPUAPI::Init(window))
         {
@@ -143,7 +158,10 @@ namespace WL
         TGPUAPI::SetPresentSurfaceClearColor(clearColor);
         auto presentBufferID = TGPUAPI::GetAttachedFrameBufferID();
         presentTarget.Wrap(presentBufferID);
+        #ifndef __EMSCRIPTEN__
         offscreenTargetMS.Init(width, height, samples);
+        #endif
+        TGPUAPI::EnableSampleCoverage();
         timeStamp = GetTimeStampUS();
         return true;
     }
@@ -179,8 +197,10 @@ namespace WL
             {
                 width = event.window.data1;
                 height = event.window.data2;
+                #ifndef __EMSCRIPTEN__
                 offscreenTargetMS.Recreate(width, height, samples);
                 offscreenTargetMS.Bind();
+                #endif
                 TGPUAPI::UpdateViewport(width, height);
             }
 
@@ -206,10 +226,14 @@ namespace WL
         updateFunction(updateState);
         preRenderFunction(updateState.dt);
         renderFunction();
+        #ifndef __EMSCRIPTEN__
         offscreenTargetMS.BlitTo(presentTarget);
         presentTarget.Bind();
+        #endif
         TGPUAPI::Present();
+        #ifndef __EMSCRIPTEN__
         offscreenTargetMS.Bind();
+        #endif
     }
 
 
