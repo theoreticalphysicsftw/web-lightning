@@ -30,9 +30,14 @@ namespace WL
 {
 	struct Config
 	{
+		Str appName = "web-lightning";
+
 		U32 defaultFontHeight = 16;
-		B useFontAtlases = true;
 		Array<UnicodeRange> defaultFontRanges;
+
+		B useFontAtlases = true;
+		B borderlessWindow = false;
+		B resizableWindow = true;
 
 		inline Config();
 	};

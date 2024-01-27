@@ -88,7 +88,7 @@ namespace WL
 
 		pso.AddVBLayout({ .binding = 0, .type = EType::Float, .components = 2 });
 		pso.AddVBLayout({ .binding = 1, .type = EType::Float, .components = 4 });
-		pso.AddVBLayout({ .binding = 2, .type = EType::Float, .components = 1 });
+		pso.AddVBLayout({ .binding = 2, .type = EType::Uint, .components = 1 });
 		pso.AddSimpleConstant(0, EType::Float, "uScreenDims");
 
 		return pso.Compile();

@@ -54,7 +54,7 @@ namespace WL
 			float innerRadius = radius - width;
 
 			float dist = arcSDF(gl_FragCoord.xy, center, radius, innerRadius);
-			float alpha = 1.f - smoothstep(0.f, 1.f, dist);
+			float alpha = 1.f - smoothstep(0.f, 1.f, dist * 0.5f);
 
 			outColor = vec4(voutColor.rgb, alpha);
 		}

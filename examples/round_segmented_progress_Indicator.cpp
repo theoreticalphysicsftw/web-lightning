@@ -30,7 +30,10 @@ int main()
     using namespace WL;
     using RT = RuntimeDefault;
 
-    if (!RT::Init())
+    Config cfg;
+    cfg.borderlessWindow = true;
+    cfg.resizableWindow = false;
+    if (!RT::Init(cfg))
     {
         std::cerr << "Init failed!" << std::endl;
     }

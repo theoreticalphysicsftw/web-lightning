@@ -27,8 +27,6 @@
 // SOFTWARE.
 
 
-#pragma once
-
 #include <common/error.hpp>
 
 #include "webgl_render_target.hpp"
@@ -74,7 +72,7 @@ namespace WL
 			}
 			else
 			{
-				WEBGL_VALIDATE(glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height));
+				WEBGL_VALIDATE(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height));
 			}
 			WEBGL_VALIDATE(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBufferID));
 		}
@@ -98,7 +96,7 @@ namespace WL
 	{
 		WEBGL_VALIDATE(glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferID));
 		WEBGL_VALIDATE(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, other.frameBufferID));
-		WEBGL_VALIDATE(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR));
+		WEBGL_VALIDATE(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
 	}
 
 	auto WebGLRenderTarget::Recreate(U32 width, U32 height, U32 samples, B withDepth) -> V

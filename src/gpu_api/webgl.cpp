@@ -74,7 +74,7 @@ namespace WL
 
     auto WebGL::EnableSampleCoverage() -> V
     {
-        glEnable(GL_SAMPLE_COVERAGE);
+        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     }
 
     auto WebGL::GetAttachedFrameBufferID() -> U32

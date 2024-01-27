@@ -51,7 +51,7 @@ namespace WL
 			if (voutRadius > 0.f)
 			{
 				float dist = roundedBoxSDF(gl_FragCoord.xy - voutCenterScreen * uScreenDims, voutDims / 2.f * uScreenDims, voutRadius * uScreenDims.x);
-				alpha = 1.f - smoothstep(0.f, 1.f, dist);
+				alpha = 1.f - smoothstep(0.f, 1.f, dist * 0.5f);
 			}
 			outColor = vec4(texture(uImage0, voutUV).rgb, alpha);
 		}

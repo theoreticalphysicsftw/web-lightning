@@ -55,9 +55,9 @@ namespace WL
 
     #define WL_DEFINE_MATRIX_COMPONENT_WISE_FUNCTION(FUNCTION_NAME) \
         template <typename T, U32 TRows, U32 TCols> \
-        Matrix<T, TRows, TCols>& FUNCTION_NAME (const Matrix<T, TRows, TCols>& v) \
+        Matrix<T, TRows, TCols> FUNCTION_NAME (const Matrix<T, TRows, TCols>& v) \
         { \
-            Matrix<T, TRows, TCols>& result; \
+            Matrix<T, TRows, TCols> result; \
             for (auto i = 0; i < TRows * TCols; ++i) \
             { \
                 result.data[i] = FUNCTION_NAME(v.data[i]); \

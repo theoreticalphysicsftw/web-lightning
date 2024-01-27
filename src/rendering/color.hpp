@@ -45,17 +45,17 @@ namespace WL
 		};
 		struct
 		{
-			U8 a;
+			U8 a0;
 			U8 cr;
 			U8 cb;
 			U8 y;
 		};
 		struct
 		{
-			U8 a;
+			U8 a1;
 			U8 v;
 			U8 u;
-			U8 y;
+			U8 y0;
 		};
 
 		ColorU32(U32 raw = 0);
