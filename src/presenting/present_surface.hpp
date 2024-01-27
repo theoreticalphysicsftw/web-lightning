@@ -147,7 +147,10 @@ namespace WL
             return false;
         }
 
-        EnableWindowTransparency(window);
+        if (borderlessWindow)
+        {
+            EnableWindowTransparency(window);
+        }
 
         if (!TGPUAPI::Init(window))
         {
