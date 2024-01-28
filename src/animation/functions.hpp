@@ -42,7 +42,7 @@ namespace WL
 	template<typename T>
 	auto Oscillate(F32 period, T range0, T range1, F32 currentTime) -> T
 	{
-		auto normalizedT = Frac((currentTime * ConstF32::C2Pi / period) / ConstF32::C2Pi) * ConstF32::C2Pi;
+		auto normalizedT = Frac((currentTime * Constants<F32>::C2Pi / period) / Constants<F32>::C2Pi) * Constants<F32>::C2Pi;
 		auto t = ((Cos(normalizedT) + 1.f) / 2.f);
 		return (range0 * t) + (range1 * (1.f - t));
 	}

@@ -137,7 +137,7 @@ namespace WL::ProgressIndicator
 
 		F32 initAngle = 0.f;
 		F32 gapAngle = ArcSin(desc.gapSize / (desc.radius - desc.width));
-		F32 deltaAngle = 2.f * ConstF32::CPi / desc.segments - gapAngle;
+		F32 deltaAngle = 2.f * Constants<F32>::CPi / desc.segments - gapAngle;
 		for (auto i = 0u; i < desc.segments; ++i)
 		{
 			auto color = (i < activeSegment) ? desc.emptyColor : (i == activeSegment)? ColorU32(activeSegmentColor) : desc.filledColor;

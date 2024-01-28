@@ -34,7 +34,7 @@ namespace WL
     template <typename T, U32 N>
     struct Vector
     {
-        T data[N];
+        StaticArray<T, N> data;
 
         T& operator[](U32 n) { return data[n]; }
         const T& operator[](U32 n) const { return data[n]; }
@@ -42,6 +42,22 @@ namespace WL
         template <typename... Ts>
             requires CAllAreConstructibleFrom<T, Ts...>
         Vector(Ts... elements) : data{ static_cast<T>(elements)... } {};
+        Vector(T fill) { for (auto i = 0; i < N; ++i) data[i] = fill; }
+
+        T Dot(const Vector& other) const
+        {
+            T sum = T(0);
+            for (auto i = 0u; i < N; ++i)
+            {
+                sum += data[i] * other.data[i];
+            }
+            return sum;
+        }
+
+        T Length() const
+        {
+            return Sqrt(this->Dot(*this));
+        }
 
         WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, +);
         WL_DEFINE_COMPONENT_WISE_OPERATOR(Vector, N, -);
@@ -93,4 +109,45 @@ namespace WL
     WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR(%);
 
     #undef WL_DEFINE_VECTOR_LEFT_SCALAR_OPERATOR
+
+    template <typename TF, U32 N>
+    auto SquaredDistance(const Vector<TF, N>& v0, const Vector<TF, N>& v1) -> TF
+    {
+        auto dir = v0 - v1;
+        return dir.Dot(dir);
+    }
+
+    template <typename TF, U32 N>
+    auto Distance(const Vector<TF, N>& v0, const Vector<TF, N>& v1) -> TF
+    {
+        return Sqrt(SquaredDistance(v0, v1));
+    }
+
+    template <typename TF, U32 N>
+    auto Max(const Vector<TF, N>& v0, const Vector<TF, N>& v1) -> Vector<TF, N>
+    {
+        Vector<TF, N> result;
+        for (auto i = 0u; i < N; ++i)
+        {
+            result[i] = Max(v0[i], v1[i]);
+        }
+        return result;
+    }
+
+    template <typename TF, U32 N>
+    auto Min(const Vector<TF, N>& v0, const Vector<TF, N>& v1) -> Vector<TF, N>
+    {
+        Vector<TF, N> result;
+        for (auto i = 0u; i < N; ++i)
+        {
+            result[i] = Min(v0[i], v1[i]);
+        }
+        return result;
+    }
+
+    template <typename TF, U32 N>
+    auto operator==(const Vector<TF, N>& v0, const Vector<TF, N>& v1) -> B
+    {
+        return v0.data == v1.data;
+    }
 }

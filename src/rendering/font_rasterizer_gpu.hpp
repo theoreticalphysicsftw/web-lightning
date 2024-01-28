@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2023 - 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 namespace WL
 {
 	template <typename TGPUAPI>
-	class FontRasterizerGPU : FontRasterizer<FontRasterizerCPU<TGPUAPI>, TGPUAPI>
+	class FontRasterizerGPU : FontRasterizer<FontRasterizerGPU<TGPUAPI>, TGPUAPI>
 	{
 	public:
 		using GPUAPI = TGPUAPI;
@@ -57,7 +57,7 @@ namespace WL
 
 
 	template<typename TGPUAPI>
-	inline auto FontRasterizerCPU<TGPUAPI>::AddFont(const Byte* fontData, U32 fontSize) -> U32
+	inline auto FontRasterizerGPU<TGPUAPI>::AddFont(const Byte* fontData, U32 fontSize) -> U32
 	{
 		return ~0u;
 	}

@@ -32,45 +32,146 @@ namespace WL
     template <typename T>
     using Limits = std::numeric_limits<T>;
 
-    inline auto ArcCos(F32 s) -> F32;
-    inline auto ArcSin(F32 s) -> F32;
-    inline auto Sin(F32 a) -> F32;
-    inline auto Cos(F32 a) -> F32;
-    inline auto Frac(F32 n) -> F32;
-}
+    template <typename TF>
+    inline auto ArcCos(TF s) -> TF;
+    template <typename TF>
+    inline auto ArcSin(TF s) -> TF;
+    template <typename TF>
+    inline auto Sin(TF a) -> TF;
+    template <typename TF>
+    inline auto Cos(TF a) -> TF;
+    template <typename TF>
+    inline auto ArcTan2(TF y, TF x) -> TF;
+    template <typename TF>
+    inline auto Exp(TF n) -> TF;
+    template <typename TF>
+    inline auto Logarithm(TF n) -> TF;
+    template <typename TF>
+    inline auto Sqrt(TF n) -> TF;
+    template <typename TF>
+    inline auto Cbrt(TF n) -> TF;
+    template <typename TF>
+    inline auto Frac(TF n) -> TF;
+    template <typename TF>
+    inline auto Abs(TF n) -> TF;
 
-namespace WL::ConstF32
-{
-    static constexpr F32 CPi = 3.1415927410125732421875f;
-    static constexpr F32 C2Pi = 2.f * CPi;
+    template <typename T>
+    inline auto SmoothStep(T range0, T range1, T x) -> T;
+
+    template <typename TF>
+    inline auto IsNan(TF n) -> B;
+
+    template <typename T>
+    inline auto Clamp(T value, T range0, T range1) -> T;
+
+
+    template <typename TF>
+    struct Constants
+    {
+        static constexpr TF CPi = TF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899);
+        static constexpr TF C2Pi = TF(2) * CPi;
+    };
 }
 
 
 namespace WL
 {
-    inline auto ArcCos(F32 c) -> F32
+    template <typename TF>
+    inline auto ArcCos(TF c) -> TF
     {
         return std::acos(c);
     }
 
-    inline auto ArcSin(F32 s) -> F32
+
+    template <typename TF>
+    inline auto ArcSin(TF s) -> TF
     {
         return std::asin(s);
     }
 
-    inline auto Sin(F32 a) -> F32
+
+    template <typename TF>
+    inline auto Sin(TF a) -> TF
     {
-        return std::asin(a);
+        return std::sin(a);
     }
 
-    inline auto Cos(F32 a) -> F32
+
+    template <typename TF>
+    inline auto Cos(TF a) -> TF
     {
         return std::cos(a);
     }
 
-    inline auto Frac(F32 n) -> F32
+
+    template<typename TF>
+    auto ArcTan2(TF y, TF x) -> TF
     {
-        F32 integralPart;
+        return std::atan2(y, x);
+    }
+
+
+    template<typename TF>
+    auto Exp(TF n) -> TF
+    {
+        return std::exp(n);
+    }
+
+
+    template<typename TF>
+    auto Logarithm(TF n) -> TF
+    {
+        return std::log(n);
+    }
+
+
+    template<typename TF>
+    auto Sqrt(TF n) -> TF
+    {
+        return std::sqrt(n);
+    }
+
+
+    template<typename TF>
+    auto Cbrt(TF n) -> TF
+    {
+        return std::cbrt(n);
+    }
+
+
+    template <typename TF>
+    inline auto Frac(TF n) -> TF
+    {
+        TF integralPart;
         return std::modf(n, &integralPart);
+    }
+
+
+    template<typename TF>
+    auto Abs(TF n) -> TF
+    {
+        return std::abs(n);
+    }
+
+
+    template<typename T>
+    auto SmoothStep(T range0, T range1, T x) -> T
+    {
+        x = Clamp((x - range0) / (range1 - range0), T(range0), T(range1));
+        return x * x * (T(3) - T(2) * x);
+    }
+
+
+    template<typename TF>
+    auto IsNan(TF n) -> B
+    {
+        return std::isnan(n);
+    }
+
+
+    template<typename T>
+    auto Clamp(T value, T range0, T range1) -> T
+    {
+        return Min(Max(value, range0), range1);
     }
 }
