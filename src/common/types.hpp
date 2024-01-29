@@ -33,6 +33,7 @@
 #include <unordered_set>
 
 #include <string>
+#include <string_view>
 
 #include <functional>
 
@@ -86,6 +87,7 @@ namespace WL
     using Pair = std::pair<F, S>;
 
     using Str = std::string;
+    using StrView = std::string_view;
 
     template <typename T>
     using Function = std::function<T>;
