@@ -33,8 +33,8 @@
 
 namespace WL
 {
-	auto GetTimeStampUS() -> F64;
-	auto UsToS(F32 us) -> F32;
+	inline auto GetTimeStampUS() -> F64;
+	inline auto UsToS(F32 us) -> F32;
 }
 
 
@@ -51,7 +51,7 @@ namespace WL
 	#endif
 	}
 
-	auto UsToS(F32 us) -> F32
+	inline auto UsToS(F32 us) -> F32
 	{
 		return us / 1E6;
 	}
