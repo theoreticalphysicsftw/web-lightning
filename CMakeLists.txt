@@ -49,6 +49,14 @@ file(
         "extern/libwebp/src/utils/*.c"
     )
 
+file(
+        GLOB
+        LIZARD_SOURCES
+        "extern/lizard/*.c"
+        "extern/lizard/entropy/*.c"
+        "extern/lizard/xxhash/*.c"
+    )
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set(USE_FLAGS "${USE_FLAGS} -sMIN_WEBGL_VERSION=2")
     set(USE_FLAGS "${USE_FLAGS} -sMAX_WEBGL_VERSION=2")
@@ -97,11 +105,12 @@ endif()
 
 add_library(stb "extern/stb.cpp")
 add_library(libwebp ${LIBWEBP_SOURCES})
-target_include_directories(libwebp PUBLIC "extern/libwebp")
+add_library(lizard ${LIZARD_SOURCES})
 target_include_directories(libwebp PUBLIC "extern/libwebp")
 
 target_link_libraries(${PROJECT_NAME} stb)
 target_link_libraries(${PROJECT_NAME} libwebp)
+target_link_libraries(${PROJECT_NAME} lizard)
 
 if(WIN32)
     # DWMAPI for window transparency functions from DWM.
