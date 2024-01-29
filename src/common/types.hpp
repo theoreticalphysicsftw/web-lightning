@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <array>
+#include <span>
 #include <deque>
 #include <unordered_map>
 #include <unordered_set>
@@ -67,6 +68,9 @@ namespace WL
     using StaticArray = std::array<T, size>;
 
     template <typename T>
+    using Span = std::span<T>;
+
+    template <typename T>
     using ChunkArray = std::deque<T>;
 
     template <typename T>
@@ -88,6 +92,27 @@ namespace WL
 
     template <typename... Ts>
     using Variant = std::variant<Ts...>;
+
+    template <typename TVisitor, typename... TVariants>
+    inline constexpr auto Visit = std::visit<TVisitor, TVariants...>;
+
+    template <typename T, typename... Ts>
+    inline constexpr auto HoldsAlternative(const Variant<Ts...>& v) -> B
+    {
+        return std::holds_alternative<T>(v);
+    }
+
+    template <typename T, typename... Ts>
+    constexpr auto Get(Variant<Ts...>& v) -> T&
+    {
+        return std::get<T>(v);
+    }
+
+    template <typename T, typename... Ts>
+    constexpr auto Get(const Variant<Ts...>& v) -> const T&
+    {
+        return std::get<T>(v);
+    }
 
     template <U32 size>
     struct StorageType
