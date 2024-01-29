@@ -26,6 +26,7 @@
 #include <rendering/font_renderer.hpp>
 #include <rendering/font_rasterizer.hpp>
 #include <rendering/font_rasterizer_cpu.hpp>
+#include <rendering/vector_rasterizer_cpu.hpp>
 #include <rendering/box_renderer.hpp>
 #include <rendering/textured_quad_renderer.hpp>
 #include <rendering/circular_arc_renderer.hpp>
@@ -40,16 +41,19 @@
 #include <widgets/box.hpp>
 #include <widgets/text_box.hpp>
 #include <widgets/grid.hpp>
+#include <widgets/vector_element.hpp>
 
 #include <widgets/progress_indicators/round_segmented.hpp>
 
 #include <decoders/webp.hpp>
+#include <decoders/lizard.hpp>
 
 namespace WL
 {
 	using GPUAPIDefault = WebGL;
 	using PresentSurfaceDefault = PresentSurface<GPUAPIDefault>;
 	using FontRasterizerDefault = FontRasterizerCPU<GPUAPIDefault>;
+	using VectorRasterizerDefault = VectorRasterizerCPU<GPUAPIDefault>;
 	
 	using FontRendererDefault = FontRenderer<PresentSurfaceDefault, FontRasterizerDefault>;
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
@@ -62,6 +66,7 @@ namespace WL
 		using BoxRenderer = BoxRendererDefault;
 		using TexturedQuadRenderer = TexturedQuadRendererDefault;
 		using ArcRenderer = ArcRendererDefault;
+		using VectorRasterizer = VectorRasterizerDefault;
 	};
 
 	using RendererDefault = Renderer<RenderersDefault>;

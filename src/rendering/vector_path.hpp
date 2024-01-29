@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,52 +23,27 @@
 
 #pragma once
 
-#include <common/types.hpp>
+#include <algebra/algebra.hpp>
+#include <algebra/bezier.hpp>
+#include <algebra/line.hpp>
+#include <rendering/color.hpp>
 
 namespace WL
 {
-	template <typename TRenderers>
-	class Renderer : TRenderers
+	template <typename TF>
+	struct Path2D
 	{
-	public:
-		using FontRenderer = TRenderers::FontRenderer;
-		using BoxRenderer = TRenderers::BoxRenderer;
-		using TexturedQuadRenderer = TRenderers::TexturedQuadRenderer;
-		using ArcRenderer = TRenderers::ArcRenderer;
-		using VectorRasterizer = TRenderers::VectorRasterizer;
+		using Scalar = TF;
+		using QuadraticBezier = QuadraticBezier<Scalar, 2>;
+		using CubicBezier = CubicBezier<Scalar, 2>;
+		using Line = Line<Scalar, 2>;
+		using Primitive = Variant<QuadraticBezier, CubicBezier, Line>;
 
-		static auto Init() -> B;
-		static auto CommitDrawCommands() -> V;
-		static auto Clear() -> V;
+		ColorU32 fillColor;
+		ColorU32 outlineColor;
+		B outlined = false;
+		B filled = true;
 
-	private:
+		Array<Primitive> primitives;
 	};
-}
-
-
-namespace WL
-{
-	template<typename TRenderers>
-	inline auto Renderer<TRenderers>::Init() -> B
-	{
-		return FontRenderer::Init() && BoxRenderer::Init() && ArcRenderer::Init() && VectorRasterizer::Init();
-	}
-
-
-	template<typename TRenderers>
-	inline auto Renderer<TRenderers>::CommitDrawCommands() -> V
-	{
-		FontRenderer::CommitDrawCommands();
-		BoxRenderer::CommitDrawCommands();
-		ArcRenderer::CommitDrawCommands();
-	}
-	
-
-	template<typename TRenderers>
-	inline auto Renderer<TRenderers>::Clear() -> V
-	{
-		FontRenderer::Clear();
-		BoxRenderer::Clear();
-		ArcRenderer::Clear();
-	}
 }

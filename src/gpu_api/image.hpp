@@ -31,6 +31,7 @@ namespace WL
 	{
 		A8 = 0,
 		RGBA8,
+		BGRA8,
 		RGBA32,
 		RGBA32Float,
 		Invalid
