@@ -104,7 +104,13 @@ target_link_libraries(${PROJECT_NAME} stb)
 target_link_libraries(${PROJECT_NAME} libwebp)
 
 if(WIN32)
+    # DWMAPI for window transparency functions from DWM.
     target_link_libraries(${PROJECT_NAME} "Dwmapi.lib")
+    # Remove console window.
+    target_link_options(${PROJECT_NAME} PUBLIC "/SUBSYSTEM:windows")
+    target_link_options(${PROJECT_NAME} PUBLIC "/ENTRY:mainCRTStartup")
+    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 endif()
 
 add_subdirectory("extern/plutosvg")
