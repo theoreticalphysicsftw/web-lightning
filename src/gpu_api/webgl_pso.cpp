@@ -73,7 +73,8 @@ namespace WL
 
     auto WebGLPso::Use() -> V
     {
-        glUseProgram(program);
+        WEBGL_VALIDATE(glBindVertexArray(vao));
+        WEBGL_VALIDATE(glUseProgram(program));
     }
 
 

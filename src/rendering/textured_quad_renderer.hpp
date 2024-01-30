@@ -130,12 +130,12 @@ namespace WL
 		linearTransformsBuffer.Update(linearTransformsBufferCPU);
 		translationsBuffer.Update(translationsBufferCPU);
 
+		pso.Use();
 		pso.BindVB(0, linearTransformsBuffer, true);
 		pso.BindVB(1, translationsBuffer, true);
 		pso.BindVB(2, uvsBuffer, true);
 		pso.BindVB(3, radiusesBuffer, true);
 
-		pso.Use();
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 		pso.BindTexture(*texture);
 

@@ -146,6 +146,7 @@ namespace WL
 		linearTransformsBuffer.Update(linearTransformsBufferCPU);
 		translationsBuffer.Update(translationsBufferCPU);
 
+		pso.Use();
 		pso.BindVB(0, positionsBuffer);
 		pso.BindVB(1, linearTransformsBuffer, true);
 		pso.BindVB(2, translationsBuffer, true);
@@ -153,7 +154,6 @@ namespace WL
 		pso.BindVB(4, radiusesBuffer, true);
 
 
-		pso.Use();
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
 		pso.DrawInstanced(0, DefaultQuad2D::verticesCount, instances);
