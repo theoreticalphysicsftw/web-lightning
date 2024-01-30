@@ -119,7 +119,7 @@ namespace WL
 		// TODO: Cleanup in destructor.
 		auto img = new Image;
 		rasterizedCache[pxWidth] = img;
-		img->Allocate(EFormat::BGRA8, pxWidth * 4, pxHeight * 4);
+		img->Allocate(EFormat::BGRA8, pxWidth, pxHeight);
 		Runtime::Renderer::VectorRasterizer::RasterizeToImage(svg, img);
 		this->desc.texture = img;
 
