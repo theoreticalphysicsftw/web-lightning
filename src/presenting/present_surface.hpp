@@ -60,6 +60,7 @@ namespace WL
         static auto Init(const Str& appName, U32 w = 0, U32 h = 0, B resizableWindow = true, B borderlessWindow = false) -> B;
         static auto Destroy() -> V;
         static auto PresentLoop() -> V;
+        static auto Close() -> V;
 
         using RenderFunction = Function<V()>;
         using UpdateFunction = Function<V(const UpdateState&)>;
@@ -93,7 +94,6 @@ namespace WL
         inline static Color4 clearColor = Color4(0.0f, 0.0f, 0.0f, 0.0f);
 
         inline static GPUAPI::RenderTarget presentTarget;
-        inline static GPUAPI::RenderTarget offscreenTargetMS;
     };
 }
 
@@ -161,9 +161,6 @@ namespace WL
         TGPUAPI::SetPresentSurfaceClearColor(clearColor);
         auto presentBufferID = TGPUAPI::GetAttachedFrameBufferID();
         presentTarget.Wrap(presentBufferID);
-        #ifndef __EMSCRIPTEN__
-        offscreenTargetMS.Init(width, height, samples);
-        #endif
         TGPUAPI::EnableSampleCoverage();
         timeStamp = GetTimeStampUS();
         return true;
@@ -181,6 +178,12 @@ namespace WL
         isWindowClosed = true;
     }
 
+    template<class TGPUAPI>
+    inline auto WL::PresentSurface<TGPUAPI>::Close() -> V
+    {
+        isWindowClosed = true;
+    }
+
 
     template <class TGPUAPI>
     auto PresentSurface<TGPUAPI>::ProcessInput() -> UpdateState
@@ -188,9 +191,8 @@ namespace WL
         UpdateState us;
         SDL_Event event;
 
-        while (SDL_PollEvent(&event))
+        while (!isWindowClosed && SDL_PollEvent(&event))
         {
-
             if (event.window.event == SDL_WINDOWEVENT_CLOSE)
             {
                 isWindowClosed = true;
@@ -200,10 +202,6 @@ namespace WL
             {
                 width = event.window.data1;
                 height = event.window.data2;
-                #ifndef __EMSCRIPTEN__
-                offscreenTargetMS.Recreate(width, height, samples);
-                offscreenTargetMS.Bind();
-                #endif
                 TGPUAPI::UpdateViewport(width, height);
             }
 
@@ -229,14 +227,7 @@ namespace WL
         updateFunction(updateState);
         preRenderFunction(updateState.dt);
         renderFunction();
-        #ifndef __EMSCRIPTEN__
-        offscreenTargetMS.BlitTo(presentTarget);
-        presentTarget.Bind();
-        #endif
         TGPUAPI::Present();
-        #ifndef __EMSCRIPTEN__
-        offscreenTargetMS.Bind();
-        #endif
     }
 
 

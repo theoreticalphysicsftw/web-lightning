@@ -42,6 +42,7 @@ namespace WL
 		auto static Init(const Config& cfg = Config()) -> B;
 		auto static Loop() -> V;
 		auto static Destroy() -> V;
+		auto static Exit() -> V;
 		
 		auto static MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V;
 		auto static Register(Widget<Runtime>* widget)->V;
@@ -102,6 +103,12 @@ namespace WL
 	}
 
 	template<typename TGPUAPI, typename TRenderer>
+	inline auto Runtime<TGPUAPI, TRenderer>::Exit() -> V
+	{
+		GPUPresentSurface::Close();
+	}
+
+	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::MoveToLayer(Widget<Runtime>* widget, U32 newLayer) -> V
 	{
 		widgetLayers[widget->layer].erase(widget);
@@ -123,7 +130,10 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Deregister(Widget<Runtime>* widget) -> V
 	{
-		widgetLayers[widget->layer].erase(widget);
+		if (widgetLayers.size() > widget->layer)
+		{
+			widgetLayers[widget->layer].erase(widget);
+		}
 	}
 
 
