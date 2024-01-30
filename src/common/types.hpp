@@ -37,6 +37,7 @@
 
 #include <functional>
 
+#include <any>
 #include <variant>
 #include <utility>
 #include <type_traits>
@@ -62,6 +63,7 @@ namespace WL
     using V = void;
     using Void = V;
 
+
     template <typename T>
     using Array = std::vector<T>;
 
@@ -83,14 +85,32 @@ namespace WL
     template <typename K>
     using Set = std::unordered_set<K>;
 
+
     template<typename F, typename S>
     using Pair = std::pair<F, S>;
 
     using Str = std::string;
     using StrView = std::string_view;
 
+
     template <typename T>
     using Function = std::function<T>;
+
+
+    using Any = std::any;
+
+    template <typename T>
+    const T& AnyCast(const Any& a)
+    {
+        return std::any_cast<const T&>(a);
+    }
+
+    template <typename T>
+    T& AnyCast(Any& a)
+    {
+        return std::any_cast<T&>(a);
+    }
+
 
     template <typename... Ts>
     using Variant = std::variant<Ts...>;
@@ -116,11 +136,13 @@ namespace WL
         return std::get<T>(v);
     }
 
+
     template <U32 size>
     struct StorageType
     {
         StaticArray<Byte, size> data;
     };
+
 
     template <typename T>
     using RemoveReference = std::remove_reference_t<T>;
