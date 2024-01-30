@@ -41,8 +41,8 @@ namespace WL
 
         template <typename... Ts>
             requires CAllAreConstructibleFrom<T, Ts...>
-        Vector(Ts... elements) : data{ static_cast<T>(elements)... } {};
-        Vector(T fill) { for (auto i = 0; i < N; ++i) data[i] = fill; }
+        constexpr Vector(Ts... elements) : data{ static_cast<T>(elements)... } {};
+        constexpr Vector(T fill) { for (auto i = 0; i < N; ++i) data[i] = fill; }
 
         T Dot(const Vector& other) const
         {

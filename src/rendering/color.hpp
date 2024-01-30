@@ -58,8 +58,8 @@ namespace WL
 			U8 y0;
 		};
 
-		ColorU32(U32 raw = 0);
-		ColorU32(U8 r, U8 g, U8 b, U8 a);
+		constexpr ColorU32(U32 raw = 0);
+		constexpr ColorU32(U8 r, U8 g, U8 b, U8 a);
 		ColorU32(const Color4& c4);
 
 		operator Color4() const;
@@ -75,12 +75,12 @@ namespace WL
 
 namespace WL
 {
-	inline ColorU32::ColorU32(U32 raw)
+	inline constexpr  ColorU32::ColorU32(U32 raw)
 		: packed(raw)
 	{
 	}
 
-	inline ColorU32::ColorU32(U8 r, U8 g, U8 b, U8 a)
+	inline constexpr  ColorU32::ColorU32(U8 r, U8 g, U8 b, U8 a)
 		: r(r), g(g), b(b), a(a)
 	{
 	}
