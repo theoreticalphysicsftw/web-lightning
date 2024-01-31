@@ -50,6 +50,8 @@ namespace WL
         F32 mouseX;
         F32 mouseY;
         U32 keyCode;
+        B leftPressed = false;
+        B leftReleased = false;
     };
 
     template <class TGPUAPI>
@@ -75,6 +77,9 @@ namespace WL
         static auto SetClearColor(const Color4& color) -> V;
         static auto EnableTransparency() -> V;
         static auto GetDimensions() -> Vec2;
+        static auto MoveWindowUnits(Vec2 u) -> V;
+        static auto RegisterWindowDragArea(Vec4 area) -> V;
+        static auto RegisterWindowDragExcludedArea(Vec4 area, U32 idx) -> V;
 
         private:
         static auto PresentLoopIteration() -> V;
@@ -92,6 +97,15 @@ namespace WL
         inline static U32 samples = 8;
         inline static B isWindowClosed = false;
         inline static Color4 clearColor = Color4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        inline static Vector<I32, 2> currentWindowPos;
+
+        // First area is draggable area. Since normal events might not be
+        // reported by the OS in that area we need to use to use the next
+        // elements of that array as areas which are excluded from the first.
+        // For example for close, minimize, maximize buttons.
+        inline static StaticArray<Vec4, 4> windowControlArea;
+        inline static U32 excludedControlAreas = 0;
 
         inline static GPUAPI::RenderTarget presentTarget;
     };
@@ -140,6 +154,8 @@ namespace WL
             extraFlags |
             TGPUAPI::GetWindowFlags()
         );
+
+        SDL_GetWindowPosition(window, &currentWindowPos[0], &currentWindowPos[1]);
 
         if (window == nullptr)
         {
@@ -209,6 +225,33 @@ namespace WL
             {
                 //switch (event.key.keysym.sym)
             }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (event.button.button = SDL_BUTTON_LEFT)
+                {
+                    us.leftPressed = true;
+                    us.mouseX = event.button.x / F32(width);
+                    us.mouseY = event.button.y / F32(width);
+                    us.leftReleased = (event.button.state == SDL_RELEASED)? true : false;
+                }
+            }
+
+            if (event.type == SDL_MOUSEBUTTONUP)
+            {
+                if (event.button.button = SDL_BUTTON_LEFT)
+                {
+                    us.leftReleased = true;
+                    us.mouseX = event.button.x / F32(width);
+                    us.mouseY = event.button.y / F32(width);
+                }
+            }
+
+            if (event.type == SDL_MOUSEMOTION)
+            {
+                us.mouseX = event.motion.x / F32(width);
+                us.mouseY = event.motion.y / F32(width);
+            }
         }
 
         auto newTimeStamp = GetTimeStampUS();
@@ -261,6 +304,51 @@ namespace WL
     auto PresentSurface<TGPUAPI>::AddRenderingCode(const RenderFunction& func) -> V
     {
         renderFunction = func;
+    }
+
+    template<class TGPUAPI>
+    inline auto PresentSurface<TGPUAPI>::MoveWindowUnits(Vec2 u) -> V
+    {
+        Vector<I32, 2> delta(u[0] * width, u[1] * width);
+        currentWindowPos = currentWindowPos + delta;
+        SDL_SetWindowPosition(window, currentWindowPos[0], currentWindowPos[1]);
+    }
+
+
+    template<class TGPUAPI>
+    inline auto PresentSurface<TGPUAPI>::RegisterWindowDragArea(Vec4 area) -> V
+    {
+        // TODO: Handle window resizing.
+        windowControlArea[0] = area * width;
+        auto hitTest = [](SDL_Window* win, const SDL_Point* p, void* data) -> SDL_HitTestResult
+        {
+            auto areas = (Vec4*) data;
+
+            for (auto i = 1; i < 4; ++i)
+            {
+                // Excluded areas
+                if (p->x >= areas[i][0] && p->x <= areas[i][1] && p->y >= areas[i][2] && p->y <= areas[i][3])
+                {
+                    return SDL_HITTEST_NORMAL;
+                }
+            }
+
+            if (p->x >= areas[0][0] && p->x <= areas[0][1] && p->y >= areas[0][2] && p->y <= areas[0][3])
+            {
+                return SDL_HITTEST_DRAGGABLE;
+            }
+
+            return SDL_HITTEST_NORMAL;
+        };
+        SDL_SetWindowHitTest(window, hitTest, &windowControlArea);
+    }
+
+
+    template<class TGPUAPI>
+    inline auto PresentSurface<TGPUAPI>::RegisterWindowDragExcludedArea(Vec4 area, U32 idx) -> V
+    {
+        WL_ASSERT(idx < windowControlArea.size() - 1);
+        windowControlArea[idx + 1] = area * width;
     }
 
 

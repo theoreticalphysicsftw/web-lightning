@@ -37,6 +37,7 @@ namespace WL
 		using GPUAPI = TGPUAPI;
 		using Renderer = TRenderer;
 		using GPUPresentSurface = PresentSurface<GPUAPI>;
+		using PresentSurface = PresentSurface<GPUAPI>;
 		using PreRenderFunction = GPUPresentSurface::PreRenderFunction;
 
 		auto static Init(const Config& cfg = Config()) -> B;
@@ -166,10 +167,23 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::UpdateWidgets(const UpdateState& updateState) -> V
 	{
+		auto mousePos = Vec2(updateState.mouseX, updateState.mouseY);
+
 		for (auto& layer : widgetLayers)
 		{
 			for (auto widgetPtr : layer)
 			{
+				auto bBox = widgetPtr->GetBBox();
+				if (bBox.Contains(mousePos))
+				{
+					if (updateState.leftPressed)
+					{
+						if (widgetPtr->updateOnClick)
+						{
+							widgetPtr->updateOnClick(updateState);
+						}
+					}
+				}
 				widgetPtr->Update(updateState);
 			}
 		}

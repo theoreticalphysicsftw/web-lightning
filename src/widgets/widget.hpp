@@ -37,6 +37,8 @@ namespace WL
 		F32 y1;
 
 		inline BBox(F32 x0 = 0, F32 y0 = 0, F32 x1 = 0, F32 y1 = 0);
+
+		inline auto Contains(Vec2 p) -> B;
 	};
 
 	template <typename TRuntime>
@@ -83,6 +85,12 @@ namespace WL
 	inline BBox::BBox(F32 x0, F32 y0, F32 x1, F32 y1) :
 		x0(x0), y0(y0), x1(x1), y1(y1)
 	{
+	}
+
+
+	inline auto BBox::Contains(Vec2 p) -> B
+	{
+		return p[0] >= x0 && p[0] <= x1 && p[1] >= y0 && p[1] <= y1;
 	}
 
 	template <typename TRuntime>
