@@ -53,7 +53,7 @@ namespace WL
 				float dist = roundedBoxSDF(gl_FragCoord.xy - voutCenterScreen * uScreenDims, voutDims / 2.f * uScreenDims, voutRadius * uScreenDims.x);
 				alpha = 1.f - smoothstep(0.f, 1.f, dist * 0.5f);
 			}
-			vec4 avgSample = textureLod(uImage0, voutUV, 0);
+			vec4 avgSample = texture(uImage0, voutUV);
 			outColor = vec4(avgSample.rgb, alpha * avgSample.a);
 		}
 	)";
