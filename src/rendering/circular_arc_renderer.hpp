@@ -120,6 +120,7 @@ namespace WL
 			return;
 		}
 
+		pso.Use();
 		colorsBuffer.Update(colorsBufferCPU);
 		paramsBuffer.Update(paramsBufferCPU);
 		centersBuffer.Update(centersBufferCPU);
@@ -128,8 +129,6 @@ namespace WL
 		pso.BindVB(1, paramsBuffer, true);
 		pso.BindVB(2, colorsBuffer, true);
 
-
-		pso.Use();
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
 		pso.DrawInstanced(0, 3, instances);
