@@ -192,6 +192,9 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::ResizeLayers(U32 newSize) -> V
 	{
-		widgetLayers.resize(newSize);
+		if (newSize > widgetLayers.size())
+		{
+			widgetLayers.resize(newSize);
+		}
 	}
 }
