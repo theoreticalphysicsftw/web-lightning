@@ -41,8 +41,10 @@ namespace WL
 
 		ColorU32 fillColor;
 		ColorU32 outlineColor;
+		F32 outlineWidth;
 		B outlined = false;
 		B filled = true;
+		B closed = false;
 
 		Array<Primitive> primitives;
 	};

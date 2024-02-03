@@ -52,7 +52,9 @@ namespace WL
 	template<typename TGPUAPI>
 	inline auto VectorRasterizerCPU<TGPUAPI>::RasterizeToImage(Span<const Path2D> paths, Image* out) -> V
 	{
-		auto surface = plutovg_surface_create(out->width, out->height);
+		const auto width = out->width;
+		const auto height = out->height;
+		auto surface = plutovg_surface_create(width, height);
 		auto context = plutovg_create(surface);
 
 		for (auto& path : paths)
@@ -64,35 +66,41 @@ namespace WL
 				if (HoldsAlternative<Path2D::Line>(prim))
 				{
 					auto& line = Get<Path2D::Line>(prim);
-					plutovg_move_to(context, line.p0[0], line.p0[1]);
-					plutovg_line_to(context, line.p1[0], line.p1[1]);
+					plutovg_move_to(context, line.p0[0] * width, line.p0[1] * height);
+					plutovg_line_to(context, line.p1[0] * width, line.p1[1] * height);
 				}
 
 				if (HoldsAlternative<Path2D::QuadraticBezier>(prim))
 				{
 					auto& qb = Get<Path2D::QuadraticBezier>(prim);
-					plutovg_move_to(context, qb.p0[0], qb.p0[1]);
-					plutovg_quad_to(context, qb.p1[0], qb.p1[1], qb.p2[0], qb.p2[1]);
+					plutovg_move_to(context, qb.p0[0] * width, qb.p0[1] * height);
+					plutovg_quad_to(context, qb.p1[0] * width, qb.p1[1] * height, qb.p2[0] * width, qb.p2[1] * height);
 				}
 
 				if (HoldsAlternative<Path2D::CubicBezier>(prim))
 				{
 					auto& cb = Get<Path2D::CubicBezier>(prim);
-					plutovg_move_to(context, cb.p0[0], cb.p0[1]);
-					plutovg_cubic_to(context, cb.p1[0], cb.p1[1], cb.p2[0], cb.p2[1], cb.p3[0], cb.p3[1]);
+					plutovg_move_to(context, cb.p0[0] * width, cb.p0[1] * height);
+					plutovg_cubic_to(context, cb.p1[0] * width, cb.p1[1] * height, cb.p2[0] * width, cb.p2[1] * height, cb.p3[0] * width, cb.p3[1] * height);
 				}
 			}
 
-			plutovg_close_path(context);
+			if (path.closed)
+			{
+				plutovg_close_path(context);
+			}
 
 			if (path.filled)
 			{
-				plutovg_set_source_rgba(context, path.fillColor.r, path.fillColor.g, path.fillColor.b, path.fillColor.a);
+				auto color = path.fillColor.operator Color4();
+				plutovg_set_source_rgba(context, color[0], color[1], color[2], color[3]);
 				plutovg_fill_preserve(context);
 			}
 			if (path.outlined)
 			{
-				plutovg_set_source_rgba(context, path.outlineColor.r, path.outlineColor.g, path.outlineColor.b, path.outlineColor.a);
+				auto color = path.outlineColor.operator Color4();
+				plutovg_set_source_rgba(context, color[0], color[1], color[2], color[3]);
+				plutovg_set_line_width(context, path.outlineWidth * width);
 				plutovg_stroke_preserve(context);
 			}
 			plutovg_restore(context);
@@ -101,7 +109,6 @@ namespace WL
 		auto rasterizedData = plutovg_surface_get_data(surface);
 		out->InitData(rasterizedData);
 		plutovg_surface_destroy(surface);
-
 		plutovg_destroy(context);
 	}
 
