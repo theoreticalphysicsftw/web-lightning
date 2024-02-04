@@ -89,6 +89,12 @@ namespace WL
     template<typename F, typename S>
     using Pair = std::pair<F, S>;
 
+    template <typename T, typename U>
+    constexpr auto MakePair(const T& f, const U& s) -> Pair<T, U>
+    {
+        return std::make_pair(f, s);
+    }
+
     using Str = std::string;
     using StrView = std::string_view;
 

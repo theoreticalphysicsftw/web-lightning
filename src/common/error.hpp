@@ -42,5 +42,5 @@
 
 namespace WL
 {
-
+	static constexpr U32 CInvalidIdx = -1;
 }
