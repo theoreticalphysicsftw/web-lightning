@@ -159,9 +159,9 @@ namespace WL
 					widgetPtr->AccumulateDrawState();
 				}
 			}
-			TRenderer::CommitDrawCommands();
-			TRenderer::Clear();
 		}
+		TRenderer::CommitDrawCommands();
+		TRenderer::Clear();
 	}
 
 	template<typename TGPUAPI, typename TRenderer>
