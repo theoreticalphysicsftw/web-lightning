@@ -48,11 +48,13 @@ namespace WL
 
 		QuadraticBezier(const Vec& p0, const Vec& p1, const Vec& p2) : p0(p0), p1(p1), p2(p2) {}
 
-		auto GetPolynomialCoefficients() const->StaticArray<Vec, 3>;
-		auto EvaluateAt(Scalar t) const->Vec;
-		auto GetCentroid() const->Vec;
-		auto GetSquaredDistanceFrom(const Vec& p) const->TF;
-		auto GetDistanceFrom(const Vec& p) const->TF;
+		auto GetPolynomialCoefficients() const -> StaticArray<Vec, 3>;
+		auto EvaluateAt(Scalar t) const -> Vec;
+		auto Split(Scalar t) const -> Pair<QuadraticBezier, QuadraticBezier>;
+		auto GetCentroid() const -> Vec;
+		auto GetSquaredDistanceFrom(const Vec& p) const -> TF;
+		auto GetDistanceFrom(const Vec& p) const -> TF;
+	
 	};
 
 
@@ -81,6 +83,7 @@ namespace WL
 
 		auto EvaluateAt(Scalar t) const -> Vec;
 		auto GetCentroid() const -> Vec;
+		auto Split(Scalar t) -> Pair<CubicBezier, CubicBezier>;
 		// TODO: Implement.
 		// auto GetSquaredDistanceFrom(const Vec& p) const->TF;
 		// auto GetDistanceFrom(const Vec& p) const->TF;
@@ -162,7 +165,6 @@ namespace WL
 	}
 
 
-
 	template<typename TF, U32 Dim>
 	inline auto CubicBezier<TF, Dim>::EvaluateAt(Scalar t) const -> Vec
 	{
@@ -173,12 +175,56 @@ namespace WL
 		auto tCb = tSq * t;
 		return oneMinusTCb * p0 + Scalar(3) * oneMinusTSq * t * p1 + Scalar(3) * oneMinusT * tSq * p2 + tCb * p3;
 	}
+	
+
+	template<typename TF, U32 Dim>
+	inline auto QuadraticBezier<TF, Dim>::Split(Scalar t) const -> Pair<QuadraticBezier, QuadraticBezier>
+	{
+		Vec b[3][3];
+
+		for (auto i = 0u; i < 3; ++i)
+		{
+			b[0][i] = points[i];
+		}
+
+		for (auto i = 1u; i < 3u; ++i)
+		{
+			for (auto j = 0u; j < (3 - i); ++j)
+			{
+				b[i][j] = (1 - t) * b[i - 1][j] + t * b[i - 1][j + 1];
+			}
+		}
+
+		return MakePair(QuadraticBezier(b[0][0], b[1][0], b[2][0]), QuadraticBezier(b[2][0], b[1][1], b[0][2]));
+	}
 
 
 	template<typename TF, U32 Dim>
 	inline auto CubicBezier<TF, Dim>::GetCentroid() const -> Vec
 	{
 		return (p0 + p1 + p2 + p3) / Scalar(4);
+	}
+
+
+	template<typename TF, U32 Dim>
+	inline auto CubicBezier<TF, Dim>::Split(Scalar t) -> Pair<CubicBezier, CubicBezier>
+	{
+		Vec b[4][4];
+
+		for (auto i = 0u; i < 4; ++i)
+		{
+			b[0][i] = points[i];
+		}
+
+		for (auto i = 1u; i < 4u; ++i)
+		{
+			for (auto j = 0u; j < (4 - i); ++j)
+			{
+				b[i][j] = (1 - t) * b[i - 1][j] + t * b[i - 1][j + 1];
+			}
+		}
+
+		return MakePair(CubicBezier(b[0][0], b[1][0], b[2][0], b[3][0]), CubicBezier(b[3][0], b[2][1], b[1][2], b[0][3]));
 	}
 
 }
