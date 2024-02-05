@@ -57,7 +57,7 @@ namespace WL
     auto SolveCubic(TF a, TF b, TF c, TF d) -> StaticArray<TF, 3>
     {
         static constexpr TF tolerance = TF(1) * Limits<TF>::epsilon();
-        PA_ASSERT(a > tolerance);
+        WL_ASSERT(a > tolerance);
         auto nan = Limits<TF>::quiet_NaN();
         StaticArray<TF, 3> roots =
         {
