@@ -55,6 +55,9 @@ namespace WL
     template <typename TF>
     inline auto Abs(TF n) -> TF;
 
+    template <typename TF>
+    inline auto Sign(TF n) -> U32;
+
     template <typename T>
     inline auto SmoothStep(T range0, T range1, T x) -> T;
 
@@ -151,6 +154,13 @@ namespace WL
     auto Abs(TF n) -> TF
     {
         return std::abs(n);
+    }
+
+
+    template<typename TF>
+    auto Sign(TF n) -> U32
+    {
+        return (n < 0)? 0 : 1u;
     }
 
 
