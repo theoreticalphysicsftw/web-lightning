@@ -21,4 +21,34 @@
 // SOFTWARE.
 
 
-#pragma once
+#include "common.hpp"
+
+namespace WL
+{
+
+	Str BezierApproxFrag =
+		R"( #version 300 es
+		precision highp float;
+
+        in vec4 voutColor;
+        in vec2 voutUV;
+		in float voutWidth;
+		in float voutFeather;
+
+		out vec4 outColor;
+		
+		uniform vec2 uScreenDims;
+
+		void main()
+		{
+			float implicit = voutUV.x * voutUV.x - voutUV.y;
+			vec2 implicitGrad = vec2(2 * voutUV.x, -1.f);
+			vec2 grad = implicitGrad * vec2(dFdx(voutUV.x), dFdx(voutUV.y));
+			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x - 1.f) / 2.f;
+			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, approxDist), 0.f, 1.f);
+
+			outColor = vec4(voutColor.rgb * alpha, alpha);
+		}
+	)";
+
+}

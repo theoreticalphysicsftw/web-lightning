@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2023 Mihail Mladenov
+// Copyright (c) 2024 Mihail Mladenov
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +23,12 @@
 
 #pragma once
 
-#include <common/types.hpp>
-
-#define DEFINE_SHADER(SHADER_NAME) extern Str SHADER_NAME;
 
 namespace WL
 {
-    DEFINE_SHADER(FontAtlasTextVert);
-    DEFINE_SHADER(FontAtlasTextFrag);
-    DEFINE_SHADER(TexturedQuadVert);
-    DEFINE_SHADER(TexturedQuadFrag);
-    DEFINE_SHADER(BoxVert);
-    DEFINE_SHADER(BoxFrag);
-    DEFINE_SHADER(CircularArcVert);
-    DEFINE_SHADER(CircularArcFrag);
-    DEFINE_SHADER(BezierApproxVert);
-    DEFINE_SHADER(BezierApproxFrag);
+	template <typename TNativeRenderer>
+	class BezierRenderer
+	{
+
+	};
 }

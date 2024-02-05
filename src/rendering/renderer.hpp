@@ -36,6 +36,7 @@ namespace WL
 		using TexturedQuadRenderer = TRenderers::TexturedQuadRenderer;
 		using ArcRenderer = TRenderers::ArcRenderer;
 		using VectorRasterizer = TRenderers::VectorRasterizer;
+		using BezierRenderer = TRenderers::BezierRenderer;
 
 		static auto Init() -> B;
 		static auto CommitDrawCommands() -> V;
@@ -51,7 +52,7 @@ namespace WL
 	template<typename TRenderers>
 	inline auto Renderer<TRenderers>::Init() -> B
 	{
-		return FontRenderer::Init() && BoxRenderer::Init() && ArcRenderer::Init() && VectorRasterizer::Init();
+		return FontRenderer::Init() && BoxRenderer::Init() && ArcRenderer::Init() && VectorRasterizer::Init() && BezierRenderer::Init();
 	}
 
 
