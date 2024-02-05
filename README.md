@@ -41,6 +41,12 @@ For Desktop/WebGL
 ### Animations
 - [x] Per-widget per-frame arbitrary property animation chains.
 - [ ] Bezier curve particle traversal.
+### Format support
+- [x] Lizard compressed data.
+- [x] WebP images.
+- [x] SVG images.
+- [ ] Avif images.
+- [ ] AV1 streams. 
 
 
 ## Showcase
