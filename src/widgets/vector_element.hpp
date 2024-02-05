@@ -23,9 +23,6 @@
 
 #pragma once
 
-
-#pragma once
-
 #include <common/error.hpp>
 
 #include "rendering/vector_path.hpp"
@@ -88,7 +85,7 @@ namespace WL
 
 		if (copySource)
 		{
-			this->paths.assign( paths.begin(), paths.end());
+			this->paths.assign(paths.begin(), paths.end());
 			pathsView = { this->paths.data(), this->paths.size() };
 		}
 		else
