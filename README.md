@@ -20,19 +20,27 @@ For Desktop/WebGL
 
 ## Progress
 ### General
-- [x] Create general WebGL rendering interface.
-- [x] Enable CPU font rendering.
-- [ ] Enable GPU font rendering.
-- [ ] Enable general 2D vector rendering on the GPU
+- [x] General WebGL rendering interface.
+- [x] CPU font rendering.
+- [ ] GPU font rendering.
+- [ ] GPU bezier curve rendering. 
+- [x] CPU General 2D vector rendering.
+- [ ] GPU 2D vector rendering.
 - [ ] API for 3D rendering
 ### Widgets
 - [x] Boxes
-- [ ] Containers
-- [ ] Buttons
+- [x] Containers
+- [x] Grids
+- [x] Buttons
+- [x] Progress Indicators 
 - [ ] Sliders
 - [ ] Menus
-- [ ] Images
+- [x] Images
 - [ ] Canvases
 - [ ] Input Fields
+### Animations
+- [x] Per-widget per-frame arbitrary property animatio chains.
+- [ ] Bezier curve particle traversal.
+
 
 ## Showcase
