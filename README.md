@@ -39,7 +39,7 @@ For Desktop/WebGL
 - [ ] Canvases
 - [ ] Input Fields
 ### Animations
-- [x] Per-widget per-frame arbitrary property animatio chains.
+- [x] Per-widget per-frame arbitrary property animation chains.
 - [ ] Bezier curve particle traversal.
 
 
