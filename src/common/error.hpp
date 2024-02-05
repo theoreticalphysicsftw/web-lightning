@@ -23,6 +23,7 @@
 #pragma once
 
 #include "logging.hpp"
+#include "utilities.hpp"
 
 #ifdef WL_DEBUG
 #define WL_ASSERT(ARG) \
