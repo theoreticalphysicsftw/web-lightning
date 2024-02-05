@@ -34,6 +34,14 @@ namespace WL
     using Vec3 = Vector<F32, 3>;
     using Vec4 = Vector<F32, 4>;
 
+    using UVec2 = Vector<U32, 2>;
+    using UVec3 = Vector<U32, 3>;
+    using UVec4 = Vector<U32, 4>;
+
+    using IVec2 = Vector<I32, 2>;
+    using IVec3 = Vector<I32, 3>;
+    using IVec4 = Vector<I32, 4>;
+
     using Mat2x2 = Matrix<F32, 2, 2>;
     using Mat3x3 = Matrix<F32, 3, 3>;
     using Mat4x4 = Matrix<F32, 4, 4>;
