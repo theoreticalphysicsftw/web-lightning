@@ -57,6 +57,8 @@ namespace WL
 		auto surface = plutovg_surface_create(width, height);
 		auto context = plutovg_create(surface);
 
+		plutovg_set_operator(context, plutovg_operator_src);
+
 		for (auto& path : paths)
 		{
 			plutovg_save(context);
