@@ -130,7 +130,7 @@ namespace WL
 
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
-		pso.DrawInstanced(0, 9, instances);
+		pso.DrawInstanced(0, 3, instances);
 
 		Clear();
 	}

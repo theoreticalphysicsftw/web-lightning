@@ -62,6 +62,7 @@ namespace WL
 		FontRenderer::CommitDrawCommands();
 		BoxRenderer::CommitDrawCommands();
 		ArcRenderer::CommitDrawCommands();
+		BezierRenderer::CommitDrawCommands();
 	}
 	
 
@@ -71,5 +72,6 @@ namespace WL
 		FontRenderer::Clear();
 		BoxRenderer::Clear();
 		ArcRenderer::Clear();
+		BezierRenderer::Clear();
 	}
 }

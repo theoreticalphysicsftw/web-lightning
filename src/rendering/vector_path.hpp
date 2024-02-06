@@ -28,6 +28,7 @@
 #include <algebra/line.hpp>
 #include <rendering/color.hpp>
 
+
 namespace WL
 {
 	template <typename TF>
@@ -46,6 +47,25 @@ namespace WL
 		B filled = true;
 		B closed = false;
 
+		auto CloneWithoutPrimitives() const -> Path2D;
+
 		Array<Primitive> primitives;
 	};
+}
+
+
+namespace WL
+{
+	template <typename TF>
+	inline auto Path2D<TF>::CloneWithoutPrimitives() const -> Path2D
+	{
+		Path2D result;
+		result.fillColor = fillColor;
+		result.filled = filled;
+		result.closed = closed;
+		result.outlineColor = outlineColor;
+		result.outlined = outlined;
+		result.outlineWidth = outlineWidth;
+		return result;
+	}
 }
