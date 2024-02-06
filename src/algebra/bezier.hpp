@@ -83,12 +83,15 @@ namespace WL
 
 		auto EvaluateAt(Scalar t) const -> Vec;
 		auto GetCentroid() const -> Vec;
-		auto Split(Scalar t) -> Pair<CubicBezier, CubicBezier>;
+		auto Split(Scalar t) const -> Pair<CubicBezier, CubicBezier>;
 		// TODO: Implement.
 		// auto GetSquaredDistanceFrom(const Vec& p) const->TF;
 		// auto GetDistanceFrom(const Vec& p) const->TF;
 		// auto GetPolynomialCoefficients() const->StaticArray<Vec, 4>;
 	};
+
+	template <typename TF>
+	auto ApproximateByQuadratics(const CubicBezier<TF, 2>& cubic, TF tolerance = 0.001) -> Array<QuadraticBezier<TF, 2>>;
 }
 
 
@@ -207,7 +210,7 @@ namespace WL
 
 
 	template<typename TF, U32 Dim>
-	inline auto CubicBezier<TF, Dim>::Split(Scalar t) -> Pair<CubicBezier, CubicBezier>
+	inline auto CubicBezier<TF, Dim>::Split(Scalar t) const -> Pair<CubicBezier, CubicBezier>
 	{
 		Vec b[4][4];
 
@@ -227,4 +230,49 @@ namespace WL
 		return MakePair(CubicBezier(b[0][0], b[1][0], b[2][0], b[3][0]), CubicBezier(b[3][0], b[2][1], b[1][2], b[0][3]));
 	}
 
+
+	template<typename TF>
+	inline auto ApproximateByQuadratics(const CubicBezier<TF, 2>& cubic, TF tolerance) -> Array<QuadraticBezier<TF, 2>>
+	{
+		Array<QuadraticBezier<TF, 2>> result;
+		Array<CubicBezier<TF, 2>> stack;
+		stack.push_back(cubic);
+
+		while (!stack.empty())
+		{
+			auto c = stack.back();
+			stack.pop_back();
+
+			// Find the tangent intersection.
+			auto t0 = c.p1 - c.p0;
+			auto t1 = c.p3 - c.p2;
+			auto b = c.p3 - c.p0;
+
+			// We need to solve the equation t0 * x0 - t1 * x1 = b or in matrix form
+			// Mat2x2(t0[0], -t1[0], t0[1], -t1[1]) * Vec2(x0, x1) = b
+			// Use Cramer's rule.
+			auto det = -t0[0] * t1[1] + t1[0] * t0[1];
+			auto x0 = (-b[0] * t1[1] + t1[0] * b[1]) / det;
+			auto x1 = (t0[0] * b[1] + b[0] * t0[1]) / det;
+			auto intersection = c.p0 + x0 * t0;
+
+			QuadraticBezier<TF, 2> approx(c.p0, intersection, c.p3);
+
+			auto halfValueCubic = c.EvaluateAt(TF(0.5));
+			auto halfValueQuadratic = approx.EvaluateAt(TF(0.5));
+
+			if ((halfValueCubic - halfValueQuadratic).Length() < tolerance)
+			{
+				result.push_back(approx);
+			}
+			else
+			{
+				auto split = c.Split(TF(0.5));
+				stack.push_back(split.second);
+				stack.push_back(split.first);
+			}
+		}
+
+		return result;
+	}
 }
