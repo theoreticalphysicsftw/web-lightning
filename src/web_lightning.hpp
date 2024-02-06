@@ -30,6 +30,7 @@
 #include <rendering/box_renderer.hpp>
 #include <rendering/textured_quad_renderer.hpp>
 #include <rendering/circular_arc_renderer.hpp>
+#include <rendering/bezier_renderer_gpu.hpp>
 #include <rendering/renderer.hpp>
 
 #include <presenting/present_surface.hpp>
@@ -42,8 +43,11 @@
 #include <widgets/text_box.hpp>
 #include <widgets/grid.hpp>
 #include <widgets/vector_element.hpp>
+#include <widgets/vector_paths.hpp>
 
 #include <widgets/progress_indicators/round_segmented.hpp>
+
+#include <widgets/particles/curve_bound.hpp>
 
 #include <decoders/webp.hpp>
 #include <decoders/lizard.hpp>
@@ -59,6 +63,7 @@ namespace WL
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
 	using TexturedQuadRendererDefault = TexturedQuadRenderer<PresentSurfaceDefault>;
 	using ArcRendererDefault = CircularArcRenderer<PresentSurfaceDefault>;
+	using BezierRendererDefault = BezierRendererGPU<PresentSurfaceDefault>;
 
 	struct RenderersDefault
 	{
@@ -67,6 +72,7 @@ namespace WL
 		using TexturedQuadRenderer = TexturedQuadRendererDefault;
 		using ArcRenderer = ArcRendererDefault;
 		using VectorRasterizer = VectorRasterizerDefault;
+		using BezierRenderer = BezierRendererDefault;
 	};
 
 	using RendererDefault = Renderer<RenderersDefault>;
