@@ -42,8 +42,11 @@ namespace WL
 		void main()
 		{
 			float implicit = voutUV.x * voutUV.x - voutUV.y;
-			vec2 implicitGrad = vec2(2 * voutUV.x, -1.f);
-			vec2 grad = implicitGrad * vec2(dFdx(voutUV.x), dFdx(voutUV.y));
+			float dUdx = dFdx(voutUV.x);
+			float dUdy = dFdy(voutUV.x);
+			float dVdx = dFdx(voutUV.y);
+			float dVdy = dFdy(voutUV.y);
+			vec2 grad = vec2(2 * voutUV.x * dUdx - dVdx, 2 * voutUV.x * dUdy - dVdy);
 			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x - 1.f) / 2.f;
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, approxDist), 0.f, 1.f);
 
