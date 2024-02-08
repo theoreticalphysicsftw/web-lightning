@@ -64,10 +64,10 @@ namespace WL
 			float u = 0.5f * l1 + l2;
 			float v = l2;
 
-			float dUdx = dFdx(u);
-			float dUdy = dFdy(u);
-			float dVdx = dFdx(v);
-			float dVdy = dFdy(v);
+			float dUdx = (0.5f * y0y2 - y1y2) / det;
+			float dUdy = -(0.5f * x0x2) / det;
+			float dVdx = (y0y2 - y1y2) / det;
+			float dVdy = -(x2x1 + x0x2) / det;
 
 			float implicit = u * u - v;
 
