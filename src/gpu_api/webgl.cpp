@@ -69,7 +69,7 @@ namespace WL
     auto WebGL::EnablePresentSurfaceTransparency() -> V
     {
         glEnable(GL_BLEND);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_DST_ALPHA);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
     }
 
     auto WebGL::EnableSampleCoverage() -> V
