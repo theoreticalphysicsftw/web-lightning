@@ -33,8 +33,12 @@ namespace WL
 		layout(location = 0) in uvec4 packedPointsAndColor;
 		layout(location = 1) in vec2 dims;
 
+		uniform vec2 uScreenDims;
+
         out vec4 voutColor;
-        out vec2 voutUV;
+		out vec2 voutP0;
+		out vec2 voutP1;
+		out vec2 voutP2;
 		out float voutWidth;
 		out float voutFeather;
 
@@ -56,11 +60,31 @@ namespace WL
 			return fpos;
 		}
 
+
+
+
 		void main()
 		{
-			vec2 position = unpackPos(packedPointsAndColor[gl_VertexID]);
+			voutWidth = dims.x;
+			voutFeather = dims.y;
+
+			vec2 positions[3] = vec2[3]
+			(
+				unpackPos(packedPointsAndColor[0]),
+				unpackPos(packedPointsAndColor[1]),
+				unpackPos(packedPointsAndColor[2])
+			);
+			vec2 position = positions[gl_VertexID];
+
+			vec2 center = (positions[0] + positions[1] + positions[2]) / 3.f;
+			// TODO: Fix conservative rasterization
+            position = position + normalize((position - center)) * (voutWidth + (voutFeather + 20.f) / uScreenDims.x);
+
 			gl_Position = vec4(position, 0.f, 1.f);
-			voutUV = UVs[gl_VertexID];
+			
+			voutP0 = positions[0];
+			voutP1 = positions[1];
+			voutP2 = positions[2];
 
 			uint color = packedPointsAndColor.w;
 			voutColor = vec4(
@@ -70,8 +94,6 @@ namespace WL
 							  color & 0xFFu
 						   ) / 255.f;
 
-			voutWidth = dims.x;
-			voutFeather = dims.y;
 		}
 	)";
 

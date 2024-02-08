@@ -31,7 +31,9 @@ namespace WL
 		precision highp float;
 
         in vec4 voutColor;
-        in vec2 voutUV;
+		in vec2 voutP0;
+		in vec2 voutP1;
+		in vec2 voutP2;
 		in float voutWidth;
 		in float voutFeather;
 
@@ -41,16 +43,40 @@ namespace WL
 
 		void main()
 		{
-			float implicit = voutUV.x * voutUV.x - voutUV.y;
-			float dUdx = dFdx(voutUV.x);
-			float dUdy = dFdy(voutUV.x);
-			float dVdx = dFdx(voutUV.y);
-			float dVdy = dFdy(voutUV.y);
-			vec2 grad = vec2(2 * voutUV.x * dUdx - dVdx, 2 * voutUV.x * dUdy - dVdy);
-			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x - 1.f) / 2.f;
+			vec2 p0 = vec2((1.f + voutP0.x) / 2.f, (1.f + voutP0.y) / 2.f) * uScreenDims;
+			vec2 p1 = vec2((1.f + voutP1.x) / 2.f, (1.f + voutP1.y) / 2.f) * uScreenDims;
+			vec2 p2 = vec2((1.f + voutP2.x) / 2.f, (1.f + voutP2.y) / 2.f) * uScreenDims;
+
+			float x = gl_FragCoord.x + 0.5f;
+			float y = gl_FragCoord.y + 0.5f;
+
+			float y1y2 = p1.y - p2.y;
+			float x0x2 = p0.x - p2.x;
+			float x2x1 = p2.x - p1.x;
+			float y0y2 = p0.y - p2.y;
+
+			float det = y1y2 * x0x2 + x2x1 * y0y2;
+			
+			float l0 = (y1y2 * (x - p2.x) + x2x1 * (y - p2.y)) / det;
+			float l1 = (-y0y2 * (x - p2.x) + x0x2 * (y - p2.y)) / det;
+			float l2 = 1.0f - l0 - l1;
+
+			float u = 0.5f * l1 + l2;
+			float v = l2;
+
+			float dUdx = dFdx(u);
+			float dUdy = dFdy(u);
+			float dVdx = dFdx(v);
+			float dVdy = dFdy(v);
+
+			float implicit = u * u - v;
+
+			vec2 grad = vec2(2 * u * dUdx - dVdx, 2 * u * dUdy - dVdy);
+
+			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x) / 2.f;
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, approxDist), 0.f, 1.f);
 
-			outColor = vec4(voutColor.rgb * alpha, alpha);
+			outColor = vec4(voutColor.rgb, alpha);
 		}
 	)";
 
