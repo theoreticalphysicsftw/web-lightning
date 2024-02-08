@@ -177,7 +177,6 @@ namespace WL
         TGPUAPI::SetPresentSurfaceClearColor(clearColor);
         auto presentBufferID = TGPUAPI::GetAttachedFrameBufferID();
         presentTarget.Wrap(presentBufferID);
-        TGPUAPI::EnableSampleCoverage();
         timeStamp = GetTimeStampUS();
         return true;
     }
