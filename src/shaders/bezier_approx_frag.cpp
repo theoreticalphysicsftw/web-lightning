@@ -47,8 +47,10 @@ namespace WL
 			vec2 p1 = vec2((1.f + voutP1.x) / 2.f, (1.f + voutP1.y) / 2.f) * uScreenDims;
 			vec2 p2 = vec2((1.f + voutP2.x) / 2.f, (1.f + voutP2.y) / 2.f) * uScreenDims;
 
-			float x = gl_FragCoord.x + 0.5f;
-			float y = gl_FragCoord.y + 0.5f;
+
+			vec2 xy = gl_FragCoord.xy + 0.5f;
+			float x = xy.x;
+			float y = xy.y;
 
 			float y1y2 = p1.y - p2.y;
 			float x0x2 = p0.x - p2.x;
@@ -65,7 +67,7 @@ namespace WL
 			float v = l2;
 
 			float dUdx = (0.5f * y0y2 - y1y2) / det;
-			float dUdy = -(0.5f * x0x2) / det;
+			float dUdy = -(0.5f * x0x2 + x2x1) / det;
 			float dVdx = (y0y2 - y1y2) / det;
 			float dVdy = -(x2x1 + x0x2) / det;
 
@@ -75,6 +77,31 @@ namespace WL
 
 			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x) / 2.f;
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, approxDist), 0.f, 1.f);
+			
+
+			// Now cut out around the start and end control points.
+			vec2 t0 = normalize(p0 - p1);
+			vec2 n0 = vec2(t0.y, -t0.x);
+            vec2 t1 = normalize(p2 - p1);
+			vec2 n1 = vec2(t1.y, -t0.x);
+
+			vec2 xyp0 = xy - p0;
+			vec2 xyp2 = xy - p2;
+
+			vec2 xyp0T0N0 = vec2(dot(xyp0, n0), dot(xyp0, t0));
+			vec2 xyp2T1N1 = vec2(dot(xyp2, n1), dot(xyp2, t1));
+
+			if (xyp0T0N0.y > 0)
+			{
+				float dist = length(xyp0T0N0.y);
+				alpha *= clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
+			}
+
+			if (xyp2T1N1.y > 0)
+			{
+				float dist = length(xyp2T1N1.y);
+				alpha *= clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
+			}
 
 			outColor = vec4(voutColor.rgb, alpha);
 		}
