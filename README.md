@@ -24,8 +24,8 @@ For Desktop/WebGL
 - [x] CPU font rendering.
 - [ ] GPU font rendering.
 - [x] GPU bezier curve rendering. 
-- [x] CPU General 2D vector rendering.
-- [ ] GPU 2D vector rendering.
+- [x] CPU general 2D vector rendering.
+- [ ] GPU general 2D vector rendering.
 - [ ] API for 3D rendering
 ### Widgets
 - [x] Boxes
