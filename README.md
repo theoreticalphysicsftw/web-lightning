@@ -23,7 +23,7 @@ For Desktop/WebGL
 - [x] General WebGL rendering interface.
 - [x] CPU font rendering.
 - [ ] GPU font rendering.
-- [ ] GPU bezier curve rendering. 
+- [x] GPU bezier curve rendering. 
 - [x] CPU General 2D vector rendering.
 - [ ] GPU 2D vector rendering.
 - [ ] API for 3D rendering
