@@ -60,31 +60,52 @@ namespace WL
 			return fpos;
 		}
 
-
-
+		vec2 findIntersection(vec2 p0, vec2 n0, vec2 p1, vec2 n1)
+		{
+			vec3 projectiveN0 = vec3(n0, -dot(p0, n0));
+			vec3 projectiveN1 = vec3(n1, -dot(p1, n1));
+			vec3 projectiveIntersection = cross(projectiveN0, projectiveN1);
+			return projectiveIntersection.xy / projectiveIntersection.z;
+		}
 
 		void main()
 		{
 			voutWidth = dims.x;
 			voutFeather = dims.y;
 
-			vec2 positions[3] = vec2[3]
+			vec2 p[3] = vec2[3]
 			(
 				unpackPos(packedPointsAndColor[0]),
 				unpackPos(packedPointsAndColor[1]),
 				unpackPos(packedPointsAndColor[2])
 			);
-			vec2 position = positions[gl_VertexID];
-
-			vec2 center = (positions[0] + positions[1] + positions[2]) / 3.f;
-			// TODO: Fix conservative rasterization
-            position = position + normalize((position - center)) * (voutWidth + (voutFeather + 20.f) / uScreenDims.x);
-
-			gl_Position = vec4(position, 0.f, 1.f);
 			
-			voutP0 = positions[0];
-			voutP1 = positions[1];
-			voutP2 = positions[2];
+			
+			vec2 p0p1 = normalize(p[1] - p[0]);
+			vec2 n0 = vec2(-p0p1.y, p0p1.x);
+			vec2 p1p2 = normalize(p[2] - p[1]);
+			vec2 n1 = vec2(-p1p2.y, p1p2.x);
+			vec2 p2p0 = normalize(p[0] - p[2]);
+			vec2 n2 = vec2(-p2p0.y, p2p0.x);
+
+			float offsetScale = 2 * (voutWidth + (voutFeather + 2.f) / uScreenDims.x);
+
+			vec2 line0P = p[0] + offsetScale * n0;
+			vec2 line1P = p[1] + offsetScale * n1;
+			vec2 line2P = p[0] + offsetScale * n2;
+
+			vec2 conservativeRasterizationPoints[3] = vec2[3]
+			(
+				findIntersection(line0P, n0, line2P, n2),
+				findIntersection(line2P, n2, line1P, n1),
+				findIntersection(line0P, n0, line1P, n1)
+			);
+			
+			gl_Position = vec4(conservativeRasterizationPoints[gl_VertexID], 0.f, 1.f);
+			
+			voutP0 = p[0];
+			voutP1 = p[1];
+			voutP2 = p[2];
 
 			uint color = packedPointsAndColor.w;
 			voutColor = vec4(
