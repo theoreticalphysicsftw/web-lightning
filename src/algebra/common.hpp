@@ -24,7 +24,7 @@
 #pragma once
 
 #define WL_DEFINE_COMPONENT_WISE_OPERATOR(CLASS, COMPONENTS, OP) \
-    CLASS operator OP (const CLASS& other) \
+    CLASS operator OP (const CLASS& other) const \
     { \
         CLASS result; \
         for (auto i = 0u; i < COMPONENTS; ++i) \
@@ -35,7 +35,7 @@
     }
 
 #define WL_DEFINE_COMPONENT_WISE_OPERATOR_SCALAR(CLASS, COMPONENTS, OP) \
-    CLASS operator OP (T scalar) \
+    CLASS operator OP (T scalar) const \
     { \
         CLASS result; \
         for (auto i = 0u; i < COMPONENTS; ++i) \

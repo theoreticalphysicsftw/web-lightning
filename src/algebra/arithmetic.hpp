@@ -24,6 +24,7 @@
 #pragma once
 
 #include <cmath>
+#include <algorithm>
 #include <limits>
 #include <common/types.hpp>
 
@@ -54,6 +55,12 @@ namespace WL
     inline auto Frac(TF n) -> TF;
     template <typename TF>
     inline auto Abs(TF n) -> TF;
+
+    template <typename T>
+    inline auto Max(const T& v0, const T& v1);
+
+    template <typename T>
+    inline auto Min(const T& v0, const T& v1);
 
     template <typename TF>
     inline auto Sign(TF n) -> U32;
@@ -192,5 +199,18 @@ namespace WL
     auto Lerp(T v0, T v1, TF t) -> T
     {
         return TF(1 - t) * v0 + t * v1;
+    }
+
+
+    template <typename T>
+    inline auto Max(const T& v0, const T& v1)
+    {
+        return std::max(v0, v1);
+    }
+
+    template <typename T>
+    inline auto Min(const T& v0, const T& v1)
+    {
+        return std::min(v0, v1);
     }
 }
