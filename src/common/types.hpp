@@ -121,8 +121,11 @@ namespace WL
     template <typename... Ts>
     using Variant = std::variant<Ts...>;
 
-    template <typename TVisitor, typename... TVariants>
-    inline constexpr auto Visit = std::visit<TVisitor, TVariants...>;
+    template<typename TR, class TVisitor, class... TVariants >
+    inline constexpr TR Visit(TVisitor&& vis, TVariants&&... vars)
+    {
+        return std::visit(vis, vars...);
+    }
 
     template <typename T, typename... Ts>
     inline constexpr auto HoldsAlternative(const Variant<Ts...>& v) -> B
