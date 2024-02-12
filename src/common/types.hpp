@@ -135,13 +135,13 @@ namespace WL
     {
         return std::get<T>(v);
     }
-
+    
     template <typename T, typename... Ts>
     constexpr auto Get(const Variant<Ts...>& v) -> const T&
     {
         return std::get<T>(v);
     }
-
+    
 
     template <U32 size>
     struct StorageType
@@ -167,3 +167,11 @@ namespace WL
         return std::forward<T>(t);
     }
 }
+
+
+#ifdef _MSC_VER
+    #pragma warning (disable: 4018)
+    #pragma warning (disable: 4244)
+    #pragma warning (disable: 4267)
+    #pragma warning (disable: 4305)
+#endif
