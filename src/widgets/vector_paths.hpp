@@ -51,7 +51,9 @@ namespace WL
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const -> BBox override;
 		virtual auto Update(const UpdateState& s) -> V override;
 
-	private:
+		auto UpdatePaths(Span<const Path2D> paths) -> V;
+		auto GetPaths() const -> Span<const Path2D>;
+
 		Array<Path2D> paths;
 		F32 width;
 		F32 height;
@@ -67,6 +69,14 @@ namespace WL
 	VectorPaths<TRuntime>::VectorPaths(Span<const Path2D> paths, F32 width, F32 height, F32 offsetX, F32 offsetY)
 		: width(width), height(height), offsetX(offsetX), offsetY(offsetY)
 	{
+		UpdatePaths(paths);
+	}
+
+
+	template<typename TRuntime>
+	inline auto VectorPaths<TRuntime>::UpdatePaths(Span<const Path2D> paths) -> V
+	{
+		this->paths.clear();
 		for (auto& path : paths)
 		{
 			auto tolerance = 8.f / (TRuntime::PresentSurface::GetDimensions()[0] * width);
@@ -90,6 +100,14 @@ namespace WL
 			}
 		}
 	}
+
+
+	template<typename TRuntime>
+	inline auto VectorPaths<TRuntime>::GetPaths() const -> Span<const Path2D>
+	{
+		return Span<const Path2D>(paths.begin(), paths.end());
+	}
+
 
 	template<typename TRuntime>
 	inline auto VectorPaths<TRuntime>::AccumulateDrawState() const -> V
@@ -119,7 +137,7 @@ namespace WL
 						pts[i][1] = 1.f - pts[i][1] * ar * 2.f;
 					}
 					Quadratic renderCurve(pts[0], pts[1], pts[2]);
-					Runtime::Renderer::BezierRenderer::AccumulateBezier(renderCurve, path.outlineColor, path.outlineWidth , 2.f);
+					Runtime::Renderer::BezierRenderer::AccumulateBezier(renderCurve, path.outlineColor, path.outlineWidth , path.outlineFeather);
 				}
 			}
 		}

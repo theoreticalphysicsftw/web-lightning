@@ -43,6 +43,7 @@ namespace WL
 		ColorU32 fillColor;
 		ColorU32 outlineColor;
 		F32 outlineWidth;
+		F32 outlineFeather = 2.f;
 		B outlined = false;
 		B filled = true;
 		B closed = false;
