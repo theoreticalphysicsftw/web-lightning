@@ -26,6 +26,7 @@
 #include "vector.hpp"
 #include "matrix.hpp"
 #include "arithmetic.hpp"
+#include "arc_length.hpp"
 
 
 namespace WL
