@@ -49,6 +49,9 @@ namespace WL
 
 	template <typename T>
 	inline auto Max(const T& v0, const T& v1);
+
+	template <typename T>
+	inline auto Swap(T& v0, T& v1) -> V;
 }
 
 
@@ -94,5 +97,11 @@ namespace WL
 	inline auto Max(const T& v0, const T& v1)
 	{
 		return std::max(v0, v1);
+	}
+
+	template<typename T>
+	inline auto Swap(T& v0, T& v1) -> V
+	{
+		return std::swap(v0, v1);
 	}
 }
