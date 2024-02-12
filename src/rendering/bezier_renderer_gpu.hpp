@@ -24,7 +24,9 @@
 #pragma once
 
 #include "bezier_renderer.hpp"
-#include "algebra/bezier.hpp"
+
+#include <algebra/bezier.hpp>
+#include <algebra/vector.hpp>
 
 
 namespace WL
@@ -95,9 +97,20 @@ namespace WL
 			ReallocateBuffers(instanceCapacity * 2);
 			instanceCapacity *= 2;
 		}
+
 		auto p0 = PackPoint(curve.p0);
 		auto p1 = PackPoint(curve.p1);
 		auto p2 = PackPoint(curve.p2);
+
+
+		// Make that the triangle is CCW.
+		auto dir0 = curve.p2 - curve.p1;
+		auto dir1 = curve.p1 - curve.p0;
+		if (HodgeDualWedge(dir0, dir1) < 0)
+		{
+			Swap(p0, p2);
+		}
+
 		packedPointsAndColorBufferCPU.emplace_back(p0, p1, p2, color.packed);
 		widthAndFeatherBufferCPU.emplace_back(width, feather);
 	}

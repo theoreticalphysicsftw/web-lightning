@@ -268,13 +268,6 @@ namespace WL
 
 			if ((halfValueCubic - halfValueQuadratic).Length() < tolerance)
 			{
-				// Make that the triangle is CCW.
-				auto dir0 = approx.p1 - approx.p0;
-				auto dir1 = approx.p2 - approx.p1;
-				if (HodgeDualWedge(dir0, dir1) < 0)
-				{
-					Swap(approx.p0, approx.p2);
-				}
 				result.push_back(approx);
 			}
 			else
