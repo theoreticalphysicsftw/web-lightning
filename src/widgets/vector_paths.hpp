@@ -69,6 +69,7 @@ namespace WL
 	{
 		for (auto& path : paths)
 		{
+			auto tolerance = 8.f / (TRuntime::PresentSurface::GetDimensions()[0] * width);
 			this->paths.emplace_back(path.CloneWithoutPrimitives());
 			for (auto& primitive : path.primitives)
 			{
@@ -80,7 +81,7 @@ namespace WL
 				{
 					WL_ASSERT(HoldsAlternative<Cubic>(primitive));
 					auto& cubic = Get<Cubic>(primitive);
-					auto approxQuadratics = ApproximateByQuadratics(cubic);
+					auto approxQuadratics = ApproximateByQuadratics(cubic, tolerance);
 					for (auto& curve : approxQuadratics)
 					{
 						this->paths.back().primitives.emplace_back(curve);
