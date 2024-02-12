@@ -67,6 +67,9 @@ namespace WL
     template <typename T>
     inline auto Clamp(T value, T range0, T range1) -> T;
 
+    template <typename T, typename TF>
+    inline auto Lerp(T v0, T v1, TF t) -> T;
+
 
     template <typename TF>
     struct Constants
@@ -183,5 +186,11 @@ namespace WL
     auto Clamp(T value, T range0, T range1) -> T
     {
         return Min(Max(value, range0), range1);
+    }
+
+    template<typename T, typename TF>
+    auto Lerp(T v0, T v1, TF t) -> T
+    {
+        return TF(1 - t) * v0 + t * v1;
     }
 }
