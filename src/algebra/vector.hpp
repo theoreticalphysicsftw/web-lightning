@@ -150,4 +150,10 @@ namespace WL
     {
         return v0.data == v1.data;
     }
+
+    template <typename TF>
+    auto HodgeDualWedge(const Vector<TF, 2>& v0, const Vector<TF, 2>& v1) -> TF
+    {
+        return v0[0] * v1[1] - v0[1] * v1[0];
+    }
 }

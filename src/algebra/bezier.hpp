@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <common/utilities.hpp>
+
 #include "algebra.hpp"
 
 namespace WL
@@ -113,7 +115,9 @@ namespace WL
 	template<typename TF, U32 Dim>
 	inline auto QuadraticBezier<TF, Dim>::EvaluateAt(Scalar t) const -> Vec
 	{
-		return (Scalar(1) - t) * (Scalar(1) - t) * p0 + Scalar(2) * (Scalar(1) - t) * t * p1 + t * t * p2;
+		auto tmp0 = Lerp(p0, p1, t);
+		auto tmp1 = Lerp(p1, p2, t);
+		return Lerp(tmp0, tmp1, t);
 	}
 
 
@@ -171,12 +175,14 @@ namespace WL
 	template<typename TF, U32 Dim>
 	inline auto CubicBezier<TF, Dim>::EvaluateAt(Scalar t) const -> Vec
 	{
-		auto oneMinusT = (Scalar(1) - t);
-		auto oneMinusTSq = oneMinusT * oneMinusT;
-		auto oneMinusTCb = oneMinusTSq * oneMinusT;
-		auto tSq = t * t;
-		auto tCb = tSq * t;
-		return oneMinusTCb * p0 + Scalar(3) * oneMinusTSq * t * p1 + Scalar(3) * oneMinusT * tSq * p2 + tCb * p3;
+		auto tmp0 = Lerp(p0, p1, t);
+		auto tmp1 = Lerp(p1, p2, t);
+		auto tmp2 = Lerp(p2, p3, t);
+
+		auto tmp3 = Lerp(tmp0, tmp1, t);
+		auto tmp4 = Lerp(tmp1, tmp2, t);
+
+		return Lerp(tmp3, tmp4, t);
 	}
 	
 
@@ -253,7 +259,6 @@ namespace WL
 			// Use Cramer's rule.
 			auto det = -t0[0] * t1[1] + t1[0] * t0[1];
 			auto x0 = (-b[0] * t1[1] + t1[0] * b[1]) / det;
-			auto x1 = (t0[0] * b[1] + b[0] * t0[1]) / det;
 			auto intersection = c.p0 + x0 * t0;
 
 			QuadraticBezier<TF, 2> approx(c.p0, intersection, c.p3);
@@ -263,6 +268,13 @@ namespace WL
 
 			if ((halfValueCubic - halfValueQuadratic).Length() < tolerance)
 			{
+				// Make that the triangle is CCW.
+				auto dir0 = approx.p1 - approx.p0;
+				auto dir1 = approx.p2 - approx.p1;
+				if (HodgeDualWedge(dir0, dir1) < 0)
+				{
+					Swap(approx.p0, approx.p2);
+				}
 				result.push_back(approx);
 			}
 			else
