@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "line.hpp"
+
 
 namespace WL
 {
@@ -33,15 +35,30 @@ namespace WL
 		using Scalar = Primitive::Scalar;
 		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 128, U32 maxSubdivisions = 1024);
 
-		auto GetParameterValue(Scalar arcLength) -> Scalar;
+		auto GetParameterValue(Scalar arcLength) const -> Scalar;
+		auto GetMaxArcLength() const -> Scalar;
 
 		Array<Scalar> parameterLUT;
+	};
+
+
+	template <typename TF, U32 Dim>
+	struct ArcLengthReparametrization<Line<TF, Dim>>
+	{
+		using Primitive = Line<TF, Dim>;
+		using Scalar = TF;
+
+		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 0, U32 maxSubdivisions = 0);
+		auto GetParameterValue(Scalar arcLength)  const -> Scalar;
+		auto GetMaxArcLength() const -> Scalar;
+
+		F32 scale;
 	};
 }
 
 
 namespace WL
-{
+{ 
 	template<typename TPrimitive>
 	inline ArcLengthReparametrization<TPrimitive>::ArcLengthReparametrization(const Primitive& prim, U32 lutSize, U32 maxSubDivisions)
 	{
@@ -79,9 +96,8 @@ namespace WL
 		}
 	}
 
-
 	template<typename TPrimitive>
-	inline auto ArcLengthReparametrization<TPrimitive>::GetParameterValue(Scalar arcLength) -> Scalar
+	inline auto ArcLengthReparametrization<TPrimitive>::GetParameterValue(Scalar arcLength) const  -> Scalar
 	{
 		auto maxDivisions = parameterLUT.size() - 1;
 		auto lutScale = parameterLUT[maxDivisions] / maxDivisions;
@@ -94,5 +110,33 @@ namespace WL
 		}
 
 		return Lerp(parameterLUT[bucket], parameterLUT[bucket + 1], Frac(q));
+	}
+
+	template<typename TPrimitive>
+	inline auto ArcLengthReparametrization<TPrimitive>::GetMaxArcLength() const -> Scalar
+	{
+		return parameterLUT.back();
+	}
+
+
+	template <typename TF, U32 Dim>
+	inline ArcLengthReparametrization<Line<TF, Dim>>::ArcLengthReparametrization(const Primitive& prim, U32 lutSize, U32 maxSubDivisions)
+	{
+		auto maxLength = (prim.p0 - prim.p1).Length();
+
+		this->scale = Scalar(1) / maxLength;
+	}
+
+
+	template <typename TF, U32 Dim>
+	inline auto ArcLengthReparametrization<Line<TF, Dim>>::GetParameterValue(Scalar arcLength) const -> Scalar
+	{
+		return this->scale * arcLength;
+	}
+
+	template <typename TF, U32 Dim>
+	inline auto ArcLengthReparametrization<Line<TF, Dim>>::GetMaxArcLength() const -> Scalar
+	{
+		return Scalar(1) / this->scale;
 	}
 }
