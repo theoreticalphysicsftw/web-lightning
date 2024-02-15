@@ -67,8 +67,8 @@ namespace WL::Particles
 		for (auto i = 0u; i < this->inPaths.size(); ++i)
 		{
 			auto width = (sizes.size() > i) ? sizes[i][0] : inPaths.paths[i].outlineWidth;
-			auto speed = (speeds.size() > i) ? speeds[i] : 0.000001f;
-			auto length = (sizes.size() > i) ? sizes[i][1] : 0.05f;
+			auto speed = (speeds.size() > i) ? speeds[i] : 0.0000001f;
+			auto length = (sizes.size() > i) ? sizes[i][1] : 0.003f;
 			auto delay = (initialDelays.size() > i) ? initialDelays[i] : 0.f;
 			widths.emplace_back(width);
 			traversals.emplace_back(inPaths.paths[i], length, speed, delay);
@@ -99,17 +99,14 @@ namespace WL::Particles
 				this->paths[i].outlineColor = 0xffffffff;
 				this->paths[i].outlineFeather = 4.f;
 
-				auto& prim = inPaths[i].primitives[params[i][0].curveIdx];
-				if (HoldsAlternative<Quadratic>(prim))
+				for (auto j = 0; j < params[i].size(); ++j)
 				{
-					auto split0 = Get<Quadratic>(prim).Split(params[i][0].t0).second;
-					auto split1 = split0.Split(params[i][0].t1).second;
-					this->paths[i].primitives.emplace_back(split1);
-
-					if (params[i].size() > 1)
+					auto& primVar = inPaths[i].primitives[params[i][j].curveIdx];
+					if (HoldsAlternative<Quadratic>(primVar))
 					{
-						auto split2 = Get<Quadratic>(inPaths[i].primitives[params[i][1].curveIdx]).Split(params[i][1].t1).first;
-						this->paths[i].primitives.emplace_back(split2);
+						auto& prim = Get<Quadratic>(primVar);
+						auto renderPrim = GetSlice(prim, params[i][j].t0, params[i][j].t1);
+						this->paths[i].primitives.emplace_back(renderPrim);
 					}
 				}
 			}

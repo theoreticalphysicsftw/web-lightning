@@ -41,8 +41,6 @@ namespace WL
 		using Cubic = CubicBezier<Scalar, 2>;
 		using LengthReparametrization = Variant<ArcLengthReparametrization<Line>, ArcLengthReparametrization<Quadratic>, ArcLengthReparametrization<Cubic>>;
 
-		static constexpr U32 maxCurvesPerPath = 16;
-
 		struct ParamValue
 		{
 			U32 curveIdx;
@@ -61,7 +59,11 @@ namespace WL
 		Scalar initialDelay;
 		Scalar currentTime;
 		Scalar currentStart;
-		StaticArray<ParamValue, maxCurvesPerPath> currentState;
+		U32 currentStartCurveIdx;
+		Array<ParamValue> currentState;
+	#ifdef WL_DEBUG
+		const Path2D* pathPtr;
+	#endif
 	};
 }
 
@@ -72,6 +74,10 @@ namespace WL
 	inline PathTraversal<TF>::PathTraversal(const Path2D& path, Scalar particleLength, Scalar speed, Scalar initialDelay)
 	{
 		this->particleLength = particleLength;
+
+	#ifdef WL_DEBUG
+		pathPtr = &path;
+	#endif
 
 		for (auto& prim : path.primitives)
 		{
@@ -103,8 +109,10 @@ namespace WL
 		this->speed = speed;
 		this->initialDelay = initialDelay;
 		currentTime = 0;
+		currentStartCurveIdx = 0;
 		currentStart = -particleLength;
 	}
+
 
 	template<typename TF>
 	inline auto PathTraversal<TF>::Update(Scalar dt) -> Span<const ParamValue>
@@ -123,12 +131,99 @@ namespace WL
 		if (currentStart >= totalLength)
 		{
 			currentTime = 0;
+			currentStartCurveIdx = 0;
 			currentStart = -particleLength;
 			return {};
 		}
 
-		auto startCurveIdx = LowerBound(cumulativeLength, Max(Scalar(0), currentStart));
+		// Most of the time the particle doesn't move far (< 2 curves forwards), so
+		// use linear search instead of binary.
+		for (auto i = 0; i < cumulativeLength.size(); ++i)
+		{
+			if (currentStart < cumulativeLength[i])
+			{
+				currentStartCurveIdx = i;
+				break;
+			}
+		}
 
-		return {};
+		auto currentEnd = particleLength + currentStart;
+
+		if (currentEnd < 0)
+		{
+			return {};
+		}
+
+		auto currentEndCurveIdx = cumulativeLength.size() - 1;
+
+		for (auto i = currentStartCurveIdx; i < cumulativeLength.size(); ++i)
+		{
+			if (currentEnd < cumulativeLength[i])
+			{
+				currentEndCurveIdx = i;
+				break;
+			}
+		}
+
+		auto curveSpan = currentEndCurveIdx - currentStartCurveIdx + 1;
+		currentState.resize(curveSpan);
+
+		auto currentStartInCurve = (currentStartCurveIdx > 0) ? currentStart - cumulativeLength[currentStartCurveIdx - 1] : currentStart;
+		auto currentEndInCurve = (currentEndCurveIdx > 0) ? currentEnd - cumulativeLength[currentEndCurveIdx - 1] : currentEnd;
+	
+		currentState[0].curveIdx = currentStartCurveIdx;
+		
+		Visit<V>
+		(
+			[&](const auto& reparam) -> V
+			{
+				currentState[0].t0 = reparam.GetParameterValue(currentStartInCurve);
+				currentState[0].t1 = (currentEndCurveIdx > currentStartCurveIdx) ? Scalar(1) : reparam.GetParameterValue(currentEndInCurve);
+			},
+			reparametrizations[currentStartCurveIdx]
+		);
+
+		// The middle ones span the whole curves.
+		for (auto i = currentStartCurveIdx + 1; i < currentEndCurveIdx; ++i)
+		{
+			auto stateIdx = i - currentStartCurveIdx;
+			currentState[stateIdx].curveIdx = i;
+			currentState[stateIdx].t0 = Scalar(0);
+			currentState[stateIdx].t1 = Scalar(1);
+		}
+
+		if (currentEndCurveIdx > currentStartCurveIdx)
+		{
+			auto stateIdx = curveSpan - 1;
+			currentState[stateIdx].curveIdx = currentEndCurveIdx;
+			currentState[stateIdx].t0 = Scalar(0);
+			Visit<V>
+			(
+				[&](const auto& reparam) -> V
+				{
+					currentState[stateIdx].t1 = reparam.GetParameterValue(currentEndInCurve);
+				},
+				reparametrizations[currentEndCurveIdx]
+			);
+			
+		}
+
+	#ifdef WL_DEBUG
+		auto sum = Scalar(0);
+		for (auto i = 0; i < currentState.size(); ++i)
+		{
+			Visit<V>
+			(
+				[&](const auto& prim) -> V
+				{
+					sum += GetArcLength(prim, currentState[i].t0, currentState[i].t1);
+				},
+				pathPtr->primitives[currentState[i].curveIdx]
+			);
+		}
+		WL_ASSERT(sum <= particleLength);
+	#endif
+
+		return {currentState.data(), curveSpan};
 	}
 }

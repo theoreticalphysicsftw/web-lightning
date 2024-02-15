@@ -33,12 +33,13 @@ namespace WL
 	{
 		using Primitive = TPrimitive;
 		using Scalar = Primitive::Scalar;
-		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 128, U32 maxSubdivisions = 1024);
+		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 1024, U32 maxSubdivisions = 1024);
 
 		auto GetParameterValue(Scalar arcLength) const -> Scalar;
 		auto GetMaxArcLength() const -> Scalar;
 
 		Array<Scalar> parameterLUT;
+		Scalar maxArcLength;
 	};
 
 
@@ -54,6 +55,9 @@ namespace WL
 
 		F32 scale;
 	};
+
+	template <typename TPrimitive, typename TF>
+	inline auto GetArcLength(const TPrimitive& prim, TF t0 = TF(0), TF t1 = TF(1), U32 maxIterations = 1024) -> TF;
 }
 
 
@@ -79,7 +83,8 @@ namespace WL
 			currentPoint = nextPoint;
 		}
 
-		auto maxArcLength = cumulativeLength[maxSubDivisions];
+		maxArcLength = cumulativeLength[maxSubDivisions];
+		WL_ASSERT(Abs(maxArcLength - GetArcLength(prim, Scalar(0), Scalar(1))) < Scalar(1) / maxSubDivisions);
 
 		auto lutScale = maxArcLength / (lutSize - 1);
 		parameterLUT.push_back(0);
@@ -92,30 +97,42 @@ namespace WL
 			auto t0 = idx0 * scale;
 			auto s0 = cumulativeLength[idx0];
 			auto s1 = cumulativeLength[idx1];
-			parameterLUT.push_back(Lerp(t0, t1, ((arcLength - s0) / (s1 - s0))));
+			WL_ASSERT(arcLength >= s0 && arcLength <= s1);
+			auto interp = ((arcLength - s0) / (s1 - s0));
+			parameterLUT.push_back(Lerp(t0, t1, interp));
 		}
+
+		#ifdef WL_DEBUG
+			for (auto i = 0u; i < maxSubDivisions + 1; ++i)
+			{
+				WL_ASSERT(Abs(GetParameterValue(cumulativeLength[i]) - i * scale) < Scalar(1) / maxSubDivisions);
+			}
+		#endif
 	}
 
 	template<typename TPrimitive>
 	inline auto ArcLengthReparametrization<TPrimitive>::GetParameterValue(Scalar arcLength) const  -> Scalar
 	{
+		arcLength = Clamp(arcLength, Scalar(0), Scalar(maxArcLength));
+
 		auto maxDivisions = parameterLUT.size() - 1;
-		auto lutScale = parameterLUT[maxDivisions] / maxDivisions;
+		auto lutScale = maxArcLength / maxDivisions;
 		auto q = arcLength / lutScale;
 		auto bucket = U32(q);
 
-		if (bucket == maxDivisions)
+		if (bucket >= maxDivisions)
 		{
 			return Scalar(1);
 		}
 
-		return Lerp(parameterLUT[bucket], parameterLUT[bucket + 1], Frac(q));
+		auto result = Lerp(parameterLUT[bucket], parameterLUT[bucket + 1], Frac(q));
+		return result;
 	}
 
 	template<typename TPrimitive>
 	inline auto ArcLengthReparametrization<TPrimitive>::GetMaxArcLength() const -> Scalar
 	{
-		return parameterLUT.back();
+		return maxArcLength;
 	}
 
 
@@ -131,6 +148,7 @@ namespace WL
 	template <typename TF, U32 Dim>
 	inline auto ArcLengthReparametrization<Line<TF, Dim>>::GetParameterValue(Scalar arcLength) const -> Scalar
 	{
+		arcLength = Clamp(arcLength, Scalar(0), Scalar(1) / this->scale);
 		return this->scale * arcLength;
 	}
 
@@ -138,5 +156,23 @@ namespace WL
 	inline auto ArcLengthReparametrization<Line<TF, Dim>>::GetMaxArcLength() const -> Scalar
 	{
 		return Scalar(1) / this->scale;
+	}
+
+	template <typename TPrimitive, typename TF>
+	inline auto GetArcLength(const TPrimitive& prim, TF t0 , TF t1, U32 maxIterations) -> TF
+	{
+		auto sum = TF(0);
+		auto range = t1 - t0;
+		auto scale = range / maxIterations;
+		
+		auto currentValue = prim.EvaluateAt(t0);
+		for (auto i = 0; i < maxIterations; ++i)
+		{
+			auto nextValue = prim.EvaluateAt((i + 1) * scale);
+			sum += (nextValue - currentValue).Length();
+			currentValue = nextValue;
+		}
+
+		return sum;
 	}
 }
