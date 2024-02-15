@@ -102,15 +102,15 @@ namespace WL
 	template<typename T>
 	auto LowerBound(const Array<T>& sortedArray, const T& value) -> U32
 	{
-		auto range = sortedArray.size();
+		I64 range = sortedArray.size();
 		auto first = 0;
 
-		while (range)
+		while (range > 0)
 		{
 			range /= 2;
 			auto mid = first + range;
 
-			if (mid < value)
+			if (sortedArray[mid] < value)
 			{
 				first = mid + 1;
 				range--;
