@@ -107,13 +107,17 @@ namespace WL
 
 		while (range > 0)
 		{
-			range /= 2;
-			auto mid = first + range;
+			auto advance = range / 2;
+			auto mid = first + advance;
 
 			if (sortedArray[mid] < value)
 			{
 				first = mid + 1;
-				range--;
+				range -= advance + 1;;
+			}
+			else
+			{
+				range = advance;
 			}
 		}
 
