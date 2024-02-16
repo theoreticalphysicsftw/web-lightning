@@ -81,7 +81,7 @@ namespace WL
 			StaticArray<Vec, 4> points;
 		};
 
-		CubicBezier(const StaticArray<Vec, 4>& pts) : points(points) {}
+		CubicBezier(const StaticArray<Vec, 4>& pts) : points(pts) {}
 		CubicBezier(const Vec& p0, const Vec& p1, const Vec& p2, const Vec& p3) : p0(p0), p1(p1), p2(p2), p3(p3) {}
 
 
