@@ -71,8 +71,7 @@ namespace WL
         static auto AddPreRenderingCode(const PreRenderFunction& func) -> V;
         static auto AddUpdateCode(const UpdateFunction& func) -> V;
         static auto AddRenderingCode(const RenderFunction& func) -> V;
-        static auto UnitsToPixels(F32 units) -> U32;
-        static auto PixelsToUnits(U32 pixels) -> F32;
+
         static auto GetAspectRatio() -> F32;
         static auto SetClearColor(const Color4& color) -> V;
         static auto EnableTransparency() -> V;
@@ -80,6 +79,23 @@ namespace WL
         static auto MoveWindowUnits(Vec2 u) -> V;
         static auto RegisterWindowDragArea(Vec4 area) -> V;
         static auto RegisterWindowDragExcludedArea(Vec4 area, U32 idx) -> V;
+
+        template <typename TF>
+        static auto WLToRenderUnits(const Vector<TF, 2> in) -> Vector<TF, 2>;
+        template <typename TF>
+        static auto WLToRenderCoords(const Vector<TF, 2> in) -> Vector<TF, 2>;
+        template <typename TF>
+        static auto RenderToWLUnits(const Vector<TF, 2> in) -> Vector<TF, 2>;
+        template <typename TF>
+        static auto NormalizedImageToWLCoords(const Vector<TF, 2>& in, TF imgWidthWLUnits, TF imgHeightWLUnits, TF offsetX = 0, TF offsetY = 0) -> Vector<TF, 2>;
+
+        template <typename TPrimitive>
+        static auto WLToRenderCoords(const TPrimitive& prim) -> TPrimitive;
+        template <typename TPrimitive, typename TF>
+        static auto NormalizedImageToWLCoords(const TPrimitive& prim, TF imgWidthWLUnits, TF imgHeightWLUnits, TF offsetX = 0, TF offsetY = 0) -> TPrimitive;
+
+        static auto UnitsToPixels(F32 units) -> U32;
+        static auto PixelsToUnits(U32 pixels) -> F32;
 
         private:
         static auto PresentLoopIteration() -> V;
@@ -311,6 +327,70 @@ namespace WL
         Vector<I32, 2> delta(u[0] * width, u[1] * width);
         currentWindowPos = currentWindowPos + delta;
         SDL_SetWindowPosition(window, currentWindowPos[0], currentWindowPos[1]);
+    }
+
+    template<class TGPUAPI>
+    template<typename TF>
+    inline auto PresentSurface<TGPUAPI>::WLToRenderUnits(const Vector<TF, 2> in) -> Vector<TF, 2>
+    {
+        auto ar = GetAspectRatio();
+        return Vector<TF, 2>(in[0], in[1] * ar) * TF(2);
+    }
+
+
+    template<class TGPUAPI>
+    template<typename TF>
+    inline auto WL::PresentSurface<TGPUAPI>::WLToRenderCoords(const Vector<TF, 2> in) -> Vector<TF, 2>
+    {
+        auto ar = GetAspectRatio();
+        return Vector<TF, 2>(TF(-1) + in[0] * TF(2), TF(1) - in[1] * ar * TF(2));
+    }
+
+
+    template<class TGPUAPI>
+    template<typename TF>
+    inline auto PresentSurface<TGPUAPI>::RenderToWLUnits(const Vector<TF, 2> in) -> Vector<TF, 2>
+    {
+        auto ar = GetAspectRatio();
+        return Vector<TF, 2>((TF(1) + in[0]) / TF(2), (TF(1) - in[1]) / (TF(2) * ar));
+    }
+
+
+    template<class TGPUAPI>
+    template<typename TF>
+    inline auto WL::PresentSurface<TGPUAPI>::NormalizedImageToWLCoords(const Vector<TF, 2>& in, TF imgWidthWLUnits, TF imgHeightWLUnits, TF offsetX, TF offsetY) -> Vector<TF, 2>
+    {
+        return Vector<TF, 2>(in[0] * imgWidthWLUnits + offsetX, in[1] * imgHeightWLUnits + offsetY);
+    }
+
+
+    template<class TGPUAPI>
+    template<typename TPrimitive>
+    inline auto WL::PresentSurface<TGPUAPI>::WLToRenderCoords(const TPrimitive& prim) -> TPrimitive
+    {
+        RemoveReference<decltype(prim.points)> transformed;
+
+        for (auto i = 0u; i < prim.points.size(); ++i)
+        {
+            transformed[i] = WLToRenderCoords(prim.points[i]);
+        }
+
+        return TPrimitive(transformed);
+    }
+
+
+    template<class TGPUAPI>
+    template<typename TPrimitive, typename TF>
+    inline auto WL::PresentSurface<TGPUAPI>::NormalizedImageToWLCoords(const TPrimitive& prim, TF imgWidthWLUnits, TF imgHeightWLUnits, TF offsetX, TF offsetY) -> TPrimitive
+    {
+        RemoveReference<decltype(prim.points)> transformed;
+
+        for (auto i = 0u; i < prim.points.size(); ++i)
+        {
+            transformed[i] = NormalizedImageToWLCoords(prim.points[i], imgWidthWLUnits, imgHeightWLUnits, offsetX, offsetY);
+        }
+
+        return TPrimitive(transformed);
     }
 
 
