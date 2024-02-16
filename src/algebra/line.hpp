@@ -47,6 +47,7 @@ namespace WL
 
 		auto operator==(const Line& other) -> B;
 
+		Line(const StaticArray<Vec, 2>& pts) : points(pts) {}
 		Line(const Vec& p0 = Vec(), const Vec& p1 = Vec()) : p0(p0), p1(p1) {}
 
 		auto GetPolynomialCoefficients() const -> StaticArray<Vec, 2>;
