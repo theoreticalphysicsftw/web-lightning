@@ -33,7 +33,7 @@ namespace WL
 	{
 		using Primitive = TPrimitive;
 		using Scalar = Primitive::Scalar;
-		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 1024, U32 maxSubdivisions = 1024);
+		ArcLengthReparametrization(const Primitive& prim, U32 lutSize = 256, U32 maxSubdivisions = 1024);
 
 		auto GetParameterValue(Scalar arcLength) const -> Scalar;
 		auto GetMaxArcLength() const -> Scalar;
@@ -168,7 +168,7 @@ namespace WL
 		auto currentValue = prim.EvaluateAt(t0);
 		for (auto i = 0; i < maxIterations; ++i)
 		{
-			auto nextValue = prim.EvaluateAt((i + 1) * scale);
+			auto nextValue = prim.EvaluateAt(t0 + (i + 1) * scale);
 			sum += (nextValue - currentValue).Length();
 			currentValue = nextValue;
 		}
