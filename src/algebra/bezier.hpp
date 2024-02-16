@@ -230,7 +230,7 @@ namespace WL
 			return curve.Split(t0).second;
 		}
 
-		return curve.Split(t0).second.Split(t1).first;
+		return curve.Split(t0).second.Split((t1 - t0) / (TF(1) - t0)).first;
 	}
 
 	template<typename TF, U32 Dim>
