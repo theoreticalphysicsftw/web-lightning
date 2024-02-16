@@ -85,13 +85,22 @@ namespace WL
 			{
 				if (HoldsAlternative<Line>(primitive) || HoldsAlternative<Quadratic>(primitive))
 				{
-					this->paths.back().primitives.emplace_back(primitive);
+					Visit<V>
+					(
+						[&](const auto& prim) -> V
+						{
+							auto transformed = TRuntime::PresentSurface::NormalizedImageToWLCoords(prim, width, height, offsetX, offsetY);
+							this->paths.back().primitives.emplace_back(transformed);
+						},
+						primitive
+					);
 				}
 				else
 				{
 					WL_ASSERT(HoldsAlternative<Cubic>(primitive));
 					auto& cubic = Get<Cubic>(primitive);
-					auto approxQuadratics = ApproximateByQuadratics(cubic, tolerance);
+					auto transformedCubic = TRuntime::PresentSurface::NormalizedImageToWLCoords(cubic, width, height, offsetX, offsetY);
+					auto approxQuadratics = ApproximateByQuadratics(transformedCubic, tolerance);
 					for (auto& curve : approxQuadratics)
 					{
 						this->paths.back().primitives.emplace_back(curve);
@@ -124,19 +133,7 @@ namespace WL
 				{
 					WL_ASSERT(HoldsAlternative<Quadratic>(primitive));
 					auto& curve = Get<Quadratic>(primitive);
-					// Transform image relative coordinates of the curve to WL coordinates
-					// and then to rendering coordinates.
-					StaticArray<Vec2, 3> pts;
-					for (auto i = 0; i < 3; ++i)
-					{
-						auto& p = curve.points[i];
-						pts[i][0] = width * p[0] + offsetX;
-						pts[i][1] = height * p[1] + offsetY;
-						auto ar = Runtime::GPUPresentSurface::GetAspectRatio();
-						pts[i][0] = pts[i][0] * 2.f - 1.f;
-						pts[i][1] = 1.f - pts[i][1] * ar * 2.f;
-					}
-					Quadratic renderCurve(pts[0], pts[1], pts[2]);
+					auto renderCurve = Runtime::PresentSurface::WLToRenderCoords(curve);
 					Runtime::Renderer::BezierRenderer::AccumulateBezier(renderCurve, path.outlineColor, path.outlineWidth , path.outlineFeather);
 				}
 			}
