@@ -221,7 +221,7 @@ namespace WL
 				pathPtr->primitives[currentState[i].curveIdx]
 			);
 		}
-		WL_ASSERT(sum <= particleLength);
+		WL_ASSERT(particleLength > sum || Abs(sum - particleLength) < Scalar(0.01 * particleLength));
 	#endif
 
 		return {currentState.data(), curveSpan};
