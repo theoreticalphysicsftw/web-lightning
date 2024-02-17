@@ -79,7 +79,7 @@ namespace WL
 		this->paths.clear();
 		for (auto& path : paths)
 		{
-			auto tolerance = 8.f / (TRuntime::PresentSurface::GetDimensions()[0] * width);
+			auto tolerance = 28.f / (TRuntime::PresentSurface::GetDimensions()[0] * width);
 			this->paths.emplace_back(path.CloneWithoutPrimitives());
 			for (auto& primitive : path.primitives)
 			{
@@ -123,8 +123,9 @@ namespace WL
 	{
 		for (auto& path : paths)
 		{
-			for (auto& primitive : path.primitives)
+			for (auto i = 0u; i < path.primitives.size(); ++i)
 			{
+				auto& primitive = path.primitives[i];
 				if (HoldsAlternative<Line>(primitive))
 				{
 					// TODO:
@@ -134,7 +135,17 @@ namespace WL
 					WL_ASSERT(HoldsAlternative<Quadratic>(primitive));
 					auto& curve = Get<Quadratic>(primitive);
 					auto renderCurve = Runtime::PresentSurface::WLToRenderCoords(curve);
-					Runtime::Renderer::BezierRenderer::AccumulateBezier(renderCurve, path.outlineColor, path.outlineWidth , path.outlineFeather);
+					auto featherBegin = (i == 0)? path.outlineFeatherBegin : 0;
+					auto featherEnd = (i == path.primitives.size() - 1)? path.outlineFeatherEnd : 0;
+					Runtime::Renderer::BezierRenderer::AccumulateBezier
+					(
+						renderCurve,
+						path.outlineColor,
+						path.outlineWidth,
+						path.outlineFeather,
+						featherBegin,
+						featherEnd
+					);
 				}
 			}
 		}

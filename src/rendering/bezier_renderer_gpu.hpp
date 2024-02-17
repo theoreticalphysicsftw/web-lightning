@@ -43,7 +43,7 @@ namespace WL
 		using QuadraticBezier = QuadraticBezier<F32, 2>;
 
 		static auto Init() -> B;
-		static auto AccumulateBezier(const QuadraticBezier& curve, ColorU32 color, F32 width, F32 feather = 1.0f) -> V;
+		static auto AccumulateBezier(const QuadraticBezier& curve, ColorU32 color, F32 width, F32 feather = 1.0f, F32 fBegin = feather, F32 fEnd = feather) -> V;
 		static auto CommitDrawCommands() -> V;
 		static auto Clear() -> V;
 
@@ -59,10 +59,10 @@ namespace WL
 
 		inline static Pso pso;
 		inline static Buffer packedPointsAndColorBuffer;
-		inline static Buffer widthAndFeatherBuffer;
+		inline static Buffer widthAndFeathersBuffer;
 
 		inline static Array<UVec4> packedPointsAndColorBufferCPU;
-		inline static Array<Vec2> widthAndFeatherBufferCPU;
+		inline static Array<Vec4> widthAndFeathersBufferCPU;
 	};
 }
 
@@ -81,7 +81,7 @@ namespace WL
 		pso.AddShader(BezierApproxFrag.data(), BezierApproxFrag.size(), EShaderType::Fragment);
 
 		pso.AddVBLayout({ .binding = 0, .type = EType::Uint, .components = 4 });
-		pso.AddVBLayout({ .binding = 1, .type = EType::Float, .components = 2 });
+		pso.AddVBLayout({ .binding = 1, .type = EType::Float, .components = 4 });
 		pso.AddSimpleConstant(0, EType::Float, "uScreenDims");
 
 		return pso.Compile();
@@ -89,7 +89,7 @@ namespace WL
 
 
 	template<typename TPresentSurface>
-	inline auto BezierRendererGPU<TPresentSurface>::AccumulateBezier(const QuadraticBezier& curve, ColorU32 color, F32 width, F32 feather) -> V
+	inline auto BezierRendererGPU<TPresentSurface>::AccumulateBezier(const QuadraticBezier& curve, ColorU32 color, F32 width, F32 feather, F32 fBegin, F32 fEnd) -> V
 	{
 		instances++;
 		if (instances > instanceCapacity)
@@ -109,10 +109,11 @@ namespace WL
 		if (HodgeDualWedge(dir0, dir1) < 0)
 		{
 			Swap(p0, p2);
+			Swap(fBegin, fEnd);
 		}
 
 		packedPointsAndColorBufferCPU.emplace_back(p0, p1, p2, color.packed);
-		widthAndFeatherBufferCPU.emplace_back(width, feather);
+		widthAndFeathersBufferCPU.emplace_back(width, feather, fBegin, fEnd);
 	}
 
 
@@ -135,11 +136,11 @@ namespace WL
 		}
 
 		packedPointsAndColorBuffer.Update(packedPointsAndColorBufferCPU);
-		widthAndFeatherBuffer.Update(widthAndFeatherBufferCPU);
+		widthAndFeathersBuffer.Update(widthAndFeathersBufferCPU);
 
 		pso.Use();
 		pso.BindVB(0, packedPointsAndColorBuffer, true);
-		pso.BindVB(1, widthAndFeatherBuffer, true);
+		pso.BindVB(1, widthAndFeathersBuffer, true);
 
 		pso.UpdateConstant(0, PresentSurface::GetDimensions());
 
@@ -154,7 +155,7 @@ namespace WL
 	{
 		B status =
 			packedPointsAndColorBuffer.Allocate(initialCurveInstancesCapacity, false) &&
-			widthAndFeatherBuffer.Allocate(initialCurveInstancesCapacity, false);
+			widthAndFeathersBuffer.Allocate(initialCurveInstancesCapacity, false);
 		return status;
 	}
 
@@ -164,7 +165,7 @@ namespace WL
 	{
 		B status =
 			packedPointsAndColorBuffer.Reallocate(initialCurveInstancesCapacity, false) &&
-			widthAndFeatherBuffer.Reallocate(initialCurveInstancesCapacity, false);
+			widthAndFeathersBuffer.Reallocate(initialCurveInstancesCapacity, false);
 		return status;
 	}
 
@@ -174,6 +175,6 @@ namespace WL
 	{
 		instances = 0;
 		packedPointsAndColorBufferCPU.clear();
-		widthAndFeatherBufferCPU.clear();
+		widthAndFeathersBufferCPU.clear();
 	}
 }

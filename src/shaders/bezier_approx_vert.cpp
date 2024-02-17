@@ -31,7 +31,7 @@ namespace WL
 		precision highp float;
 
 		layout(location = 0) in uvec4 packedPointsAndColor;
-		layout(location = 1) in vec2 dims;
+		layout(location = 1) in vec4 dims;
 
 		uniform vec2 uScreenDims;
 
@@ -41,6 +41,8 @@ namespace WL
 		out vec2 voutP2;
 		out float voutWidth;
 		out float voutFeather;
+		out float voutFeatherBegin;
+		out float voutFeatherEnd;
 
 		vec2 UVs[3] = vec2[3]
 		(
@@ -72,6 +74,8 @@ namespace WL
 		{
 			voutWidth = dims.x;
 			voutFeather = dims.y;
+			voutFeatherBegin = dims.z;
+			voutFeatherEnd = dims.w;
 
 			vec2 p[3] = vec2[3]
 			(

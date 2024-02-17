@@ -52,6 +52,7 @@ namespace WL::Particles
 		Array<Traversal> traversals;
 		Array<F32> widths;
 		Array<Span<const Param>> params;
+		VectorPaths<TRuntime> highlight;
 	};
 }
 
@@ -59,16 +60,17 @@ namespace WL::Particles
 namespace WL::Particles
 {
 	template<typename TRuntime>
-	inline CurveBound<TRuntime>::CurveBound(const Base& inPaths, Span<Vec2> sizes, Span<F32> speeds, Span<F32> initialDelays)
-		: Base({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY)
+	inline CurveBound<TRuntime>::CurveBound(const Base& inPaths, Span<Vec2> sizes, Span<F32> speeds, Span<F32> initialDelays) :
+		Base({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY),
+		highlight({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY)
 	{
 		this->inPaths = inPaths.GetPaths();
 		params.resize(this->inPaths.size());
 		for (auto i = 0u; i < this->inPaths.size(); ++i)
 		{
 			auto width = (sizes.size() > i) ? sizes[i][0] : inPaths.paths[i].outlineWidth;
-			auto speed = (speeds.size() > i) ? speeds[i] : 0.0000001f;
-			auto length = (sizes.size() > i) ? sizes[i][1] : 0.003f;
+			auto speed = (speeds.size() > i) ? speeds[i] : 0.0000005f;
+			auto length = (sizes.size() > i) ? sizes[i][1] : 0.26f;
 			auto delay = (initialDelays.size() > i) ? initialDelays[i] : 0.f;
 			widths.emplace_back(width);
 			traversals.emplace_back(inPaths.paths[i], length, speed, delay);
@@ -80,6 +82,7 @@ namespace WL::Particles
 	inline auto CurveBound<TRuntime>::AccumulateDrawState() const -> V
 	{
 		Base::AccumulateDrawState();
+		highlight.AccumulateDrawState();
 	}
 
 
@@ -88,16 +91,23 @@ namespace WL::Particles
 	{
 		Base::Update(s);
 		this->paths.resize(params.size());
+		highlight.paths.resize(params.size());
 		for (auto i = 0u; i < params.size(); ++i)
 		{
 			params[i] = traversals[i].Update(s.dt);
 			this->paths[i].primitives.clear();
+			highlight.paths[i].primitives.clear();
 			if (!params[i].empty())
 			{
-				this->paths[i].outlineWidth = widths[i];
+				this->paths[i].outlineWidth = widths[i] / 4.f;
 				this->paths[i].outlined = true;
-				this->paths[i].outlineColor = 0xffffffff;
-				this->paths[i].outlineFeather = 4.f;
+				this->paths[i].outlineColor = 0x4affffff;
+				this->paths[i].outlineFeather = 6.f;
+
+				highlight.paths[i].outlineWidth = widths[i] / 4.f;
+				highlight.paths[i].outlined = true;
+				highlight.paths[i].outlineColor = 0xffffffff;
+				highlight.paths[i].outlineFeather = 3.f;
 
 				for (auto j = 0; j < params[i].size(); ++j)
 				{
@@ -107,6 +117,7 @@ namespace WL::Particles
 						auto& prim = Get<Quadratic>(primVar);
 						auto renderPrim = GetSlice(prim, params[i][j].t0, params[i][j].t1);
 						this->paths[i].primitives.emplace_back(renderPrim);
+						highlight.paths[i].primitives.emplace_back(renderPrim);
 					}
 				}
 			}

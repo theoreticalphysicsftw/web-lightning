@@ -36,6 +36,8 @@ namespace WL
 		in vec2 voutP2;
 		in float voutWidth;
 		in float voutFeather;
+		in float voutFeatherBegin;
+		in float voutFeatherEnd;
 
 		out vec4 outColor;
 		
@@ -94,13 +96,13 @@ namespace WL
 			if (xyp0T0N0.y > 0)
 			{
 				float dist = length(xyp0T0N0.y);
-				alpha *= clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
+				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherBegin, dist), 0.f, 1.f);
 			}
 
 			if (xyp2T1N1.y > 0)
 			{
 				float dist = length(xyp2T1N1.y);
-				alpha *= clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
+				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherEnd, dist), 0.f, 1.f);
 			}
 
 			outColor = vec4(voutColor.rgb, alpha);
