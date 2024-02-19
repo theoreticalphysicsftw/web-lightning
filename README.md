@@ -40,7 +40,7 @@ For Desktop/WebGL
 - [ ] Input Fields
 ### Animations
 - [x] Per-widget per-frame arbitrary property animation chains.
-- [ ] Bezier curve particle traversal.
+- [x] Bezier curve particle traversal.
 ### Format support
 - [x] Lizard compressed data.
 - [x] WebP images.
