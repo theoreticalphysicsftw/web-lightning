@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <common/random.hpp>
 #include <widgets/widget.hpp>
 #include <widgets/vector_paths.hpp>
 #include <animation/path_traversal.hpp>
@@ -46,7 +47,9 @@ namespace WL::Particles
 		virtual auto Update(const UpdateState& s) -> V override;
 		virtual auto GetBBox(const Widget<TRuntime>* w = nullptr) const -> BBox override;
 
-		CurveBound(const Base& inPaths, Span<Vec2> sizes = {}, Span<F32> speeds = {}, Span<F32> initialDelays = {});
+		CurveBound(const Base& inPaths, Span<const Vec2> sizes = {}, Span<const F32> speeds = {}, Span<const F32> initialDelays = {}, B alternatingUpdate = false);
+
+		B alternatingUpdate;
 
 	protected:
 		Span<const Path2D> inPaths;
@@ -54,6 +57,8 @@ namespace WL::Particles
 		Array<F32> widths;
 		Array<Span<const Param>> params;
 		VectorPaths<TRuntime> highlight;
+
+		U32 currentPath;
 	};
 }
 
@@ -61,9 +66,10 @@ namespace WL::Particles
 namespace WL::Particles
 {
 	template<typename TRuntime>
-	inline CurveBound<TRuntime>::CurveBound(const Base& inPaths, Span<Vec2> sizes, Span<F32> speeds, Span<F32> initialDelays) :
+	inline CurveBound<TRuntime>::CurveBound(const Base& inPaths, Span<const Vec2> sizes, Span<const F32> speeds, Span<const F32> initialDelays, B alternatingUpdate) :
 		Base({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY),
-		highlight({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY)
+		highlight({}, inPaths.width, inPaths.height, inPaths.offsetX, inPaths.offsetY),
+		alternatingUpdate(alternatingUpdate)
 	{
 		this->inPaths = inPaths.GetPaths();
 		params.resize(this->inPaths.size());
@@ -71,10 +77,15 @@ namespace WL::Particles
 		{
 			auto width = (sizes.size() > i) ? sizes[i][0] : inPaths.paths[i].outlineWidth;
 			auto speed = (speeds.size() > i) ? speeds[i] : 0.0000005f;
-			auto length = (sizes.size() > i) ? sizes[i][1] : 0.26f;
+			auto length = (sizes.size() > i) ? sizes[i][1] : 0.06f;
 			auto delay = (initialDelays.size() > i) ? initialDelays[i] : 0.f;
 			widths.emplace_back(width);
 			traversals.emplace_back(inPaths.paths[i], length, speed, delay);
+		}
+
+		if (alternatingUpdate)
+		{
+			currentPath = GetUniformU32(0, params.size() - 1);
 		}
 	}
 
@@ -91,24 +102,28 @@ namespace WL::Particles
 	inline auto CurveBound<TRuntime>::Update(const UpdateState& s) -> V
 	{
 		Base::Update(s);
+		U32 startPath = (alternatingUpdate) ? currentPath : 0u;
+		U32 updateCount = (alternatingUpdate) ? 1u : params.size();
 		this->paths.resize(params.size());
 		highlight.paths.resize(params.size());
-		for (auto i = 0u; i < params.size(); ++i)
+		for (auto i = startPath; i < startPath + updateCount; ++i)
 		{
 			params[i] = traversals[i].Update(s.dt);
 			this->paths[i].primitives.clear();
 			highlight.paths[i].primitives.clear();
-			if (!params[i].empty())
+			if (!params[i].empty() && params[i][0].curveIdx != CInvalidIdx)
 			{
-				this->paths[i].outlineWidth = widths[i] / 4.f;
+				this->paths[i].outlineWidth = widths[i] / 8.f;
 				this->paths[i].outlined = true;
 				this->paths[i].outlineColor = 0x4affffff;
-				this->paths[i].outlineFeather = 6.f;
+				this->paths[i].outlineFeather = inPaths[i].outlineFeather * 1.5f;
+				this->paths[i].outlineFeatherBegin = inPaths[i].outlineFeather * 48;
 
-				highlight.paths[i].outlineWidth = widths[i] / 4.f;
+				highlight.paths[i].outlineWidth = widths[i] / 16.f;
 				highlight.paths[i].outlined = true;
 				highlight.paths[i].outlineColor = 0xffffffff;
-				highlight.paths[i].outlineFeather = 3.f;
+				highlight.paths[i].outlineFeather = inPaths[i].outlineFeather / 2.0f;
+				highlight.paths[i].outlineFeatherBegin = inPaths[i].outlineFeather * 32;
 
 				for (auto j = 0; j < params[i].size(); ++j)
 				{
@@ -128,6 +143,15 @@ namespace WL::Particles
 						highlight.paths[i].primitives.emplace_back(renderPrim);
 					}
 				}
+			}
+			else if (!params[i].empty())
+			{
+				auto oldPath = currentPath;
+				while (params.size() != 1 && oldPath == currentPath)
+				{
+					currentPath = GetUniformU32(0u, params.size() - 1);
+				}
+				break;
 			}
 		}
 	}

@@ -133,7 +133,9 @@ namespace WL
 			currentTime = 0;
 			currentStartCurveIdx = 0;
 			currentStart = -particleLength;
-			return {};
+			currentState.resize(1);
+			currentState[0].curveIdx = CInvalidIdx;
+			return {currentState.data(), 1u};
 		}
 
 		// Most of the time the particle doesn't move far (< 2 curves forwards), so
