@@ -36,6 +36,7 @@ namespace WL::Particles
 		using Runtime = TRuntime;
 		using Base = VectorPaths<TRuntime>;
 		using Path2D = Path2D<F32>;
+		using Line = Line<F32, 2>;
 		using Cubic = CubicBezier<F32, 2>;
 		using Quadratic = QuadraticBezier<F32, 2>;
 		using Traversal = PathTraversal<F32>;
@@ -115,6 +116,13 @@ namespace WL::Particles
 					if (HoldsAlternative<Quadratic>(primVar))
 					{
 						auto& prim = Get<Quadratic>(primVar);
+						auto renderPrim = GetSlice(prim, params[i][j].t0, params[i][j].t1);
+						this->paths[i].primitives.emplace_back(renderPrim);
+						highlight.paths[i].primitives.emplace_back(renderPrim);
+					}
+					if (HoldsAlternative<Line>(primVar))
+					{
+						auto& prim = Get<Line>(primVar);
 						auto renderPrim = GetSlice(prim, params[i][j].t0, params[i][j].t1);
 						this->paths[i].primitives.emplace_back(renderPrim);
 						highlight.paths[i].primitives.emplace_back(renderPrim);

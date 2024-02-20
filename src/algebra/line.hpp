@@ -56,6 +56,9 @@ namespace WL
 		auto GetSquaredDistanceFrom(const Vec& p) const -> TF;
 		auto GetDistanceFrom(const Vec& p) const -> TF;
 	};
+
+	template<typename TF, U32 Dim>
+	inline auto GetSlice(const Line<TF, Dim>& line, TF t0, TF t1) -> Line<TF, Dim>;
 }
 
 
@@ -119,5 +122,14 @@ namespace WL
 	inline auto Line<TF, Dim>::GetDistanceFrom(const Vec& p) const -> TF
 	{
 		return Sqrt(GetSquaredDistanceFrom(p));
+	}
+
+
+	template<typename TF, U32 Dim>
+	inline auto GetSlice(const Line<TF, Dim>& line, TF t0, TF t1) -> Line<TF, Dim>
+	{
+		t0 = Max(TF(0), t0);
+		t1 = Min(TF(1), t1);
+		return Line<TF, Dim>(line.EvaluateAt(t0), line.EvaluateAt(t1));
 	}
 }

@@ -34,6 +34,7 @@ namespace WL
 		using FontRenderer = TRenderers::FontRenderer;
 		using BoxRenderer = TRenderers::BoxRenderer;
 		using TexturedQuadRenderer = TRenderers::TexturedQuadRenderer;
+		using LineRenderer = TRenderers::LineRenderer;
 		using ArcRenderer = TRenderers::ArcRenderer;
 		using VectorRasterizer = TRenderers::VectorRasterizer;
 		using BezierRenderer = TRenderers::BezierRenderer;
@@ -52,7 +53,13 @@ namespace WL
 	template<typename TRenderers>
 	inline auto Renderer<TRenderers>::Init() -> B
 	{
-		return FontRenderer::Init() && BoxRenderer::Init() && ArcRenderer::Init() && VectorRasterizer::Init() && BezierRenderer::Init();
+		return
+			FontRenderer::Init() &&
+			BoxRenderer::Init() &&
+			ArcRenderer::Init() &&
+			LineRenderer::Init() &&
+			VectorRasterizer::Init() &&
+			BezierRenderer::Init();
 	}
 
 
@@ -61,6 +68,7 @@ namespace WL
 	{
 		FontRenderer::CommitDrawCommands();
 		BoxRenderer::CommitDrawCommands();
+		LineRenderer::CommitDrawCommands();
 		ArcRenderer::CommitDrawCommands();
 		BezierRenderer::CommitDrawCommands();
 	}
@@ -71,6 +79,7 @@ namespace WL
 	{
 		FontRenderer::Clear();
 		BoxRenderer::Clear();
+		LineRenderer::Clear();
 		ArcRenderer::Clear();
 		BezierRenderer::Clear();
 	}

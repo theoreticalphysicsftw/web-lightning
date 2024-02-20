@@ -31,6 +31,7 @@
 #include <rendering/textured_quad_renderer.hpp>
 #include <rendering/circular_arc_renderer.hpp>
 #include <rendering/bezier_renderer_gpu.hpp>
+#include <rendering/line_renderer.hpp>
 #include <rendering/renderer.hpp>
 
 #include <presenting/present_surface.hpp>
@@ -62,6 +63,7 @@ namespace WL
 	using FontRendererDefault = FontRenderer<PresentSurfaceDefault, FontRasterizerDefault>;
 	using BoxRendererDefault = BoxRenderer<PresentSurfaceDefault>;
 	using TexturedQuadRendererDefault = TexturedQuadRenderer<PresentSurfaceDefault>;
+	using LineRendererDefault = LineRenderer<PresentSurfaceDefault>;
 	using ArcRendererDefault = CircularArcRenderer<PresentSurfaceDefault>;
 	using BezierRendererDefault = BezierRendererGPU<PresentSurfaceDefault>;
 
@@ -70,6 +72,7 @@ namespace WL
 		using FontRenderer = FontRendererDefault;
 		using BoxRenderer = BoxRendererDefault;
 		using TexturedQuadRenderer = TexturedQuadRendererDefault;
+		using LineRenderer = LineRendererDefault;
 		using ArcRenderer = ArcRendererDefault;
 		using VectorRasterizer = VectorRasterizerDefault;
 		using BezierRenderer = BezierRendererDefault;

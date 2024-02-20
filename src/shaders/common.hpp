@@ -35,6 +35,8 @@ namespace WL
     DEFINE_SHADER(TexturedQuadFrag);
     DEFINE_SHADER(BoxVert);
     DEFINE_SHADER(BoxFrag);
+    DEFINE_SHADER(LineVert);
+    DEFINE_SHADER(LineFrag);
     DEFINE_SHADER(CircularArcVert);
     DEFINE_SHADER(CircularArcFrag);
     DEFINE_SHADER(BezierApproxVert);

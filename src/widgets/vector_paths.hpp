@@ -126,17 +126,30 @@ namespace WL
 			for (auto i = 0u; i < path.primitives.size(); ++i)
 			{
 				auto& primitive = path.primitives[i];
+				auto featherBegin = (i == 0) ? path.outlineFeatherBegin : 0;
+				auto featherEnd = (i == path.primitives.size() - 1) ? path.outlineFeatherEnd : 0;
+
 				if (HoldsAlternative<Line>(primitive))
 				{
-					// TODO:
+					auto& line = Get<Line>(primitive);
+					auto renderLine = Runtime::PresentSurface::WLToRenderCoords(line);
+
+					Runtime::Renderer::LineRenderer::AccumulateLine
+					(
+						renderLine,
+						path.outlineColor,
+						path.outlineWidth,
+						path.outlineFeather,
+						featherBegin,
+						featherEnd
+					);
 				}
 				else
 				{
 					WL_ASSERT(HoldsAlternative<Quadratic>(primitive));
 					auto& curve = Get<Quadratic>(primitive);
 					auto renderCurve = Runtime::PresentSurface::WLToRenderCoords(curve);
-					auto featherBegin = (i == 0)? path.outlineFeatherBegin : 0;
-					auto featherEnd = (i == path.primitives.size() - 1)? path.outlineFeatherEnd : 0;
+
 					Runtime::Renderer::BezierRenderer::AccumulateBezier
 					(
 						renderCurve,
