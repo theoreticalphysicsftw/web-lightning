@@ -34,7 +34,11 @@
 namespace WL
 {
 	inline auto GetTimeStampUS() -> F64;
-	inline auto UsToS(F32 us) -> F32;
+
+	template <typename TF>
+	constexpr inline auto UsToS(TF us) -> TF;
+	template <typename TF>
+	constexpr inline auto SToUs(TF s) -> TF;
 }
 
 
@@ -51,8 +55,15 @@ namespace WL
 	#endif
 	}
 
-	inline auto UsToS(F32 us) -> F32
+	template <typename TF>
+	constexpr inline auto UsToS(TF us) -> TF
 	{
-		return us / 1E6;
+		return us / TF(1000000);
+	}
+
+	template<typename TF>
+	constexpr inline auto SToUs(TF s) -> TF
+	{
+		return s * TF(1000000);
 	}
 }
