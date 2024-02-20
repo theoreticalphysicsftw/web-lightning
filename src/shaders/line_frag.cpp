@@ -54,7 +54,7 @@ namespace WL
 			float x = xy.x;
 			float y = xy.y;
 
-			float dist = dot(p0p1, vec2(p1.y - y, p0.x - x)) / length(p0p1);
+			float dist = abs(dot(p0p1, vec2(p1.y - y, p0.x - x))) / length(p0p1) - voutWidth * uScreenDims.x;
 
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
 			

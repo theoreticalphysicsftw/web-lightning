@@ -57,17 +57,17 @@ namespace WL
 			vec2 dir = voutP0 - voutP1;
 			vec2 norm = vec2(-dir.y, dir.x);
 
-			float offset0 = (voutWidth + voutFeather / uScreenDims.x) / 2.f;
-			float offset1 = (voutFeatherBegin + voutFeatherEnd) / uScreenDims.x / 2.f;
+			float offset0 = (voutWidth + voutFeather / uScreenDims.x) / 2.f + 0.1f;
+			float offset1 = (voutFeatherBegin + voutFeatherEnd) / uScreenDims.x;
 
 			vec2 boundingRect[6] = vec2[6]
 			(
 				voutP0 + dir * offset1 - norm * offset0,
 				voutP0 + dir * offset1 + norm * offset0,
-				voutP1 - dir * offset1 + norm * offset0,
-				voutP0 + dir * offset1 - norm * offset0,
 				voutP1 - dir * offset1 - norm * offset0,
-				voutP1 - dir * offset1 + norm * offset0
+				voutP1 - dir * offset1 - norm * offset0,
+				voutP1 - dir * offset1 + norm * offset0,
+				voutP0 + dir * offset1 + norm * offset0
 			);
 
 			gl_Position = vec4(boundingRect[gl_VertexID], 0.f, 1.f);
