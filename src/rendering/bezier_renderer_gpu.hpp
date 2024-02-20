@@ -164,8 +164,8 @@ namespace WL
 	inline auto BezierRendererGPU<TPresentSurface>::ReallocateBuffers(U32 newCapacity) -> B
 	{
 		B status =
-			packedPointsAndColorBuffer.Reallocate(initialCurveInstancesCapacity, false) &&
-			widthAndFeathersBuffer.Reallocate(initialCurveInstancesCapacity, false);
+			packedPointsAndColorBuffer.Reallocate(newCapacity, false) &&
+			widthAndFeathersBuffer.Reallocate(newCapacity, false);
 		return status;
 	}
 

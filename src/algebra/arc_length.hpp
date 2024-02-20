@@ -90,7 +90,8 @@ namespace WL
 		parameterLUT.push_back(0);
 		for (auto i = 0u; i < (lutSize - 1); ++i)
 		{
-			auto arcLength = (i + 1) * lutScale;
+			// Min required due to precision issues that can cause LowerBound to fail.
+			auto arcLength = Min((i + 1) * lutScale, maxArcLength);
 			auto idx1 = LowerBound(cumulativeLength, arcLength);
 			auto idx0 = idx1 - 1;
 			auto t1 = idx1 * scale;
