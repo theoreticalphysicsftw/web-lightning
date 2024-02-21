@@ -76,6 +76,7 @@ namespace WL
 			voutFeather = dims.y;
 			voutFeatherBegin = dims.z;
 			voutFeatherEnd = dims.w;
+			float feather = max(voutFeather, max(voutFeatherBegin, voutFeatherEnd));
 
 			vec2 p[3] = vec2[3]
 			(
@@ -92,7 +93,7 @@ namespace WL
 			vec2 p2p0 = normalize(p[0] - p[2]);
 			vec2 n2 = vec2(-p2p0.y, p2p0.x);
 
-			float offsetScale = 2 * (voutWidth + (voutFeather + 2.f) / uScreenDims.x);
+			float offsetScale = 2.f * (voutWidth + (feather + 2.f) / uScreenDims.x);
 
 			vec2 line0P = p[0] + offsetScale * n0;
 			vec2 line1P = p[1] + offsetScale * n1;

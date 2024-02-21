@@ -75,7 +75,7 @@ namespace WL
 
 			float implicit = u * u - v;
 
-			vec2 grad = vec2(2 * u * dUdx - dVdx, 2 * u * dUdy - dVdy);
+			vec2 grad = vec2(2.f * u * dUdx - dVdx, 2.f * u * dUdy - dVdy);
 
 			float approxDist = abs(implicit) / length(grad) - (voutWidth * uScreenDims.x) / 2.f;
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, approxDist), 0.f, 1.f);
@@ -93,15 +93,15 @@ namespace WL
 			vec2 xyp0T0N0 = vec2(dot(xyp0, n0), dot(xyp0, t0));
 			vec2 xyp2T1N1 = vec2(dot(xyp2, n1), dot(xyp2, t1));
 
-			if (xyp0T0N0.y > 0)
+			if (xyp0T0N0.y > 0.f)
 			{
-				float dist = length(xyp0T0N0.y);
+				float dist = length(xyp0T0N0);
 				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherBegin, dist), 0.f, 1.f);
 			}
 
-			if (xyp2T1N1.y > 0)
+			if (xyp2T1N1.y > 0.f)
 			{
-				float dist = length(xyp2T1N1.y);
+				float dist = length(xyp2T1N1);
 				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherEnd, dist), 0.f, 1.f);
 			}
 
