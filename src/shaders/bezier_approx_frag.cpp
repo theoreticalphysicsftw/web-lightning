@@ -96,13 +96,20 @@ namespace WL
 			if (xyp0T0N0.y > 0.f)
 			{
 				float dist = length(xyp0T0N0);
-				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherBegin, dist), 0.f, 1.f);
+				float fadeout = (voutFeatherBegin > 0.f)? voutFeatherBegin : voutFeather;
+				alpha *= clamp(1.f - smoothstep(0.f, fadeout, dist), 0.f, 1.f);
 			}
 
 			if (xyp2T1N1.y > 0.f)
 			{
 				float dist = length(xyp2T1N1);
-				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherEnd, dist), 0.f, 1.f);
+				float fadeout = (voutFeatherEnd > 0.f)? voutFeatherEnd : voutFeather;
+				alpha *= clamp(1.f - smoothstep(0.f, fadeout, dist), 0.f, 1.f);
+			}
+
+			if (voutFeatherBegin < 0.f)
+			{
+				alpha *= clamp(1.f - smoothstep(0.f, -voutFeatherBegin + xyp0T0N0.x, l0), 0.f, 1.f);
 			}
 
 			outColor = vec4(voutColor.rgb, alpha);
