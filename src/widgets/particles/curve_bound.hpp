@@ -77,7 +77,7 @@ namespace WL::Particles
 		{
 			auto width = (sizes.size() > i) ? sizes[i][0] : inPaths.paths[i].outlineWidth;
 			auto speed = (speeds.size() > i) ? speeds[i] : 0.0000005f;
-			auto length = (sizes.size() > i) ? sizes[i][1] : 0.06f;
+			auto length = (sizes.size() > i) ? sizes[i][1] : 0.25f;
 			auto delay = (initialDelays.size() > i) ? initialDelays[i] : 0.f;
 			widths.emplace_back(width);
 			traversals.emplace_back(inPaths.paths[i], length, speed, delay);
@@ -117,13 +117,13 @@ namespace WL::Particles
 				this->paths[i].outlined = true;
 				this->paths[i].outlineColor = 0x4affffff;
 				this->paths[i].outlineFeather = inPaths[i].outlineFeather * 1.5f;
-				this->paths[i].outlineFeatherBegin = inPaths[i].outlineFeather * 48;
+				this->paths[i].outlineFeatherBegin = -inPaths[i].outlineFeather * 0.9;
 
 				highlight.paths[i].outlineWidth = widths[i] / 16.f;
 				highlight.paths[i].outlined = true;
 				highlight.paths[i].outlineColor = 0xffffffff;
 				highlight.paths[i].outlineFeather = inPaths[i].outlineFeather / 2.0f;
-				highlight.paths[i].outlineFeatherBegin = inPaths[i].outlineFeather * 32;
+				highlight.paths[i].outlineFeatherBegin = -inPaths[i].outlineFeather * 0.7;
 
 				for (auto j = 0; j < params[i].size(); ++j)
 				{
