@@ -212,6 +212,7 @@ namespace WL
 		return MakePair(QuadraticBezier(b[0][0], b[1][0], b[2][0]), QuadraticBezier(b[2][0], b[1][1], b[0][2]));
 	}
 
+
 	template<typename TBezier, typename TF>
 	auto GetSlice(const TBezier& curve, TF t0, TF t1) -> TBezier
 	{
@@ -232,6 +233,7 @@ namespace WL
 
 		return curve.Split(t0).second.Split((t1 - t0) / (TF(1) - t0)).first;
 	}
+
 
 	template<typename TF, U32 Dim>
 	inline auto CubicBezier<TF, Dim>::GetCentroid() const -> Vec
