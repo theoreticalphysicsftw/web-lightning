@@ -54,7 +54,7 @@ namespace WL
 			float x = xy.x;
 			float y = xy.y;
 
-			float dist = abs(dot(p0p1, vec2(p1.y - y, p0.x - x))) / length(p0p1) - voutWidth * uScreenDims.x;
+			float dist = abs(dot(p0p1, vec2(p1.y - y, p0.x - x))) / length(p0p1) - voutWidth * uScreenDims.x / 2.f;
 
 			float alpha = clamp(1.f - smoothstep(0.f, voutFeather, dist), 0.f, 1.f);
 			
@@ -68,15 +68,15 @@ namespace WL
 			vec2 xyp0TN = vec2(dot(xyp0, n), dot(xyp0, t));
 			vec2 xyp1TN = vec2(dot(xyp1, n), dot(xyp1, -t));
 
-			if (xyp0TN.y > 0)
+			if (xyp0TN.y > 0.f)
 			{
-				float dist = length(xyp0TN);
+				float dist = xyp0TN.y;
 				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherBegin, dist), 0.f, 1.f);
 			}
 
-			if (xyp1TN.y > 0)
+			if (xyp1TN.y > 0.f)
 			{
-				float dist = length(xyp1TN);
+				float dist = xyp1TN.y;
 				alpha *= clamp(1.f - smoothstep(0.f, voutFeatherEnd, dist), 0.f, 1.f);
 			}
 

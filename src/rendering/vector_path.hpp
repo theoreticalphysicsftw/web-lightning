@@ -44,6 +44,8 @@ namespace WL
 		ColorU32 outlineColor;
 		F32 outlineWidth;
 		F32 outlineFeather = 2.f;
+		F32 widthBegin = 0;
+		F32 widthEnd = 0;
 		F32 outlineFeatherBegin = outlineFeather;
 		F32 outlineFeatherEnd = outlineFeather;
 		B outlined = false;

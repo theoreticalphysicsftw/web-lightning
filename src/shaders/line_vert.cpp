@@ -57,8 +57,8 @@ namespace WL
 			vec2 dir = voutP0 - voutP1;
 			vec2 norm = vec2(-dir.y, dir.x);
 
-			float offset0 = (voutWidth + voutFeather / uScreenDims.x) / 2.f + 0.1f;
-			float offset1 = (voutFeatherBegin + voutFeatherEnd) / uScreenDims.x;
+			float offset0 = (voutWidth + voutFeather / uScreenDims.x) + 1.0f;
+			float offset1 = (voutFeatherBegin + voutFeatherEnd) / uScreenDims.x + 1.0f;
 
 			vec2 boundingRect[6] = vec2[6]
 			(
