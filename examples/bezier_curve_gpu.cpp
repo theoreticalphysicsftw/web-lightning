@@ -38,10 +38,20 @@ int main()
     Path2D<F32> path;
     path.outlined = true;
     path.outlineColor = 0xFFFFFFFF;
-    path.outlineWidth = 0.001f;
-    path.primitives.emplace_back(CubicBezier<F32, 2>(Vec2(0, 0), Vec2(0.25, 0.25), Vec2(0.5, 0.25), Vec2(1, 0)));
-    path.primitives.emplace_back(QuadraticBezier<F32, 2>(Vec2(0, 0), Vec2(0.0, 0.5), Vec2(1, 0)));
-    VectorPaths<RT> vectorPaths({ &path, 1u }, 0.5, 0.5, 0, 0);
+    path.outlineWidth = 0.002f;
+    //path.primitives.emplace_back(CubicBezier<F32, 2>(Vec2(0, 0), Vec2(0.25, 0.25), Vec2(0.5, 0.25), Vec2(1, 0)));
+    path.primitives.emplace_back
+    (
+        CubicBezier<F32, 2>
+        (
+            WL::Vec2(0.87097974, 1.00000000),
+            WL::Vec2(0.84091690, 0.94828285),
+            WL::Vec2(0.80847345, 0.89250221),
+            WL::Vec2(0.79261792, 0.83596743)
+        )
+    );
+    path.primitives.emplace_back(QuadraticBezier<F32, 2>(Vec2(1.0, 0.5), Vec2(0.5, 1.0),Vec2(0.0, 0.5)));
+    VectorPaths<RT> vectorPaths({ &path, 1u }, 0.6, 0.5, 0.2, 0);
     
     RT::Register(&vectorPaths);
     RT::Loop();
