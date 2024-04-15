@@ -53,7 +53,7 @@ namespace WL
 		inline static auto AddFont(const Byte* fontData, U32 fontSize) -> U32;
 		inline static auto BuildAtlas(U32 fontIndex, U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
 		inline static auto BuildAtlases(U32 fontHeight, const Array<UnicodeRange>& ranges) -> V;
-		inline static auto GetRasterizedFont(U16 fontIndex) -> Array<RasterizedFont<GPUAPI>>&;
+		inline static auto GetRasterizedFont(U16 fontIndex) -> RasterizedFont<GPUAPI>&;
 
 		inline static Set<U32> availableAtlases;
 
@@ -181,7 +181,7 @@ namespace WL
 	}
 
 	template<typename TGPUAPI>
-	inline auto FontRasterizerCPU<TGPUAPI>::GetRasterizedFont(U16 fontIndex) -> Array<RasterizedFont<GPUAPI>>&
+	inline auto FontRasterizerCPU<TGPUAPI>::GetRasterizedFont(U16 fontIndex) -> RasterizedFont<GPUAPI>&
 	{
 		return fonts[fontIndex];
 	}

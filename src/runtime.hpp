@@ -69,7 +69,12 @@ namespace WL
 	template<typename TGPUAPI, typename TRenderer>
 	inline auto Runtime<TGPUAPI, TRenderer>::Init(const Config& cfg) -> B
 	{
-		if (!(GPUPresentSurface::Init(cfg.appName, cfg.width, cfg.height, cfg.resizableWindow, cfg.borderlessWindow) && Renderer::Init()))
+		if (!GPUPresentSurface::Init(cfg.appName, cfg.width, cfg.height, cfg.resizableWindow, cfg.borderlessWindow))
+		{
+			return false;
+		}
+		
+		if (!Renderer::FontRenderer::Rasterizer::Init())
 		{
 			return false;
 		}
@@ -77,6 +82,11 @@ namespace WL
 		if (cfg.useFontAtlases)
 		{
 			Renderer::FontRenderer::Rasterizer::BuildAtlases(cfg.defaultFontHeight, cfg.defaultFontRanges);
+		}
+
+		if (!Renderer::Init())
+		{
+			return false;
 		}
 
 		GPUPresentSurface::EnableTransparency();

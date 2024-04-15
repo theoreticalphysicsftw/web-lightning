@@ -97,11 +97,6 @@ namespace WL
 	template <typename TPresentSurface, typename TRasterizer>
 	auto FontRenderer<TPresentSurface, TRasterizer>::Init() -> B
 	{
-		if (!Rasterizer::Init())
-		{
-			return false;
-		}
-
 		for (auto atlasIdx : Rasterizer::availableAtlases)
 		{
 			if (!AllocateBuffers(atlasIdx))
@@ -128,7 +123,7 @@ namespace WL
 	template <typename TPresentSurface, typename TRasterizer>
 	auto FontRenderer<TPresentSurface, TRasterizer>::AccumulateDrawState(const Array<I32> codepoints, const FontRendererOptions& options) -> V
 	{
-		auto uHeight = PresentSurface::UnitsToPixels(options.fontIndex);
+		auto uHeight = PresentSurface::UnitsToPixels(options.height);
 		auto atlasIdx = options.fontIndex | (uHeight << 16);
 
 
@@ -143,14 +138,14 @@ namespace WL
 			instanceCapacity *= 2;
 		}
 
-		auto& rasterizedFont = Rasterizer::GetRasterizedFont();
-		buffersPtr->atlas = rasterizedFont->heightToAtlas[uHeight];
+		auto& rasterizedFont = Rasterizer::GetRasterizedFont(atlasIdx);
+		buffersPtr->atlas = rasterizedFont.heightToAtlas[uHeight];
 
 		F32 xAdvance = 0.f;
 		for (auto codepoint : codepoints)
 		{
 			auto& glyphDesc = rasterizedFont.codePointAndHeightToGlyph[U32(codepoint) | (U64(uHeight) << 32)];
-			auto ar = PresentSurface::GetAspectRation();
+			auto ar = PresentSurface::GetAspectRatio();
 
 			F32 x0 = PresentSurface::PixelsToUnits(glyphDesc.xOffset0);
 			F32 y0 = PresentSurface::PixelsToUnits(glyphDesc.yOffset0) * ar;
