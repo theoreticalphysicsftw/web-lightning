@@ -166,7 +166,10 @@ namespace WL
 		atlas->Allocate(EFormat::A8, CDefaultAtlasSize, CDefaultAtlasSize, 1);
 		atlas->InitData(bitmapData);
 
-		availableAtlases.insert(fontIndex | (fontHeight << 16));
+
+		auto atlasIdx = fontIndex | (fontHeight << 16);
+		availableAtlases.insert(atlasIdx);
+		fonts[fontIndex].heightToAtlas[fontHeight] = atlas;
 
 		Deallocate(bitmapData);
 	}
